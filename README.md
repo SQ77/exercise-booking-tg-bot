@@ -1,4 +1,6 @@
-# Exercise Studio Telegram Booking Bot
+# Telegram Bot Link [@studios_schedule_checker_bot](https://t.me/studios_schedule_checker_bot) ![Uptime Status](https://img.shields.io/uptimerobot/status/m798833895-8d770d3a02f7cd0eae64a49b)
+
+Special thanks to [@SQ77](https://github.com/SQ77) for helping with the deployment 🥳
 
 ## Overview
 
@@ -16,7 +18,13 @@ _Note: Screenshots are not updated to show support for all studios. Usage for di
 
 ## Prerequisites
 
-To be able to run the bot, you will need to get a **bot token**. FreeCodeCamp has a nice guide [here](https://www.freecodecamp.org/news/how-to-create-a-telegram-bot-using-python/) that was used as a reference for this project.
+### Environment Variables to set
+
+- BOT_TOKEN
+  - To be able to run the bot, you will need to get a bot token from @botfather. FreeCodeCamp has a nice guide [here](https://www.freecodecamp.org/news/how-to-create-a-telegram-bot-using-python/) that was used as a reference for this project.
+- BOOKING_BOT_REV_SECURITY_TOKEN
+  - Requests to Hapana (used by Revolution) requires a security token that can be attained by inspecting a request on your browser under the headers.\
+  ![image](https://github.com/user-attachments/assets/deba27e8-e3ec-4449-82f5-999d15c0a6d4)
 
 ## Usage (Normal Mode)
 

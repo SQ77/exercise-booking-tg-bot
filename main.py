@@ -20,55 +20,55 @@ from common.data_types import ResultData, StudioLocation
 from rev.rev import get_rev_schedule_and_instructorid_map
 from server import start_server, ping_dummy_server
 
-@global_variables.BOT.message_handler(commands=['start'])
+@global_variables.BOT.message_handler(commands=["start"])
 def start_handler(message: telebot.types.Message) -> None:
-  global_variables.HISTORY_HANDLER.add(int(time.time()), message.from_user.id, message.chat.id, message.from_user.username, message.from_user.first_name, message.from_user.last_name, 'start')
-  global_variables.USER_MANAGER.reset_query_data(message.from_user.id, message.chat.id)
-  global_variables.USER_MANAGER.reset_button_data(message.from_user.id, message.chat.id)
-  menu.main_page_handler.main_page_handler(message.from_user.id, message)
+  global_variables.HISTORY_HANDLER.add(int(time.time()), message.from_user.id, message.chat.id, message.from_user.username, message.from_user.first_name, message.from_user.last_name, "start")
+  global_variables.CHAT_MANAGER.reset_query_and_messages_to_edit_data(message.chat.id)
+  global_variables.CHAT_MANAGER.add_message_id_to_delete(message.chat.id, message.id)
+  menu.main_page_handler.main_page_handler(message)
 
 def update_cached_result_data() -> None:
   def _get_absolute_schedule(mutex, updated_cached_result_data):
     absolute_schedule, global_variables.ABSOLUTE_INSTRUCTORID_MAP = get_absolute_schedule_and_instructorid_map()
-    global_variables.ABSOLUTE_INSTRUCTOR_NAMES = [instructor.lower() for instructor in list(global_variables.ABSOLUTE_INSTRUCTORID_MAP)]
+    global_variables.ABSOLUTE_INSTRUCTOR_NAMES = sorted([instructor.lower() for instructor in list(global_variables.ABSOLUTE_INSTRUCTORID_MAP)])
     with mutex:
       updated_cached_result_data += absolute_schedule
 
   def _get_ally_schedule(mutex, updated_cached_result_data):
     ally_schedule, global_variables.ALLY_INSTRUCTORID_MAP = get_ally_schedule_and_instructorid_map()
-    global_variables.ALLY_INSTRUCTOR_NAMES = [instructor.lower() for instructor in list(global_variables.ALLY_INSTRUCTORID_MAP)]
+    global_variables.ALLY_INSTRUCTOR_NAMES = sorted([instructor.lower() for instructor in list(global_variables.ALLY_INSTRUCTORID_MAP)])
     with mutex:
       updated_cached_result_data += ally_schedule
 
   def _get_anarchy_schedule(mutex, updated_cached_result_data):
     anarchy_schedule, global_variables.ANARCHY_INSTRUCTORID_MAP = get_anarchy_schedule_and_instructorid_map()
-    global_variables.ANARCHY_INSTRUCTOR_NAMES = [instructor.lower() for instructor in list(global_variables.ANARCHY_INSTRUCTORID_MAP)]
+    global_variables.ANARCHY_INSTRUCTOR_NAMES = sorted([instructor.lower() for instructor in list(global_variables.ANARCHY_INSTRUCTORID_MAP)])
     with mutex:
       updated_cached_result_data += anarchy_schedule
 
   def _get_barrys_schedule(mutex, updated_cached_result_data):
     barrys_schedule, global_variables.BARRYS_INSTRUCTORID_MAP = get_barrys_schedule_and_instructorid_map()
-    global_variables.BARRYS_INSTRUCTOR_NAMES = [instructor.lower() for instructor in list(global_variables.BARRYS_INSTRUCTORID_MAP)]
+    global_variables.BARRYS_INSTRUCTOR_NAMES = sorted([instructor.lower() for instructor in list(global_variables.BARRYS_INSTRUCTORID_MAP)])
     with mutex:
       updated_cached_result_data += barrys_schedule
 
   def _get_rev_schedule(mutex, updated_cached_result_data):
     rev_schedule, global_variables.REV_INSTRUCTORID_MAP = get_rev_schedule_and_instructorid_map()
-    global_variables.REV_INSTRUCTOR_NAMES = [instructor.lower() for instructor in list(global_variables.REV_INSTRUCTORID_MAP)]
+    global_variables.REV_INSTRUCTOR_NAMES = sorted([instructor.lower() for instructor in list(global_variables.REV_INSTRUCTORID_MAP)])
     with mutex:
       updated_cached_result_data += rev_schedule
 
-  global_variables.LOGGER.info('Updating cached result data...')
+  global_variables.LOGGER.info("Updating cached result data...")
   updated_cached_result_data = ResultData()
   mutex = threading.Lock()
 
   threads = []
   for func, name in [
-    (_get_absolute_schedule, 'absolute_thread'),
-    (_get_ally_schedule, 'ally_thread'),
-    (_get_anarchy_schedule, 'anarchy_thread'),
-    (_get_barrys_schedule, 'barrys_thread'),
-    (_get_rev_schedule, 'rev_thread')
+    (_get_absolute_schedule, "absolute_thread"),
+    (_get_ally_schedule, "ally_thread"),
+    (_get_anarchy_schedule, "anarchy_thread"),
+    (_get_barrys_schedule, "barrys_thread"),
+    (_get_rev_schedule, "rev_thread")
   ]:
     thread = threading.Thread(target=func, name=name, args=(mutex, updated_cached_result_data,))
     threads.append(thread)
@@ -78,11 +78,11 @@ def update_cached_result_data() -> None:
     thread.join()
 
   global_variables.CACHED_RESULT_DATA = updated_cached_result_data
-  global_variables.LOGGER.info('Successfully updated cached result data!')
+  global_variables.LOGGER.info("Successfully updated cached result data!")
 
 def schedule_update_cached_result_data(stop_event) -> None:
   schedule.every(10).minutes.do(update_cached_result_data)
-  schedule.every(10).minutes.do(ping_dummy_server) 
+  schedule.every(10).minutes.do(ping_dummy_server)
 
   while not stop_event.is_set():
     schedule.run_pending()
@@ -108,9 +108,9 @@ if __name__ == "__main__":
   flask_thread.start()
 
   # Get current schedule and store in cache
-  global_variables.LOGGER.info('Starting bot...')
+  global_variables.LOGGER.info("Starting bot...")
   update_cached_result_data()
-  global_variables.LOGGER.info('Bot started!')
+  global_variables.LOGGER.info("Bot started!")
 
   # Start bot polling in a separate thread
   bot_polling_thread = threading.Thread(target=start_bot_polling, daemon=True)

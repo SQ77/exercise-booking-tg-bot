@@ -1,25 +1,27 @@
 import logging
 import os
 import telebot
+from chat_manager import ChatManager
 from common.data_types import ResultData
+from keyboard_manager import KeyboardManager
 from history_handler import HistoryHandler
-from user_manager import UserManager
 
 # Global variables
 LOGGER = logging.getLogger(__name__)
 logging.basicConfig(
-  format='%(asctime)s %(filename)s:%(lineno)d [%(levelname)-1s] %(message)s',
+  format="%(asctime)s %(filename)s:%(lineno)d [%(levelname)-1s] %(message)s",
   level=logging.INFO,
-  datefmt='%d-%m-%Y %H:%M:%S')
+  datefmt="%d-%m-%Y %H:%M:%S")
 
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
 BOT = telebot.TeleBot(BOT_TOKEN)
-START_COMMAND = telebot.types.BotCommand(command='start', description='Check schedules')
-NERD_COMMAND = telebot.types.BotCommand(command='nerd', description='Nerd mode')
-INSTRUCTORS_COMMAND = telebot.types.BotCommand(command='instructors', description='Show list of instructors')
+START_COMMAND = telebot.types.BotCommand(command="start", description="Check schedules")
+NERD_COMMAND = telebot.types.BotCommand(command="nerd", description="Nerd mode")
+INSTRUCTORS_COMMAND = telebot.types.BotCommand(command="instructors", description="Show list of instructors")
 BOT.set_my_commands([START_COMMAND, NERD_COMMAND, INSTRUCTORS_COMMAND])
 
-USER_MANAGER = UserManager()
+KEYBOARD_MANAGER = KeyboardManager()
+CHAT_MANAGER = ChatManager()
 CACHED_RESULT_DATA = ResultData()
 ABSOLUTE_INSTRUCTORID_MAP = {}
 ABSOLUTE_INSTRUCTOR_NAMES = []
