@@ -44,6 +44,7 @@ def instructors_message_handler(
 def instructors_selection_callback_query_handler(
   query: telebot.types.CallbackQuery,
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
 ) -> None:
   """
   Handles the callback query when the step to select instructors is triggered.
@@ -51,13 +52,15 @@ def instructors_selection_callback_query_handler(
   Args:
     - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
   """
   query_data_dict = eval(query.data)
-  instructors_selection_handler(message=query.message, chat_manager=chat_manager)
+  instructors_selection_handler(message=query.message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
 
 def show_instructors_callback_query_handler(
   query: telebot.types.CallbackQuery,
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
   studios_manager: "StudiosManager",
 ) -> None:
   """
@@ -66,6 +69,7 @@ def show_instructors_callback_query_handler(
   Args:
     - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
     - studios_manager (StudiosManager): The manager handling studio data.
   """
   query_data = chat_manager.get_query_data(chat_id=query.message.chat.id)
@@ -84,11 +88,12 @@ def show_instructors_callback_query_handler(
     text += "*Anarchy Instructors:* " + ", ".join(studios_manager["Anarchy"].instructor_names) + "\n\n"
 
   chat_manager.send_prompt(chat_id=query.message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
-  instructors_selection_handler(message=query.message, chat_manager=chat_manager)
+  instructors_selection_handler(message=query.message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
 
 def rev_instructors_callback_query_handler(
   query: telebot.types.CallbackQuery,
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
   bot: telebot.TeleBot,
   instructorid_map: dict[str, int],
 ) -> None:
@@ -98,6 +103,7 @@ def rev_instructors_callback_query_handler(
   Args:
     - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
     - bot (telebot.TeleBot): The instance of the Telegram bot.
     - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
   """
@@ -115,13 +121,15 @@ def rev_instructors_callback_query_handler(
   bot.register_next_step_handler(
     message=sent_msg,
     callback=instructors_input_handler,
-    instructorid_map=instructorid_map,
     chat_manager=chat_manager,
+    keyboard_manager=keyboard_manager,
+    instructorid_map=instructorid_map,
   )
 
 def barrys_instructors_callback_query_handler(
   query: telebot.types.CallbackQuery,
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
   bot: telebot.TeleBot,
   instructorid_map: dict[str, int],
 ) -> None:
@@ -131,6 +139,7 @@ def barrys_instructors_callback_query_handler(
   Args:
     - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
     - bot (telebot.TeleBot): The instance of the Telegram bot.
     - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
   """
@@ -145,13 +154,15 @@ def barrys_instructors_callback_query_handler(
   bot.register_next_step_handler(
     message=sent_msg,
     callback=instructors_input_handler,
-    instructorid_map=instructorid_map,
     chat_manager=chat_manager,
+    keyboard_manager=keyboard_manager,
+    instructorid_map=instructorid_map,
   )
 
 def absolute_spin_instructors_callback_query_handler(
   query: telebot.types.CallbackQuery,
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
   bot: telebot.TeleBot,
   instructorid_map: dict[str, int],
 ) -> None:
@@ -161,6 +172,7 @@ def absolute_spin_instructors_callback_query_handler(
   Args:
     - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
     - bot (telebot.TeleBot): The instance of the Telegram bot.
     - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
   """
@@ -175,13 +187,15 @@ def absolute_spin_instructors_callback_query_handler(
   bot.register_next_step_handler(
     message=sent_msg,
     callback=instructors_input_handler,
-    instructorid_map=instructorid_map,
     chat_manager=chat_manager,
+    keyboard_manager=keyboard_manager,
+    instructorid_map=instructorid_map,
   )
 
 def absolute_pilates_instructors_callback_query_handler(
   query: telebot.types.CallbackQuery,
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
   bot: telebot.TeleBot,
   instructorid_map: dict[str, int],
 ) -> None:
@@ -191,6 +205,7 @@ def absolute_pilates_instructors_callback_query_handler(
   Args:
     - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
     - bot (telebot.TeleBot): The instance of the Telegram bot.
     - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
   """
@@ -211,13 +226,15 @@ def absolute_pilates_instructors_callback_query_handler(
   bot.register_next_step_handler(
     message=sent_msg,
     callback=instructors_input_handler,
-    instructorid_map=instructorid_map,
     chat_manager=chat_manager,
+    keyboard_manager=keyboard_manager,
+    instructorid_map=instructorid_map,
   )
 
 def ally_spin_instructors_callback_query_handler(
   query: telebot.types.CallbackQuery,
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
   bot: telebot.TeleBot,
   instructorid_map: dict[str, int],
 ) -> None:
@@ -227,6 +244,7 @@ def ally_spin_instructors_callback_query_handler(
   Args:
     - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
     - bot (telebot.TeleBot): The instance of the Telegram bot.
     - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
   """
@@ -244,13 +262,15 @@ def ally_spin_instructors_callback_query_handler(
   bot.register_next_step_handler(
     message=sent_msg,
     callback=instructors_input_handler,
-    instructorid_map=instructorid_map,
     chat_manager=chat_manager,
+    keyboard_manager=keyboard_manager,
+    instructorid_map=instructorid_map,
   )
 
 def ally_pilates_instructors_callback_query_handler(
   query: telebot.types.CallbackQuery,
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
   bot: telebot.TeleBot,
   instructorid_map: dict[str, int],
 ) -> None:
@@ -260,6 +280,7 @@ def ally_pilates_instructors_callback_query_handler(
   Args:
     - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
     - bot (telebot.TeleBot): The instance of the Telegram bot.
     - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
   """
@@ -277,13 +298,15 @@ def ally_pilates_instructors_callback_query_handler(
   bot.register_next_step_handler(
     message=sent_msg,
     callback=instructors_input_handler,
-    instructorid_map=instructorid_map,
     chat_manager=chat_manager,
+    keyboard_manager=keyboard_manager,
+    instructorid_map=instructorid_map,
   )
 
 def anarchy_instructors_callback_query_handler(
   query: telebot.types.CallbackQuery,
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
   bot: telebot.TeleBot,
   instructorid_map: dict[str, int],
 ) -> None:
@@ -293,6 +316,7 @@ def anarchy_instructors_callback_query_handler(
   Args:
     - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
     - bot (telebot.TeleBot): The instance of the Telegram bot.
     - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
   """
@@ -310,22 +334,25 @@ def anarchy_instructors_callback_query_handler(
   bot.register_next_step_handler(
     message=sent_msg,
     callback=instructors_input_handler,
-    instructorid_map=instructorid_map,
     chat_manager=chat_manager,
+    keyboard_manager=keyboard_manager,
+    instructorid_map=instructorid_map,
   )
 
 def instructors_input_handler(
   message: telebot.types.Message,
-  instructorid_map: dict[str, int],
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
+  instructorid_map: dict[str, int],
 ) -> None:
   """
   Handles user input for instructor names, validating them against the instructor map.
 
   Args:
     - message (telebot.types.Message): The message object containing user interaction data.
-    - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
+    - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
   """
   query_data = chat_manager.get_query_data(chat_id=message.chat.id)
   updated_instructors_list = [x.strip() for x in message.text.lower().split(",")]
@@ -359,79 +386,34 @@ def instructors_input_handler(
     if len(updated_instructors_list) > 0:
       query_data.studios[query_data.current_studio].instructors = updated_instructors_list
 
-  instructors_selection_handler(message=message, chat_manager=chat_manager)
+  instructors_selection_handler(message=message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
 
-def instructors_selection_handler(message: telebot.types.Message, chat_manager: "ChatManager") -> None:
+def instructors_selection_handler(
+  message: telebot.types.Message,
+  chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
+) -> None:
   """
   Displays the instructors selection prompt.
 
   Args:
     - message (telebot.types.Message): The message object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
   """
   query_data = chat_manager.get_query_data(chat_id=message.chat.id)
   if len(query_data.studios) == 0:
     text = "No studio selected. Please select a studio first"
     chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
-    main_page_handler(message=message, chat_manager=chat_manager)
+    main_page_handler(message=message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
     return
 
   text = "*Currently selected instructor(s)*\n"
   text += query_data.get_query_str(include_instructors=True)
 
-  keyboard = telebot.types.InlineKeyboardMarkup()
-  if StudioType.Rev in query_data.studios:
-    rev_instructors_button = telebot.types.InlineKeyboardButton(
-      text="Enter Rev Instructor(s)",
-      callback_data="{'step': 'rev-instructors'}",
-    )
-    keyboard.add(rev_instructors_button)
-  if StudioType.Barrys in query_data.studios:
-    barrys_instructors_button = telebot.types.InlineKeyboardButton(
-      text="Enter Barrys Instructor(s)",
-      callback_data="{'step': 'barrys-instructors'}",
-    )
-    keyboard.add(barrys_instructors_button)
-  if StudioType.AbsoluteSpin in query_data.studios:
-    absolute_spin_instructors_button = telebot.types.InlineKeyboardButton(
-      text="Enter Absolute (Spin) Instructor(s)",
-      callback_data="{'step': 'absolute-spin-instructors'}",
-    )
-    keyboard.add(absolute_spin_instructors_button)
-  if StudioType.AbsolutePilates in query_data.studios:
-    absolute_pilates_instructors_button = telebot.types.InlineKeyboardButton(
-      text="Enter Absolute (Pilates) Instructor(s)",
-      callback_data="{'step': 'absolute-pilates-instructors'}",
-    )
-    keyboard.add(absolute_pilates_instructors_button)
-  if StudioType.AllySpin in query_data.studios:
-    ally_spin_instructors_button = telebot.types.InlineKeyboardButton(
-      text="Enter Ally (Spin) Instructor(s)",
-      callback_data="{'step': 'ally-spin-instructors'}",
-    )
-    keyboard.add(ally_spin_instructors_button)
-  if StudioType.AllyPilates in query_data.studios:
-    ally_pilates_instructors_button = telebot.types.InlineKeyboardButton(
-      text="Enter Ally (Pilates) Instructor(s)",
-      callback_data="{'step': 'ally-pilates-instructors'}",
-    )
-    keyboard.add(ally_pilates_instructors_button)
-  if StudioType.Anarchy in query_data.studios:
-    anarchy_instructors_button = telebot.types.InlineKeyboardButton(
-      text="Enter Anarchy Instructor(s)",
-      callback_data="{'step': 'anarchy-instructors'}",
-    )
-    keyboard.add(anarchy_instructors_button)
-
-  show_instructors_button = telebot.types.InlineKeyboardButton(
-    text="Show Names of Instructors",
-    callback_data="{'step': 'show-instructors'}",
+  chat_manager.send_prompt(
+    chat_id=message.chat.id,
+    text=text,
+    reply_markup=keyboard_manager.get_instructors_keyboard(query=query_data),
+    delete_sent_msg_in_future=True,
   )
-  next_button = telebot.types.InlineKeyboardButton(
-    text="Next ▶️",
-    callback_data="{'step': 'main-page-handler'}",
-  )
-  keyboard.add(show_instructors_button)
-  keyboard.add(next_button)
-
-  chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=keyboard, delete_sent_msg_in_future=True)

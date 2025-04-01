@@ -9,6 +9,7 @@ from menu.main_page_handler import main_page_handler
 def get_schedule_callback_query_handler(
   query: "telebot.types.CallbackQuery",
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
   full_result_data: "ResultData",
 ) -> None:
   """
@@ -18,6 +19,7 @@ def get_schedule_callback_query_handler(
   Args:
     - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
     - full_result_data (ResultData): The schedule data of all the available classes.
   """
   query_data = chat_manager.get_query_data(chat_id=query.message.chat.id)
@@ -29,7 +31,7 @@ def get_schedule_callback_query_handler(
       reply_markup=None,
       delete_sent_msg_in_future=False,
     )
-    main_page_handler(message=query.message, chat_manager=chat_manager)
+    main_page_handler(message=query.message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
     return
 
   if len(query_data.days) == 0:
@@ -40,7 +42,7 @@ def get_schedule_callback_query_handler(
       reply_markup=None,
       delete_sent_msg_in_future=False,
     )
-    main_page_handler(message=query.message, chat_manager=chat_manager)
+    main_page_handler(message=query.message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
     return
 
   send_results(query=query, chat_manager=chat_manager, full_result_data=full_result_data)

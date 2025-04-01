@@ -33,7 +33,9 @@ class ChatManager:
     """
 
     def __init__(self) -> None:
-      """Initializes the MessagesToEdit instance with None values."""
+      """
+      Initializes the MessagesToEdit instance with None values.
+      """
       self.days_selection_message = None
       self.studios_selection_message = None
       self.locations_selection_message = None
@@ -236,7 +238,7 @@ class ChatManager:
     Args:
       - chat_id (int): The ID of the chat to send the prompt to.
       - text (str): The message to send to the chat.
-      - reply_markup (telebot.types.InlineKeyboardMarkup): The inline keyboard markup.
+      - reply_markup (telebot.types.InlineKeyboardMarkup | None): The reply markup to use.
       - delete_sent_msg_in_future (bool):
         True if the message should be deleted on the next call to send_prompt, false otherwise.
 

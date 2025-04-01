@@ -6,59 +6,51 @@ Description: This file defines callback queries related to entering time filters
 import telebot
 from datetime import datetime
 
-def time_selection_callback_query_handler(query: telebot.types.CallbackQuery, chat_manager: "ChatManager") -> None:
+def time_selection_callback_query_handler(
+  query: telebot.types.CallbackQuery,
+  chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
+) -> None:
   """
   Handles the callback query when the step to enter a time filter is triggered.
 
   Args:
     - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
   """
-  time_selection_handler(query.message, chat_manager)
+  time_selection_handler(message=query.message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
 
-def time_selection_handler(message: telebot.types.Message, chat_manager: "ChatManager") -> None:
+def time_selection_handler(
+  message: telebot.types.Message,
+  chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
+) -> None:
   """
   Displays the current time filters and provides options to add, remove, or reset the filters.
 
   Args:
     - message (telebot.types.Message): The message object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
   """
   query_data = chat_manager.get_query_data(chat_id=message.chat.id)
   text = "*Currently selected timings(s)*\n"
   text += query_data.get_query_str(include_time=True)
 
-  keyboard = telebot.types.InlineKeyboardMarkup()
-  add_timeslot_button = telebot.types.InlineKeyboardButton(
-    text="Add Timeslot",
-    callback_data="{'step': 'time-selection-add'}",
+  chat_manager.send_prompt(
+    chat_id=message.chat.id,
+    text=text,
+    reply_markup=keyboard_manager.get_timeslot_filter_keyboard(),
+    delete_sent_msg_in_future=True,
   )
-  remove_timeslot_button = telebot.types.InlineKeyboardButton(
-    text="Remove Timeslot",
-    callback_data="{'step': 'time-selection-remove'}",
-  )
-  reset_all_timeslot_button = telebot.types.InlineKeyboardButton(
-    text="Reset All Timeslot(s)",
-    callback_data="{'step': 'time-selection-reset'}",
-  )
-  next_button = telebot.types.InlineKeyboardButton(
-    text="Next ▶️",
-    callback_data="{'step': 'main-page-handler'}",
-  )
-
-  keyboard = telebot.types.InlineKeyboardMarkup()
-  keyboard.add(add_timeslot_button)
-  keyboard.add(remove_timeslot_button)
-  keyboard.add(reset_all_timeslot_button)
-  keyboard.add(next_button)
-
-  chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=keyboard, delete_sent_msg_in_future=True)
 
 def time_selection_add_callback_query_handler(
   query: telebot.types.CallbackQuery,
   logger: "logging.Logger",
   bot: "telebot.TeleBot",
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
 ) -> None:
   """
   Handles the callback query when the step to add a time filter is triggered.
@@ -68,14 +60,22 @@ def time_selection_add_callback_query_handler(
     - logger (logging.Logger): Logger for logging messages.
     - bot (telebot.TeleBot): The instance of the Telegram bot.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
   """
-  start_time_selection_handler(query.message, logger, bot, chat_manager)
+  start_time_selection_handler(
+    message=query.message,
+    logger=logger,
+    bot=bot,
+    chat_manager=chat_manager,
+    keyboard_manager=keyboard_manager,
+  )
 
 def start_time_selection_handler(
   message: telebot.types.Message,
   logger: "logging.Logger",
   bot: "telebot.TeleBot",
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
 ) -> None:
   """
   Initiates the process of setting a time filter by prompting the user for input.
@@ -85,6 +85,7 @@ def start_time_selection_handler(
     - logger (logging.Logger): Logger for logging messages.
     - bot (telebot.TeleBot): The instance of the Telegram bot.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
   """
   text = "Enter range of timeslot to check\ne.g. *0700-0830*"
   sent_msg = chat_manager.send_prompt(
@@ -98,12 +99,14 @@ def start_time_selection_handler(
     callback=timeslot_input_handler,
     logger=logger,
     chat_manager=chat_manager,
+    keyboard_manager=keyboard_manager,
   )
 
 def timeslot_input_handler(
   message: telebot.types.Message,
   logger: "logging.Logger",
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
 ) -> None:
   """
   Processes the user's input for a timeslot.
@@ -112,6 +115,7 @@ def timeslot_input_handler(
     - message (telebot.types.Message): The message object containing user interaction data.
     - logger (logging.Logger): Logger for logging messages.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
   """
   try:
     message_without_whitespace = "".join(message.text.split())
@@ -134,7 +138,7 @@ def timeslot_input_handler(
     logger.warning(f"Invalid time '{message.text}' entered: {str(e)}")
     text = f"Invalid timeslot range '{message.text}' entered"
     chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
-    time_selection_handler(message, chat_manager)
+    time_selection_handler(message=message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
     return
 
   if end_time < start_time:
@@ -143,7 +147,7 @@ def timeslot_input_handler(
       f"Start time: {start_time.strftime('%H%M')}, End time: {end_time.strftime('%H%M')}"
     )
     chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
-    time_selection_handler(message, chat_manager)
+    time_selection_handler(message=message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
     return
 
   query_data = chat_manager.get_query_data(chat_id=message.chat.id)
@@ -176,7 +180,7 @@ def timeslot_input_handler(
       f"'{conflicting_start_time_str} - {conflicting_end_time_str}'"
     )
     chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
-    time_selection_handler(message, chat_manager)
+    time_selection_handler(message=message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
     return
 
   # End time should be less than or equal to existing start time or greater than existing end time
@@ -200,7 +204,7 @@ def timeslot_input_handler(
           f"'{conflicting_start_time_str} - {conflicting_end_time_str}'"
         )
         chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
-        time_selection_handler(message, chat_manager)
+        time_selection_handler(message=message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
         return
 
   if not is_valid_end_time:
@@ -209,16 +213,17 @@ def timeslot_input_handler(
       f"'{conflicting_start_time_str} - {conflicting_end_time_str}'"
     )
     chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
-    time_selection_handler(message, chat_manager)
+    time_selection_handler(message=message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
     return
 
   query_data.start_times.append((start_time, end_time))
   query_data.start_times = sorted(query_data.start_times)
-  time_selection_handler(message, chat_manager)
+  time_selection_handler(message=message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
 
 def time_selection_remove_callback_query_handler(
   query: telebot.types.CallbackQuery,
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
 ) -> None:
   """
   Handles the callback query when the step to remove a time filter is triggered.
@@ -226,22 +231,28 @@ def time_selection_remove_callback_query_handler(
   Args:
     - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
   """
-  time_selection_remove_handler(query.message, chat_manager)
+  time_selection_remove_handler(message=query.message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
 
-def time_selection_remove_handler(message: telebot.types.Message, chat_manager: "ChatManager") -> None:
+def time_selection_remove_handler(
+  message: telebot.types.Message,
+  chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
+) -> None:
   """
   Handles the callback query when the step to remove a time filter is triggered.
 
   Args:
     - message (telebot.types.Message): The message object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
   """
   query_data = chat_manager.get_query_data(chat_id=message.chat.id)
   if len(query_data.start_times) == 0:
     text = "No timeslot to remove"
     chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
-    time_selection_handler(message, chat_manager)
+    time_selection_handler(message=message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
   else:
     text = "*Select timeslot to remove*"
     keyboard = telebot.types.InlineKeyboardMarkup()
@@ -266,6 +277,7 @@ def time_selection_remove_handler(message: telebot.types.Message, chat_manager: 
 def time_selection_remove_timeslot_callback_query_handler(
   query: telebot.types.CallbackQuery,
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
 ) -> None:
   """
   Handles the callback query when the step to remove a timeslot is triggered.
@@ -273,16 +285,18 @@ def time_selection_remove_timeslot_callback_query_handler(
   Args:
     - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
   """
   start_time = eval(query.data)["start"]
   end_time = eval(query.data)["end"]
   query_data = chat_manager.get_query_data(chat_id=query.message.chat.id)
   query_data.start_times.remove((datetime.strptime(start_time, "%H%M"), datetime.strptime(end_time, "%H%M")))
-  time_selection_handler(query.message, chat_manager)
+  time_selection_handler(message=query.message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
 
 def time_selection_reset_callback_query_handler(
   query: telebot.types.CallbackQuery,
   chat_manager: "ChatManager",
+  keyboard_manager: "KeyboardManager",
 ) -> None:
   """
   Handles the callback query when the step to reset the timeslot filter triggered.
@@ -290,7 +304,8 @@ def time_selection_reset_callback_query_handler(
   Args:
     - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
   """
   query_data = chat_manager.get_query_data(chat_id=query.message.chat.id)
   query_data.start_times = []
-  time_selection_handler(query.message, chat_manager)
+  time_selection_handler(message=query.message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)

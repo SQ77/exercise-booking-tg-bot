@@ -116,4 +116,4 @@ def days_next_callback_query_handler(
     days_selection_handler(message=query.message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
     return
 
-  main_page_handler(message=query.message, chat_manager=chat_manager)
+  main_page_handler(message=query.message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)

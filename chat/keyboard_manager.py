@@ -15,9 +15,9 @@ class KeyboardManager:
   This class handles query data, messages to be edited or deleted, and communication with users.
 
   Attributes:
+    - main_page_keyboard (telebot.types.InlineKeyboardMarkup): Keyboard used for the main page.
     - studios_select_all_button (telebot.types.InlineKeyboardButton): Button for selecting all studios.
     - studios_unselect_all_button (telebot.types.InlineKeyboardButton): Button for unselecting all studios.
-    - studios_next_button (telebot.types.InlineKeyboardButton): Button for going to the next page from studios page.
     - studios_buttons_unselected_map (dict[str, telebot.types.InlineKeyboardButton]):
       Dictionary of studios and unselected button for the studio.
     - studios_buttons_selected_map (dict[str, telebot.types.InlineKeyboardButton]):
@@ -26,12 +26,24 @@ class KeyboardManager:
     - locations_unselect_all_button (telebot.types.InlineKeyboardButton): Button for unselecting all locations
     - locations_select_more_studios_button (telebot.types.InlineKeyboardButton):
       Button for going back to studios selection from locations page.
-    - locations_next_button (telebot.types.InlineKeyboardButton):
-      Button for going to the next page from locations page.
     - studios_locations_buttons_unselected_map (dict[str, dict[str, telebot.types.InlineKeyboardButton]]):
       Dictionary of studios and dictionary of locations and unselected button for the location.
     - studios_locations_buttons_selected_map (dict[str, dict[str, telebot.types.InlineKeyboardButton]]):
       Dictionary of studios and dictionary of locations and selected button for the location.
+    - rev_instructors_button (telebot.types.InlineKeyboardButton): Button to enter instructors for Rev.
+    - barrys_instructors_button (telebot.types.InlineKeyboardButton): Button to enter instructors for Barrys.
+    - absolute_spin_instructors_button (telebot.types.InlineKeyboardButton):
+      Button to enter instructors for Absolute (Spin).
+    - absolute_pilates_instructors_button (telebot.types.InlineKeyboardButton):
+      Button to enter instructors for Absolute (Pilates).
+    - ally_spin_instructors_button (telebot.types.InlineKeyboardButton):
+      Button to enter instructors for Ally (Spin).
+    - ally_pilates_instructors_button (telebot.types.InlineKeyboardButton):
+      Button to enter instructors for Ally (Pilates).
+    - anarchy_instructors_button (telebot.types.InlineKeyboardButton): Button to enter instructors for Anarchy.
+    - show_instructors_button (telebot.types.InlineKeyboardButton): Button to show names of instructors.
+    - next_button_to_main_page (telebot.types.InlineKeyboardButton): Next button to go to the main page.
+    - weeks_page_keyboard (telebot.types.InlineKeyboardMarkup): Keyboard used for the weeks page.
     - days_select_all_button (telebot.types.InlineKeyboardButton): Button for selecting all days.
     - days_unselect_all_button (telebot.types.InlineKeyboardButton): Button for unselecting all days.
     - days_next_button (telebot.types.InlineKeyboardButton): Button for going to the next page from studios page.
@@ -39,10 +51,50 @@ class KeyboardManager:
       Dictionary of days and unselected button for the day.
     - days_buttons_selected_map (dict[str, telebot.types.InlineKeyboardButton]):
       Dictionary of days and selected button for the day.
+    - timeslot_filter_keyboard (telebot.types.InlineKeyboardMarkup): Keyboard used for the timeslot filter page.
+    - class_name_filter_keyboard (telebot.types.InlineKeyboardMarkup): Keyboard used for the class name filter page.
   """
 
   def __init__(self) -> None:
-    """Initializes the KeyboardManager instance."""
+    """
+    Initializes the KeyboardManager instance.
+    """
+
+    # Initialize main page keyboard
+    studios_button = telebot.types.InlineKeyboardButton(
+      text="Studios",
+      callback_data="{'step': 'studios-selection'}",
+    )
+    instructors_button = telebot.types.InlineKeyboardButton(
+      text="Instructors",
+      callback_data="{'step': 'instructors-selection'}",
+    )
+    weeks_button = telebot.types.InlineKeyboardButton(
+      text="Weeks",
+      callback_data="{'step': 'weeks-selection'}",
+    )
+    days_button = telebot.types.InlineKeyboardButton(
+      text="Days",
+      callback_data="{'step': 'days-selection'}",
+    )
+    time_button = telebot.types.InlineKeyboardButton(
+      text="Time",
+      callback_data="{'step': 'time-selection'}",
+    )
+    class_name_button = telebot.types.InlineKeyboardButton(
+      text="Class Name",
+      callback_data="{'step': 'class-name-filter-selection'}",
+    )
+    get_schedule_button = telebot.types.InlineKeyboardButton(
+      text="Get Schedule ▶️",
+      callback_data="{'step': 'get-schedule'}",
+    )
+
+    self.main_page_keyboard = telebot.types.InlineKeyboardMarkup()
+    self.main_page_keyboard.add(studios_button, instructors_button)
+    self.main_page_keyboard.add(weeks_button, days_button)
+    self.main_page_keyboard.add(time_button, class_name_button)
+    self.main_page_keyboard.add(get_schedule_button)
 
     # Initialize studios buttons
     self.studios_select_all_button = telebot.types.InlineKeyboardButton(
@@ -52,10 +104,6 @@ class KeyboardManager:
     self.studios_unselect_all_button = telebot.types.InlineKeyboardButton(
       text="Unselect All",
       callback_data="{'studios': 'Null', 'step': 'studios'}",
-    )
-    self.studios_next_button = telebot.types.InlineKeyboardButton(
-      text="Next ▶️",
-      callback_data="{'step': 'main-page-handler'}",
     )
     self.studios_buttons_unselected_map = {
       "Rev": telebot.types.InlineKeyboardButton(
@@ -138,10 +186,6 @@ class KeyboardManager:
     self.locations_select_more_studios_button = telebot.types.InlineKeyboardButton(
       text="◀️ Select More",
       callback_data="{'step': 'studios-selection'}",
-    )
-    self.locations_next_button = telebot.types.InlineKeyboardButton(
-      text="Next ▶️",
-      callback_data="{'step': 'main-page-handler'}",
     )
     self.studios_locations_buttons_unselected_map = {
       "Rev": {
@@ -332,6 +376,56 @@ class KeyboardManager:
       },
     }
 
+    # Initialize instructors buttons
+    self.rev_instructors_button = telebot.types.InlineKeyboardButton(
+      text="Enter Rev Instructor(s)",
+      callback_data="{'step': 'rev-instructors'}",
+    )
+    self.barrys_instructors_button = telebot.types.InlineKeyboardButton(
+      text="Enter Barrys Instructor(s)",
+      callback_data="{'step': 'barrys-instructors'}",
+    )
+    self.absolute_spin_instructors_button = telebot.types.InlineKeyboardButton(
+      text="Enter Absolute (Spin) Instructor(s)",
+      callback_data="{'step': 'absolute-spin-instructors'}",
+    )
+    self.absolute_pilates_instructors_button = telebot.types.InlineKeyboardButton(
+      text="Enter Absolute (Pilates) Instructor(s)",
+      callback_data="{'step': 'absolute-pilates-instructors'}",
+    )
+    self.ally_spin_instructors_button = telebot.types.InlineKeyboardButton(
+      text="Enter Ally (Spin) Instructor(s)",
+      callback_data="{'step': 'ally-spin-instructors'}",
+    )
+    self.ally_pilates_instructors_button = telebot.types.InlineKeyboardButton(
+      text="Enter Ally (Pilates) Instructor(s)",
+      callback_data="{'step': 'ally-pilates-instructors'}",
+    )
+    self.anarchy_instructors_button = telebot.types.InlineKeyboardButton(
+      text="Enter Anarchy Instructor(s)",
+      callback_data="{'step': 'anarchy-instructors'}",
+    )
+    self.show_instructors_button = telebot.types.InlineKeyboardButton(
+      text="Show Names of Instructors",
+      callback_data="{'step': 'show-instructors'}",
+    )
+    self.next_button_to_main_page = telebot.types.InlineKeyboardButton(
+      text="Next ▶️",
+      callback_data="{'step': 'main-page-handler'}",
+    )
+
+    # Initialize weeks keyboard
+    one_button = telebot.types.InlineKeyboardButton(text="1", callback_data="{'weeks': 1, 'step': 'weeks'}")
+    two_button = telebot.types.InlineKeyboardButton(text="2", callback_data="{'weeks': 2, 'step': 'weeks'}")
+    three_button = telebot.types.InlineKeyboardButton(text="3", callback_data="{'weeks': 3, 'step': 'weeks'}")
+    four_button = telebot.types.InlineKeyboardButton(text="4", callback_data="{'weeks': 4, 'step': 'weeks'}")
+    back_button = telebot.types.InlineKeyboardButton(text="◀️ Back", callback_data="{'step': 'main-page-handler'}")
+
+    self.weeks_page_keyboard = telebot.types.InlineKeyboardMarkup()
+    self.weeks_page_keyboard.add(one_button, two_button)
+    self.weeks_page_keyboard.add(three_button, four_button)
+    self.weeks_page_keyboard.add(back_button)
+
     # Initialize days buttons
     self.days_select_all_button = telebot.types.InlineKeyboardButton(
       text="Select All",
@@ -406,6 +500,51 @@ class KeyboardManager:
       ),
     }
 
+    # Initialize timeslot filter keyboard
+    self.timeslot_filter_keyboard = telebot.types.InlineKeyboardMarkup()
+    add_timeslot_button = telebot.types.InlineKeyboardButton(
+      text="Add Timeslot",
+      callback_data="{'step': 'time-selection-add'}",
+    )
+    remove_timeslot_button = telebot.types.InlineKeyboardButton(
+      text="Remove Timeslot",
+      callback_data="{'step': 'time-selection-remove'}",
+    )
+    reset_all_timeslot_button = telebot.types.InlineKeyboardButton(
+      text="Reset All Timeslot(s)",
+      callback_data="{'step': 'time-selection-reset'}",
+    )
+
+    self.timeslot_filter_keyboard = telebot.types.InlineKeyboardMarkup()
+    self.timeslot_filter_keyboard.add(add_timeslot_button)
+    self.timeslot_filter_keyboard.add(remove_timeslot_button)
+    self.timeslot_filter_keyboard.add(reset_all_timeslot_button)
+    self.timeslot_filter_keyboard.add(self.next_button_to_main_page)
+
+    # Initialize class name filter keyboard
+    self.class_name_filter_keyboard = telebot.types.InlineKeyboardMarkup()
+    set_filter_button = telebot.types.InlineKeyboardButton(
+      text="Add Filter",
+      callback_data="{'step': 'class-name-filter-add'}",
+    )
+    reset_filter_button = telebot.types.InlineKeyboardButton(
+      text="Reset Filter",
+      callback_data="{'step': 'class-name-filter-reset'}",
+    )
+
+    self.class_name_filter_keyboard = telebot.types.InlineKeyboardMarkup()
+    self.class_name_filter_keyboard.add(set_filter_button, reset_filter_button)
+    self.class_name_filter_keyboard.add(self.next_button_to_main_page)
+
+  def get_main_page_keyboard(self) -> telebot.types.InlineKeyboardMarkup:
+    """
+    Returns the keyboard to be used for the main page.
+
+    Returns:
+      telebot.types.InlineKeyboardMarkup: The keyboard to be used.
+    """
+    return self.main_page_keyboard
+
   def get_studios_keyboard(self, query: "QueryData") -> telebot.types.InlineKeyboardMarkup:
     """
     Constructs the studios keyboard to be used based on the specified query.
@@ -438,7 +577,7 @@ class KeyboardManager:
     studios_keyboard.add(studio_buttons[StudioType.AllySpin], studio_buttons[StudioType.AllyPilates])
     studios_keyboard.add(studio_buttons[StudioType.AllyRecovery], studio_buttons[StudioType.Anarchy])
     studios_keyboard.add(self.studios_select_all_button, self.studios_unselect_all_button)
-    studios_keyboard.add(self.studios_next_button)
+    studios_keyboard.add(self.next_button_to_main_page)
     return studios_keyboard
 
   def get_locations_keyboard(self, query: "QueryData") -> telebot.types.InlineKeyboardMarkup:
@@ -515,8 +654,47 @@ class KeyboardManager:
       )
       locations_keyboard.add(studio_locations_buttons["Absolute (Pilates)"]["Great World"])
     locations_keyboard.add(self.locations_select_all_button, self.locations_unselect_all_button)
-    locations_keyboard.add(self.locations_select_more_studios_button, self.locations_next_button)
+    locations_keyboard.add(self.locations_select_more_studios_button, self.next_button_to_main_page)
     return locations_keyboard
+
+  def get_instructors_keyboard(self, query: "QueryData") -> telebot.types.InlineKeyboardMarkup:
+    """
+    Constructs the instructors keyboard to be used based on the specified query.
+
+    Args:
+      - query (QueryData): The query data to construct the days keyboard for.
+
+    Returns:
+      telebot.types.InlineKeyboardMarkup: The keyboard to be used.
+    """
+    instructors_keyboard = telebot.types.InlineKeyboardMarkup()
+    if StudioType.Rev in query.studios:
+      instructors_keyboard.add(self.rev_instructors_button)
+    if StudioType.Barrys in query.studios:
+      instructors_keyboard.add(self.barrys_instructors_button)
+    if StudioType.AbsoluteSpin in query.studios:
+      instructors_keyboard.add(self.absolute_spin_instructors_button)
+    if StudioType.AbsolutePilates in query.studios:
+      instructors_keyboard.add(self.absolute_pilates_instructors_button)
+    if StudioType.AllySpin in query.studios:
+      instructors_keyboard.add(self.ally_spin_instructors_button)
+    if StudioType.AllyPilates in query.studios:
+      instructors_keyboard.add(self.ally_pilates_instructors_button)
+    if StudioType.Anarchy in query.studios:
+      instructors_keyboard.add(self.anarchy_instructors_button)
+
+    instructors_keyboard.add(self.show_instructors_button)
+    instructors_keyboard.add(self.next_button_to_main_page)
+    return instructors_keyboard
+
+  def get_weeks_page_keyboard(self) -> telebot.types.InlineKeyboardMarkup:
+    """
+    Returns the keyboard to be used for the weeks page.
+
+    Returns:
+      telebot.types.InlineKeyboardMarkup: The keyboard to be used.
+    """
+    return self.weeks_page_keyboard
 
   def get_days_keyboard(self, query: "QueryData") -> telebot.types.InlineKeyboardMarkup:
     """
@@ -551,3 +729,21 @@ class KeyboardManager:
     days_keyboard.add(self.days_select_all_button, self.days_unselect_all_button)
     days_keyboard.add(self.days_next_button)
     return days_keyboard
+
+  def get_timeslot_filter_keyboard(self) -> telebot.types.InlineKeyboardMarkup:
+    """
+    Returns the keyboard to be used for the timeslot filter page.
+
+    Returns:
+      telebot.types.InlineKeyboardMarkup: The keyboard to be used.
+    """
+    return self.timeslot_filter_keyboard
+
+  def get_class_name_filter_keyboard(self) -> telebot.types.InlineKeyboardMarkup:
+    """
+    Returns the keyboard to be used for the class name filter page.
+
+    Returns:
+      telebot.types.InlineKeyboardMarkup: The keyboard to be used.
+    """
+    return self.class_name_filter_keyboard

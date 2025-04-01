@@ -73,6 +73,7 @@ class MenuManager:
       main_page_handler.main_page_handler_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "studios")
@@ -106,6 +107,7 @@ class MenuManager:
       instructors_page_handler.instructors_selection_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "show-instructors")
@@ -113,13 +115,16 @@ class MenuManager:
       instructors_page_handler.show_instructors_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
-        studios_manager=self.studios_manager)
+        keyboard_manager=self.keyboard_manager,
+        studios_manager=self.studios_manager,
+      )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "rev-instructors")
     def rev_instructors_callback_query_handler(query: "telebot.types.CallbackQuery") -> None:
       instructors_page_handler.rev_instructors_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
         bot=self.bot,
         instructorid_map=self.studios_manager["Rev"].instructorid_map,
       )
@@ -129,6 +134,7 @@ class MenuManager:
       instructors_page_handler.barrys_instructors_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
         bot=self.bot,
         instructorid_map=self.studios_manager["Barrys"].instructorid_map,
       )
@@ -138,6 +144,7 @@ class MenuManager:
       instructors_page_handler.absolute_spin_instructors_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
         bot=self.bot,
         instructorid_map=self.studios_manager["Absolute"].instructorid_map,
       )
@@ -147,6 +154,7 @@ class MenuManager:
       instructors_page_handler.absolute_pilates_instructors_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
         bot=self.bot,
         instructorid_map=self.studios_manager["Absolute"].instructorid_map,
       )
@@ -156,6 +164,7 @@ class MenuManager:
       instructors_page_handler.ally_spin_instructors_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
         bot=self.bot,
         instructorid_map=self.studios_manager["Ally"].instructorid_map,
       )
@@ -165,6 +174,7 @@ class MenuManager:
       instructors_page_handler.ally_pilates_instructors_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
         bot=self.bot,
         instructorid_map=self.studios_manager["Ally"].instructorid_map,
       )
@@ -174,6 +184,7 @@ class MenuManager:
       instructors_page_handler.anarchy_instructors_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
         bot=self.bot,
         instructorid_map=self.studios_manager["Anarchy"].instructorid_map,
       )
@@ -183,6 +194,7 @@ class MenuManager:
       weeks_page_handler.weeks_selection_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "weeks")
@@ -190,6 +202,7 @@ class MenuManager:
       weeks_page_handler.weeks_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "days")
@@ -222,6 +235,7 @@ class MenuManager:
       time_page_handler.time_selection_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "time-selection-add")
@@ -231,6 +245,7 @@ class MenuManager:
         logger=self.logger,
         bot=self.bot,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "time-selection-remove")
@@ -238,6 +253,7 @@ class MenuManager:
       time_page_handler.time_selection_remove_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "remove-timeslot")
@@ -245,6 +261,7 @@ class MenuManager:
       time_page_handler.time_selection_remove_timeslot_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "time-selection-reset")
@@ -252,6 +269,7 @@ class MenuManager:
       time_page_handler.time_selection_reset_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "class-name-filter-selection")
@@ -259,6 +277,7 @@ class MenuManager:
       name_filter_page_handler.class_name_filter_selection_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "class-name-filter-add")
@@ -267,6 +286,7 @@ class MenuManager:
         query=query,
         bot=self.bot,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "class-name-filter-reset")
@@ -274,6 +294,7 @@ class MenuManager:
       name_filter_page_handler.class_name_filter_reset_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "get-schedule")
@@ -281,6 +302,7 @@ class MenuManager:
       get_schedule_handler.get_schedule_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
         full_result_data=self.cached_result_data,
       )
 
@@ -293,6 +315,7 @@ class MenuManager:
       start_page_handler.start_message_handler(
         message=message,
         chat_manager=self.chat_manager,
+        keyboard_manager=self.keyboard_manager,
         history_manager=self.history_manager,
       )
 

@@ -40,7 +40,7 @@ class StudioManager:
     Retrieves the full schedule of the studio.
 
     Returns:
-      QueryData: The full schedule of the studio.
+      ResultData: The full schedule of the studio.
     """
     schedule, self.instructorid_map = self.get_schedule_and_instructorid_map_func(logger=self.logger)
     self.instructor_names = sorted([instructor.lower() for instructor in list(self.instructorid_map)])
