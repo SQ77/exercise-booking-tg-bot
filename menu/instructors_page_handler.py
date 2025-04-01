@@ -21,7 +21,7 @@ def instructors_message_handler(
     - message (telebot.types.Message): The message object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
     - history_manager (HistoryManager): The manager handling user history data.
-    - studios_manager (StudiosManager): The manager handling studio data.
+    - studios_manager (StudiosManager): The manager handling studios data.
   """
   history_manager.add(
     timestamp=int(time.time()),
@@ -32,11 +32,11 @@ def instructors_message_handler(
     last_name=message.from_user.last_name,
     command="instructors",
   )
-  text = "*Rev Instructors:* " + ", ".join(studios_manager["Rev"].instructor_names) + "\n\n"
-  text += "*Barrys Instructors:* " + ", ".join(studios_manager["Barrys"].instructor_names) + "\n\n"
-  text += "*Absolute Instructors:* " + ", ".join(studios_manager["Absolute"].instructor_names) + "\n\n"
-  text += "*Ally Instructors:* " + ", ".join(studios_manager["Ally"].instructor_names) + "\n\n"
-  text += "*Anarchy Instructors:* " + ", ".join(studios_manager["Anarchy"].instructor_names) + "\n\n"
+  text = "*Rev Instructors:* " + ", ".join(studios_manager.studios["Rev"].instructor_names) + "\n\n"
+  text += "*Barrys Instructors:* " + ", ".join(studios_manager.studios["Barrys"].instructor_names) + "\n\n"
+  text += "*Absolute Instructors:* " + ", ".join(studios_manager.studios["Absolute"].instructor_names) + "\n\n"
+  text += "*Ally Instructors:* " + ", ".join(studios_manager.studios["Ally"].instructor_names) + "\n\n"
+  text += "*Anarchy Instructors:* " + ", ".join(studios_manager.studios["Anarchy"].instructor_names) + "\n\n"
 
   chat_manager.add_message_id_to_delete(chat_id=message.chat.id, message_id=message.id)
   chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
@@ -70,22 +70,22 @@ def show_instructors_callback_query_handler(
     - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
     - chat_manager (ChatManager): The manager handling chat data.
     - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
-    - studios_manager (StudiosManager): The manager handling studio data.
+    - studios_manager (StudiosManager): The manager handling studios data.
   """
   query_data = chat_manager.get_query_data(chat_id=query.message.chat.id)
   text = ""
   if StudioType.Rev in query_data.studios:
-    text += "*Rev Instructors:* " + ", ".join(studios_manager["Rev"].instructor_names) + "\n\n"
+    text += "*Rev Instructors:* " + ", ".join(studios_manager.studios["Rev"].instructor_names) + "\n\n"
   if StudioType.Barrys in query_data.studios:
-    text += "*Barrys Instructors:* " + ", ".join(studios_manager["Barrys"].instructor_names) + "\n\n"
+    text += "*Barrys Instructors:* " + ", ".join(studios_manager.studios["Barrys"].instructor_names) + "\n\n"
   if StudioType.AbsoluteSpin in query_data.studios or StudioType.AbsolutePilates in query_data.studios:
-    text += "*Absolute Instructors:* " + ", ".join(studios_manager["Absolute"].instructor_names) + "\n\n"
+    text += "*Absolute Instructors:* " + ", ".join(studios_manager.studios["Absolute"].instructor_names) + "\n\n"
   if StudioType.AllySpin in query_data.studios or StudioType.AllyPilates in query_data.studios:
-    text += "*Ally Instructors:* " + ", ".join(studios_manager["Ally"].instructor_names) + "\n\n"
+    text += "*Ally Instructors:* " + ", ".join(studios_manager.studios["Ally"].instructor_names) + "\n\n"
   if StudioType.AllyRecovery in query_data.studios:
     text += "No instructors for Ally (Recovery)\n\n"
   if StudioType.Anarchy in query_data.studios:
-    text += "*Anarchy Instructors:* " + ", ".join(studios_manager["Anarchy"].instructor_names) + "\n\n"
+    text += "*Anarchy Instructors:* " + ", ".join(studios_manager.studios["Anarchy"].instructor_names) + "\n\n"
 
   chat_manager.send_prompt(chat_id=query.message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
   instructors_selection_handler(message=query.message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)

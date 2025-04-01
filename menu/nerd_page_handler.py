@@ -29,7 +29,7 @@ def nerd_message_handler(
     - bot (telebot.TeleBot): The instance of the Telegram bot.
     - chat_manager (ChatManager): The manager handling chat data.
     - history_manager (HistoryManager): The manager handling user history data.
-    - studios_manager (StudiosManager): The manager handling studio data.
+    - studios_manager (StudiosManager): The manager handling studios data.
     - full_result_data (ResultData): The schedule data of all the available classes.
   """
   history_manager.add(
@@ -103,7 +103,7 @@ def nerd_input_handler(
     - message (telebot.types.Message): The message object containing user interaction data.
     - logger (logging.Logger): Logger for logging messages.
     - chat_manager (ChatManager): The manager handling chat data.
-    - studios_manager (StudiosManager): The manager handling studio data.
+    - studios_manager (StudiosManager): The manager handling studios data.
     - full_result_data (ResultData): The schedule data of all the available classes.
   """
   input_str_list = message.text.splitlines()
@@ -159,18 +159,18 @@ def nerd_input_handler(
     elif step == 2: # Studio instructors
       instructor_list = []
       if current_studio == StudioType.Rev:
-        instructor_list = studios_manager["Rev"].instructor_names
+        instructor_list = studios_manager.studios["Rev"].instructor_names
       elif current_studio == StudioType.Barrys:
-        instructor_list = studios_manager["Barrys"].instructor_names
+        instructor_list = studios_manager.studios["Barrys"].instructor_names
       elif current_studio == StudioType.AbsolutePilates or current_studio == StudioType.AbsoluteSpin:
-        instructor_list = studios_manager["Absolute"].instructor_names
+        instructor_list = studios_manager.studios["Absolute"].instructor_names
       elif (
         current_studio == StudioType.AllyPilates or current_studio == StudioType.AllySpin
         or current_studio == StudioType.AllyRecovery
       ):
-        instructor_list = studios_manager["Ally"].instructor_names
+        instructor_list = studios_manager.studios["Ally"].instructor_names
       elif current_studio == StudioType.Anarchy:
-        instructor_list = studios_manager["Anarchy"].instructor_names
+        instructor_list = studios_manager.studios["Anarchy"].instructor_names
 
       selected_instructors = [x.strip().lower() for x in input_str.split(",")]
       invalid_instructors = []

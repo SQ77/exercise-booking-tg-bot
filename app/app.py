@@ -18,19 +18,29 @@ from common.result_data import ResultData
 from history.history_manager import HistoryManager
 from menu.menu_manager import MenuManager
 from server.server import Server
-from studios.absolute.absolute import get_absolute_schedule_and_instructorid_map
-from studios.ally.ally import get_ally_schedule_and_instructorid_map
-from studios.anarchy.anarchy import get_anarchy_schedule_and_instructorid_map
-from studios.barrys.barrys import get_barrys_schedule_and_instructorid_map
-from studios.rev.rev import get_rev_schedule_and_instructorid_map
 from studios.studios_manager import StudioManager, StudiosManager
 
 class App:
   """
   Main application class for the Studios Schedule Checker Telegram Bot.
-
   This class initializes and manages the bot, schedules updates,
   handles server interactions, and runs the application.
+
+  Attributes:
+    - logger (logging.Logger): Logger for logging messages.
+    - bot (telebot.TeleBot): The Telegram bot instance.
+    - chat_manager (ChatManager): The manager handling chat data.
+    - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
+    - studios_manager (StudiosManager): The manager handling studios data.
+    - history_manager (HistoryManager): The manager handling user history data.
+    - server (Server): The server handling REST requests.
+    - menu_manager (MenuManager): The manager handling menus used for interactions between the Telegram bot and chats.
+    - keep_alive_thread (threading.Thread):
+      The thread used by the server to ping itself. Used to keep deployment on Render alive.
+    - bot_polling_thread (threading.Thread): The thread used by the bot to poll for messages.
+    - server_thread (threading.Thread): The thread used by the server to handle REST requests.
+    - studios_manager_thread (threading.Thread):
+      The thread used by the schedule manager to handle retrieving of schedules.
   """
 
   def __init__(self) -> None:
@@ -54,18 +64,9 @@ class App:
     instructors_command = telebot.types.BotCommand(command="instructors", description="Show list of instructors")
     self.bot.set_my_commands(commands=[start_command, nerd_command, instructors_command])
 
-    self.keyboard_manager = KeyboardManager()
     self.chat_manager = ChatManager(bot=self.bot)
-    self.studios_manager = StudiosManager(
-      {
-        "Absolute": StudioManager(self.logger, get_absolute_schedule_and_instructorid_map),
-        "Ally": StudioManager(self.logger, get_ally_schedule_and_instructorid_map),
-        "Anarchy": StudioManager(self.logger, get_anarchy_schedule_and_instructorid_map),
-        "Barrys": StudioManager(self.logger, get_barrys_schedule_and_instructorid_map),
-        "Rev": StudioManager(self.logger, get_rev_schedule_and_instructorid_map)
-      },
-    )
-
+    self.keyboard_manager = KeyboardManager()
+    self.studios_manager = StudiosManager(logger=self.logger)
     self.history_manager = HistoryManager(logger=self.logger)
     self.server = Server(logger=self.logger)
     self.menu_manager = MenuManager(
@@ -76,74 +77,23 @@ class App:
       studios_manager=self.studios_manager,
       history_manager=self.history_manager,
     )
-    self.bot_polling_thread = None
-    self.server_thread = None
-    self.update_schedule_thread = None
 
-  def update_cached_result_data(self) -> None:
+    # Setup threads
+    self.stop_event = threading.Event()
+    self.keep_alive_thread = threading.Thread(target=self.keep_alive, daemon=True)
+    self.bot_polling_thread = threading.Thread(target=self.start_bot_polling)
+    self.server_thread = threading.Thread(target=self.server.start_server, daemon=True)
+    self.studios_manager_thread = threading.Thread(
+      target=self.studios_manager.schedule_update_cached_result_data,
+      daemon=True,
+    )
+
+  def keep_alive(self) -> None:
     """
-    Updates the cached schedule data from all studios.
+    Periodically pings server. Used to keep deployment on Render alive.
+    Scheduled runs is triggered in main thread.
     """
-    def _get_absolute_schedule(self, mutex: threading.Lock, updated_cached_result_data: ResultData) -> None:
-      absolute_schedule = self.studios_manager["Absolute"].get_schedule()
-      with mutex:
-        updated_cached_result_data += absolute_schedule
-
-    def _get_ally_schedule(self, mutex: threading.Lock, updated_cached_result_data: ResultData) -> None:
-      ally_schedule = self.studios_manager["Ally"].get_schedule()
-      with mutex:
-        updated_cached_result_data += ally_schedule
-
-    def _get_anarchy_schedule(self, mutex: threading.Lock, updated_cached_result_data: ResultData) -> None:
-      anarchy_schedule = self.studios_manager["Anarchy"].get_schedule()
-      with mutex:
-        updated_cached_result_data += anarchy_schedule
-
-    def _get_barrys_schedule(self, mutex: threading.Lock, updated_cached_result_data: ResultData) -> None:
-      barrys_schedule = self.studios_manager["Barrys"].get_schedule()
-      with mutex:
-        updated_cached_result_data += barrys_schedule
-
-    def _get_rev_schedule(self, mutex: threading.Lock, updated_cached_result_data: ResultData) -> None:
-      rev_schedule = self.studios_manager["Rev"].get_schedule()
-      with mutex:
-        updated_cached_result_data += rev_schedule
-
-    self.logger.info("Updating cached result data...")
-    updated_cached_result_data = ResultData()
-    mutex = threading.Lock()
-
-    threads = []
-    for func, name in [
-      (_get_absolute_schedule, "absolute_thread"),
-      (_get_ally_schedule, "ally_thread"),
-      (_get_anarchy_schedule, "anarchy_thread"),
-      (_get_barrys_schedule, "barrys_thread"),
-      (_get_rev_schedule, "rev_thread")
-    ]:
-      thread = threading.Thread(target=func, name=name, args=[self, mutex, updated_cached_result_data], daemon=True)
-      threads.append(thread)
-      thread.start()
-
-    for thread in threads:
-      thread.join()
-
-    self.menu_manager.cached_result_data = updated_cached_result_data
-    self.logger.info("Successfully updated cached result data!")
-
-  def schedule_update_cached_result_data(self, stop_event: threading.Event) -> None:
-    """
-    Periodically updates cached schedule data.
-
-    Args:
-      - stop_event (threading.Event): Event that signals if execution should be stopped.
-    """
-    schedule.every(10).minutes.do(job_func=self.update_cached_result_data)
     schedule.every(10).minutes.do(job_func=self.server.ping_self)
-
-    while not stop_event.is_set():
-      schedule.run_pending()
-      time.sleep(1)
 
   def start_bot_polling(self) -> None:
     """
@@ -177,35 +127,25 @@ class App:
     """
     Starts the application and runs all necessary processes.
     """
-    # Load existing history
-    self.history_manager.start()
-
-    # Create threads
-    self.stop_event = threading.Event()
-
-    # Setup threads
-    self.server_thread = threading.Thread(target=self.server.start_server, daemon=True)
-    self.update_schedule_thread = threading.Thread(
-      target=self.schedule_update_cached_result_data,
-      args=[self.stop_event],
-      daemon=True,
-    )
-    self.bot_polling_thread = threading.Thread(target=self.start_bot_polling)
-
     # Register signal handlers
     signal.signal(signalnum=signal.SIGTERM, handler=self.shutdown)
     signal.signal(signalnum=signal.SIGINT, handler=self.shutdown)
 
-    # Get current schedule and store in cache
-    self.update_cached_result_data()
+    # Load existing history
+    self.history_manager.start()
+
+    # Start schedule manager to get current schedule and store in cache
+    self.studios_manager.start()
 
     # Start threads
     self.logger.info("Starting threads...")
     self.server_thread.start()
-    self.update_schedule_thread.start()
+    self.keep_alive_thread.start()
+    self.studios_manager_thread.start()
     self.bot_polling_thread.start()
     self.logger.info("Bot started!")
 
     # Keep the main thread alive
     while not self.stop_event.is_set():
+      schedule.run_pending()
       time.sleep(1)

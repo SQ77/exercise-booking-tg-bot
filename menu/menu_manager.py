@@ -29,9 +29,8 @@ class MenuManager:
     - bot (telebot.TeleBot): The Telegram bot instance.
     - chat_manager (ChatManager): The manager handling chat data.
     - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
-    - studios_manager (StudiosManager): The manager handling studio data.
+    - studios_manager (StudiosManager): The manager handling studios data.
     - history_manager (HistoryManager): The manager handling user history data.
-    - cached_result_data (ResultData): Cached result data containing schedules of all the studios.
   """
   def __init__(
     self,
@@ -50,7 +49,7 @@ class MenuManager:
       - bot (telebot.TeleBot): The Telegram bot instance.
       - chat_manager (ChatManager): The manager handling chat data.
       - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
-      - studios_manager (StudiosManager): The manager handling studio data.
+      - studios_manager (StudiosManager): The manager handling studios data.
       - history_manager (HistoryManager): The manager handling user history data.
     """
     self.logger = logger
@@ -59,7 +58,6 @@ class MenuManager:
     self.keyboard_manager = keyboard_manager
     self.studios_manager = studios_manager
     self.history_manager = history_manager
-    self.cached_result_data = ResultData()
 
     self.setup_message_handlers()
     self.setup_callback_query_handlers()
@@ -126,7 +124,7 @@ class MenuManager:
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,
         bot=self.bot,
-        instructorid_map=self.studios_manager["Rev"].instructorid_map,
+        instructorid_map=self.studios_manager.studios["Rev"].instructorid_map,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "barrys-instructors")
@@ -136,7 +134,7 @@ class MenuManager:
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,
         bot=self.bot,
-        instructorid_map=self.studios_manager["Barrys"].instructorid_map,
+        instructorid_map=self.studios_manager.studios["Barrys"].instructorid_map,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "absolute-spin-instructors")
@@ -146,7 +144,7 @@ class MenuManager:
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,
         bot=self.bot,
-        instructorid_map=self.studios_manager["Absolute"].instructorid_map,
+        instructorid_map=self.studios_manager.studios["Absolute"].instructorid_map,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "absolute-pilates-instructors")
@@ -156,7 +154,7 @@ class MenuManager:
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,
         bot=self.bot,
-        instructorid_map=self.studios_manager["Absolute"].instructorid_map,
+        instructorid_map=self.studios_manager.studios["Absolute"].instructorid_map,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "ally-spin-instructors")
@@ -166,7 +164,7 @@ class MenuManager:
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,
         bot=self.bot,
-        instructorid_map=self.studios_manager["Ally"].instructorid_map,
+        instructorid_map=self.studios_manager.studios["Ally"].instructorid_map,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "ally-pilates-instructors")
@@ -176,7 +174,7 @@ class MenuManager:
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,
         bot=self.bot,
-        instructorid_map=self.studios_manager["Ally"].instructorid_map,
+        instructorid_map=self.studios_manager.studios["Ally"].instructorid_map,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "anarchy-instructors")
@@ -186,7 +184,7 @@ class MenuManager:
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,
         bot=self.bot,
-        instructorid_map=self.studios_manager["Anarchy"].instructorid_map,
+        instructorid_map=self.studios_manager.studios["Anarchy"].instructorid_map,
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "weeks-selection")
@@ -303,7 +301,7 @@ class MenuManager:
         query=query,
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,
-        full_result_data=self.cached_result_data,
+        full_result_data=self.studios_manager.get_cached_result_data(),
       )
 
   def setup_message_handlers(self) -> None:
@@ -328,7 +326,7 @@ class MenuManager:
         chat_manager=self.chat_manager,
         history_manager=self.history_manager,
         studios_manager=self.studios_manager,
-        full_result_data=self.cached_result_data,
+        full_result_data=self.studios_manager.get_cached_result_data(),
       )
 
     @self.bot.message_handler(commands=["instructors"])
