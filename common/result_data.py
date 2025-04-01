@@ -1,5 +1,5 @@
 """
-reslt_data.py
+result_data.py
 Author: https://github.com/lendrixxx
 Description:
   This file defines the ResultData class used to store class schedules and
@@ -11,6 +11,7 @@ from common.class_availability import ClassAvailability
 from common.class_data import ClassData
 from common.query_data import QueryData
 from common.studio_location import StudioLocation
+from common.studio_type import StudioType
 from copy import copy
 from datetime import datetime, timedelta
 
