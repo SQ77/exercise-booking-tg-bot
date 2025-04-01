@@ -83,7 +83,7 @@ def show_instructors_callback_query_handler(
   if StudioType.AllySpin in query_data.studios or StudioType.AllyPilates in query_data.studios:
     text += "*Ally Instructors:* " + ", ".join(studios_manager["Ally"].instructor_names) + "\n\n"
   if StudioType.AllyRecovery in query_data.studios:
-    text += "No instructors for *Ally (Recovery)\n\n"
+    text += "No instructors for Ally (Recovery)\n\n"
   if StudioType.Anarchy in query_data.studios:
     text += "*Anarchy Instructors:* " + ", ".join(studios_manager["Anarchy"].instructor_names) + "\n\n"
 
