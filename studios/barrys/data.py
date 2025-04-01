@@ -1,11 +1,12 @@
-from common.data_types import StudioLocation
+"""
+data.py
+Author: https://github.com/lendrixxx
+Description: This file contains data used for retrieving Barrys schedules.
+"""
+from common.studio_location import StudioLocation
 
-LOCATION_MAP = {
-  StudioLocation.Raffles: 1,
-  StudioLocation.Orchard: 12,
-}
-
+# Dictionary of location strings from response and studio locations
 RESPONSE_LOCATION_TO_STUDIO_LOCATION_MAP = {
-  "Orchard" : StudioLocation.Orchard,
-  "Raffles Place" : StudioLocation.Raffles,
+  "Orchard": StudioLocation.Orchard,
+  "Raffles Place": StudioLocation.Raffles,
 }

@@ -1,19 +1,50 @@
+"""
+time_page_handler.py
+Author: https://github.com/lendrixxx
+Description: This file defines callback queries related to entering time filters for class schedules.
+"""
 import telebot
 from datetime import datetime
 
 def time_selection_callback_query_handler(query: telebot.types.CallbackQuery, chat_manager: "ChatManager") -> None:
+  """
+  Handles the callback query when the step to enter a time filter is triggered.
+
+  Args:
+    - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
+    - chat_manager (ChatManager): The manager handling chat data.
+  """
   time_selection_handler(query.message, chat_manager)
 
 def time_selection_handler(message: telebot.types.Message, chat_manager: "ChatManager") -> None:
-  query_data = chat_manager.get_query_data(message.chat.id)
+  """
+  Displays the current time filters and provides options to add, remove, or reset the filters.
+
+  Args:
+    - message (telebot.types.Message): The message object containing user interaction data.
+    - chat_manager (ChatManager): The manager handling chat data.
+  """
+  query_data = chat_manager.get_query_data(chat_id=message.chat.id)
   text = "*Currently selected timings(s)*\n"
   text += query_data.get_query_str(include_time=True)
 
   keyboard = telebot.types.InlineKeyboardMarkup()
-  add_timeslot_button = telebot.types.InlineKeyboardButton("Add Timeslot", callback_data="{'step': 'time-selection-add'}")
-  remove_timeslot_button = telebot.types.InlineKeyboardButton("Remove Timeslot", callback_data="{'step': 'time-selection-remove'}")
-  reset_all_timeslot_button = telebot.types.InlineKeyboardButton("Reset All Timeslot(s)", callback_data="{'step': 'time-selection-reset'}")
-  next_button = telebot.types.InlineKeyboardButton("Next ▶️", callback_data="{'step': 'main-page-handler'}")
+  add_timeslot_button = telebot.types.InlineKeyboardButton(
+    text="Add Timeslot",
+    callback_data="{'step': 'time-selection-add'}",
+  )
+  remove_timeslot_button = telebot.types.InlineKeyboardButton(
+    text="Remove Timeslot",
+    callback_data="{'step': 'time-selection-remove'}",
+  )
+  reset_all_timeslot_button = telebot.types.InlineKeyboardButton(
+    text="Reset All Timeslot(s)",
+    callback_data="{'step': 'time-selection-reset'}",
+  )
+  next_button = telebot.types.InlineKeyboardButton(
+    text="Next ▶️",
+    callback_data="{'step': 'main-page-handler'}",
+  )
 
   keyboard = telebot.types.InlineKeyboardMarkup()
   keyboard.add(add_timeslot_button)
@@ -23,15 +54,65 @@ def time_selection_handler(message: telebot.types.Message, chat_manager: "ChatMa
 
   chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=keyboard, delete_sent_msg_in_future=True)
 
-def time_selection_add_callback_query_handler(query: telebot.types.CallbackQuery, logger: "logging.Logger", bot: "telebot.TeleBot", chat_manager: "ChatManager") -> None:
+def time_selection_add_callback_query_handler(
+  query: telebot.types.CallbackQuery,
+  logger: "logging.Logger",
+  bot: "telebot.TeleBot",
+  chat_manager: "ChatManager",
+) -> None:
+  """
+  Handles the callback query when the step to add a time filter is triggered.
+
+  Args:
+    - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
+    - logger (logging.Logger): Logger for logging messages.
+    - bot (telebot.TeleBot): The instance of the Telegram bot.
+    - chat_manager (ChatManager): The manager handling chat data.
+  """
   start_time_selection_handler(query.message, logger, bot, chat_manager)
 
-def start_time_selection_handler(message: telebot.types.Message, logger: "logging.Logger", bot: "telebot.TeleBot", chat_manager: "ChatManager") -> None:
-  text = "Enter range of timeslot to check\ne.g. *0700-0830*"
-  sent_msg = chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=True)
-  bot.register_next_step_handler(sent_msg, start_time_input_handler, logger, chat_manager)
+def start_time_selection_handler(
+  message: telebot.types.Message,
+  logger: "logging.Logger",
+  bot: "telebot.TeleBot",
+  chat_manager: "ChatManager",
+) -> None:
+  """
+  Initiates the process of setting a time filter by prompting the user for input.
 
-def start_time_input_handler(message: telebot.types.Message, logger: "logging.Logger", chat_manager: "ChatManager") -> None:
+  Args:
+    - message (telebot.types.Message): The message object containing user interaction data.
+    - logger (logging.Logger): Logger for logging messages.
+    - bot (telebot.TeleBot): The instance of the Telegram bot.
+    - chat_manager (ChatManager): The manager handling chat data.
+  """
+  text = "Enter range of timeslot to check\ne.g. *0700-0830*"
+  sent_msg = chat_manager.send_prompt(
+    chat_id=message.chat.id,
+    text=text,
+    reply_markup=None,
+    delete_sent_msg_in_future=True,
+  )
+  bot.register_next_step_handler(
+    message=sent_msg,
+    callback=timeslot_input_handler,
+    logger=logger,
+    chat_manager=chat_manager,
+  )
+
+def timeslot_input_handler(
+  message: telebot.types.Message,
+  logger: "logging.Logger",
+  chat_manager: "ChatManager",
+) -> None:
+  """
+  Processes the user's input for a timeslot.
+
+  Args:
+    - message (telebot.types.Message): The message object containing user interaction data.
+    - logger (logging.Logger): Logger for logging messages.
+    - chat_manager (ChatManager): The manager handling chat data.
+  """
   try:
     message_without_whitespace = "".join(message.text.split())
     split_message_without_whitespace = message_without_whitespace.split("-")
@@ -57,17 +138,23 @@ def start_time_input_handler(message: telebot.types.Message, logger: "logging.Lo
     return
 
   if end_time < start_time:
-    text = f"End time must be later than or equal start time. Start time: {start_time.strftime('%H%M')}, End time: {end_time.strftime('%H%M')}"
+    text = (
+      f"End time must be later than or equal start time. "
+      f"Start time: {start_time.strftime('%H%M')}, End time: {end_time.strftime('%H%M')}"
+    )
     chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
     time_selection_handler(message, chat_manager)
     return
 
-  query_data = chat_manager.get_query_data(message.chat.id)
+  query_data = chat_manager.get_query_data(chat_id=message.chat.id)
 
   # Start time should be at least one minute before existing start time or greater than or equal existing end time
   is_valid_start_time = True
   for existing_start_time, existing_end_time in query_data.start_times:
-    at_least_one_minute_before_existing_start_time = start_time.hour < existing_start_time.hour or start_time.hour == existing_start_time.hour and start_time.minute < existing_start_time.minute
+    at_least_one_minute_before_existing_start_time = (
+      start_time.hour < existing_start_time.hour
+      or start_time.hour == existing_start_time.hour and start_time.minute < existing_start_time.minute
+    )
     greater_than_or_equal_existing_end_time = start_time >= existing_end_time
     if not at_least_one_minute_before_existing_start_time and not greater_than_or_equal_existing_end_time:
       conflicting_start_time_str = existing_start_time.strftime("%H%M")
@@ -84,7 +171,10 @@ def start_time_input_handler(message: telebot.types.Message, logger: "logging.Lo
         break
 
   if not is_valid_start_time:
-    text = f"Start time '{start_time_str}' conflicts with existing timeslot '{conflicting_start_time_str} - {conflicting_end_time_str}'"
+    text = (
+      f"Start time '{start_time_str}' conflicts with existing timeslot "
+      f"'{conflicting_start_time_str} - {conflicting_end_time_str}'"
+    )
     chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
     time_selection_handler(message, chat_manager)
     return
@@ -105,13 +195,19 @@ def start_time_input_handler(message: telebot.types.Message, logger: "logging.Lo
       if start_time < existing_end_time:
         conflicting_start_time_str = existing_start_time.strftime("%H%M")
         conflicting_end_time_str = existing_end_time.strftime("%H%M")
-        text = f"Time range '{start_time_str} - {end_time_str}' conflicts with existing timeslot '{conflicting_start_time_str} - {conflicting_end_time_str}'"
+        text = (
+          f"Time range '{start_time_str} - {end_time_str}' conflicts with existing timeslot "
+          f"'{conflicting_start_time_str} - {conflicting_end_time_str}'"
+        )
         chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
         time_selection_handler(message, chat_manager)
         return
 
   if not is_valid_end_time:
-    text = f"End time '{end_time_str}' conflicts with existing timeslot '{conflicting_start_time_str} - {conflicting_end_time_str}'"
+    text = (
+      f"End time '{end_time_str}' conflicts with existing timeslot "
+      f"'{conflicting_start_time_str} - {conflicting_end_time_str}'"
+    )
     chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
     time_selection_handler(message, chat_manager)
     return
@@ -120,11 +216,28 @@ def start_time_input_handler(message: telebot.types.Message, logger: "logging.Lo
   query_data.start_times = sorted(query_data.start_times)
   time_selection_handler(message, chat_manager)
 
-def time_selection_remove_callback_query_handler(query: telebot.types.CallbackQuery, chat_manager: "ChatManager") -> None:
+def time_selection_remove_callback_query_handler(
+  query: telebot.types.CallbackQuery,
+  chat_manager: "ChatManager",
+) -> None:
+  """
+  Handles the callback query when the step to remove a time filter is triggered.
+
+  Args:
+    - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
+    - chat_manager (ChatManager): The manager handling chat data.
+  """
   time_selection_remove_handler(query.message, chat_manager)
 
 def time_selection_remove_handler(message: telebot.types.Message, chat_manager: "ChatManager") -> None:
-  query_data = chat_manager.get_query_data(message.chat.id)
+  """
+  Handles the callback query when the step to remove a time filter is triggered.
+
+  Args:
+    - message (telebot.types.Message): The message object containing user interaction data.
+    - chat_manager (ChatManager): The manager handling chat data.
+  """
+  query_data = chat_manager.get_query_data(chat_id=message.chat.id)
   if len(query_data.start_times) == 0:
     text = "No timeslot to remove"
     chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
@@ -136,22 +249,48 @@ def time_selection_remove_handler(message: telebot.types.Message, chat_manager: 
     for start_time, end_time in query_data.start_times:
       start_time_str = start_time.strftime("%H%M")
       end_time_str = end_time.strftime("%H%M")
-      remove_timeslot_button = telebot.types.InlineKeyboardButton(f"{start_time_str} - {end_time_str}", callback_data=f"{{'step': 'remove-timeslot', 'start':'{start_time_str}', 'end':'{end_time_str}'}}")
+      remove_timeslot_button = telebot.types.InlineKeyboardButton(
+        text=f"{start_time_str} - {end_time_str}",
+        callback_data=f"{{'step': 'remove-timeslot', 'start':'{start_time_str}', 'end':'{end_time_str}'}}",
+      )
       buttons.append(remove_timeslot_button)
       keyboard.add(buttons[-1])
 
-    back_button = telebot.types.InlineKeyboardButton("◀️ Back", callback_data="{'step': 'time-selection'}")
+    back_button = telebot.types.InlineKeyboardButton(
+      text="◀️ Back",
+      callback_data="{'step': 'time-selection'}",
+    )
     keyboard.add(back_button)
     chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=keyboard, delete_sent_msg_in_future=True)
 
-def time_selection_remove_timeslot_callback_query_handler(query: telebot.types.CallbackQuery, chat_manager: "ChatManager") -> None:
+def time_selection_remove_timeslot_callback_query_handler(
+  query: telebot.types.CallbackQuery,
+  chat_manager: "ChatManager",
+) -> None:
+  """
+  Handles the callback query when the step to remove a timeslot is triggered.
+
+  Args:
+    - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
+    - chat_manager (ChatManager): The manager handling chat data.
+  """
   start_time = eval(query.data)["start"]
   end_time = eval(query.data)["end"]
-  query_data = chat_manager.get_query_data(query.message.chat.id)
+  query_data = chat_manager.get_query_data(chat_id=query.message.chat.id)
   query_data.start_times.remove((datetime.strptime(start_time, "%H%M"), datetime.strptime(end_time, "%H%M")))
   time_selection_handler(query.message, chat_manager)
 
-def time_selection_reset_callback_query_handler(query: telebot.types.CallbackQuery, chat_manager: "ChatManager") -> None:
-  query_data = chat_manager.get_query_data(query.message.chat.id)
+def time_selection_reset_callback_query_handler(
+  query: telebot.types.CallbackQuery,
+  chat_manager: "ChatManager",
+) -> None:
+  """
+  Handles the callback query when the step to reset the timeslot filter triggered.
+
+  Args:
+    - query (telebot.types.CallbackQuery): The callback query object containing user interaction data.
+    - chat_manager (ChatManager): The manager handling chat data.
+  """
+  query_data = chat_manager.get_query_data(chat_id=query.message.chat.id)
   query_data.start_times = []
   time_selection_handler(query.message, chat_manager)

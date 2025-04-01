@@ -1,5 +1,14 @@
+"""
+nerd_message_handler.py
+Author: https://github.com/lendrixxx
+Description: This file defines callback queries related to nerd mode.
+"""
 import time
-from common.data_types import QueryData, StudioData, StudioLocation, StudioType, SORTED_DAYS
+from common.query_data import QueryData
+from common.studio_data import StudioData
+from common.studio_location import StudioLocation
+from common.studio_type import StudioType
+from common.data import SORTED_DAYS
 from datetime import datetime
 
 def nerd_message_handler(
@@ -9,54 +18,98 @@ def nerd_message_handler(
   chat_manager: "ChatManager",
   history_manager: "HistoryManager",
   studios_manager: "StudiosManager",
-  result_data: "ResultData"
+  full_result_data: "ResultData"
 ) -> None:
-  history_manager.add(int(time.time()), message.from_user.id, message.chat.id, message.from_user.username, message.from_user.first_name, message.from_user.last_name, "nerd")
-  text = "Welcome to nerd mode 🤓\n" \
-         "\n" \
-         "*Enter your query in the following format:*\n" \
-         "Studio name\n" \
-         "Studio locations (comma separated)\n" \
-         "Instructor names (comma separated)\n" \
-         "(Repeat above for multiple studios)\n" \
-         "Weeks\n" \
-         "Days\n" \
-         "Timeslots (comma separated. enter 'nil' to ignore filters)\n" \
-         "Class Name Filter (enter 'nil' to ignore filters)\n" \
-         "\n" \
-         "*Studio names*: rev, barrys, absolute (spin), absolute (pilates), ally (spin), ally (pilates)\n" \
-         "*Studio locations*: orchard, tjpg, bugis, raffles, centrepoint, i12, millenia walk, star vista, great world, cross street\n" \
-         "*Instructors*: Use /instructors for list of instructors\n" \
-         "\n" \
-         "*e.g.*\n" \
-         "`rev\n" \
-         "bugis, orchard\n" \
-         "chloe, zai\n" \
-         "absolute (spin)\n" \
-         "raffles\n" \
-         "ria\n" \
-         "2\n" \
-         "monday, wednesday, saturday\n" \
-         "0700-0900, 1300-1500, 1800-2000\n" \
-         "essential\n`"
+  """
+  Initiates nerd mode and prompts the user for structured query input.
 
-  chat_manager.add_message_id_to_delete(message.chat.id, message.id)
-  sent_msg = chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
-  bot.register_next_step_handler(sent_msg, nerd_input_handler, logger, chat_manager, studios_manager, result_data)
+  Args:
+    - message (telebot.types.Message): The message object containing user interaction data.
+    - logger (logging.Logger): Logger for logging messages.
+    - bot (telebot.TeleBot): The instance of the Telegram bot.
+    - chat_manager (ChatManager): The manager handling chat data.
+    - history_manager (HistoryManager): The manager handling user history data.
+    - studios_manager (StudiosManager): The manager handling studio data.
+    - full_result_data (ResultData): The schedule data of all the available classes.
+  """
+  history_manager.add(
+    timestamp=int(time.time()),
+    user_id=message.from_user.id,
+    chat_id=message.chat.id,
+    username=message.from_user.username,
+    first_name=message.from_user.first_name,
+    last_name=message.from_user.last_name,
+    command="nerd",
+  )
+  text = (
+    "Welcome to nerd mode 🤓\n"
+    "\n"
+    "*Enter your query in the following format:*\n"
+    "Studio name\n"
+    "Studio locations (comma separated)\n"
+    "Instructor names (comma separated)\n"
+    "(Repeat above for multiple studios)\n"
+    "Weeks\n"
+    "Days\n"
+    "Timeslots (comma separated. enter 'nil' to ignore filters)\n"
+    "Class Name Filter (enter 'nil' to ignore filters)\n"
+    "\n"
+    "*Studio names*: rev, barrys, absolute (spin), absolute (pilates), ally (spin), ally (pilates)\n"
+    "*Studio locations*: orchard, tjpg, bugis, raffles, centrepoint, i12, "
+    "millenia walk, star vista, great world, cross street\n"
+    "*Instructors*: Use /instructors for list of instructors\n"
+    "\n"
+    "*e.g.*\n"
+    "`rev\n"
+    "bugis, orchard\n"
+    "chloe, zai\n"
+    "absolute (spin)\n"
+    "raffles\n"
+    "ria\n"
+    "2\n"
+    "monday, wednesday, saturday\n"
+    "0700-0900, 1300-1500, 1800-2000\n"
+    "essential\n`"
+  )
+
+  chat_manager.add_message_id_to_delete(chat_id=message.chat.id, message_id=message.id)
+  sent_msg = chat_manager.send_prompt(
+    chat_id=message.chat.id,
+    text=text,
+    reply_markup=None,
+    delete_sent_msg_in_future=False,
+  )
+  bot.register_next_step_handler(
+    message=sent_msg,
+    callback=nerd_input_handler,
+    logger=logger,
+    chat_manager=chat_manager,
+    studios_manager=studios_manager,
+    full_result_data=full_result_data,
+  )
 
 def nerd_input_handler(
   message: "telebot.types.Message",
   logger: "logging.Logger",
   chat_manager: "ChatManager",
   studios_manager: "StudiosManager",
-  result_data: "ResultData"
+  full_result_data: "ResultData"
 ) -> None:
   """
+  Processes the user's input, validates it, and retrieves filtered results.
   See nerd_handler function header for expected message format
+
+  Args:
+    - message (telebot.types.Message): The message object containing user interaction data.
+    - logger (logging.Logger): Logger for logging messages.
+    - chat_manager (ChatManager): The manager handling chat data.
+    - studios_manager (StudiosManager): The manager handling studio data.
+    - full_result_data (ResultData): The schedule data of all the available classes.
   """
   input_str_list = message.text.splitlines()
 
-  # Weeks, days, timeslots, and class name filter = 4 items. Remaining items should be divisible by 3 (studio name, locations, instructors)
+  # Weeks, days, timeslots, and class name filter = 4 items
+  # Remaining items should be divisible by 3 (studio name, locations, instructors)
   if len(input_str_list) < 7 or (len(input_str_list) - 4) % 3 != 0:
     text = "Failed to handle query. Unexpected format received."
     chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
@@ -78,7 +131,12 @@ def nerd_input_handler(
           break
       if not found_studio:
         text = f"Failed to handle query. Unexpected studio name '{input_str}'"
-        chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
+        chat_manager.send_prompt(
+          chat_id=message.chat.id,
+          text=text,
+          reply_markup=None,
+          delete_sent_msg_in_future=False,
+        )
         return
     elif step == 1: # Studio locations
       selected_locations = [x.strip() for x in input_str.split(",")]
@@ -91,20 +149,28 @@ def nerd_input_handler(
             break
         if not found_location:
           text = f"Failed to handle query. Unexpected studio name '{selected_location}'"
-          chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
+          chat_manager.send_prompt(
+            chat_id=message.chat.id,
+            text=text,
+            reply_markup=None,
+            delete_sent_msg_in_future=False,
+          )
           return
     elif step == 2: # Studio instructors
       instructor_list = []
       if current_studio == StudioType.Rev:
-        instructor_list = studios_manager.studios["Rev"].instructor_names
+        instructor_list = studios_manager["Rev"].instructor_names
       elif current_studio == StudioType.Barrys:
-        instructor_list = studios_manager.studios["Barrys"].instructor_names
+        instructor_list = studios_manager["Barrys"].instructor_names
       elif current_studio == StudioType.AbsolutePilates or current_studio == StudioType.AbsoluteSpin:
-        instructor_list = studios_manager.studios["Absolute"].instructor_names
-      elif current_studio == StudioType.AllyPilates or current_studio == StudioType.AllySpin or current_studio == StudioType.AllyRecovery:
-        instructor_list = studios_manager.studios["Ally"].instructor_names
+        instructor_list = studios_manager["Absolute"].instructor_names
+      elif (
+        current_studio == StudioType.AllyPilates or current_studio == StudioType.AllySpin
+        or current_studio == StudioType.AllyRecovery
+      ):
+        instructor_list = studios_manager["Ally"].instructor_names
       elif current_studio == StudioType.Anarchy:
-        instructor_list = studios_manager.studios["Anarchy"].instructor_names
+        instructor_list = studios_manager["Anarchy"].instructor_names
 
       selected_instructors = [x.strip().lower() for x in input_str.split(",")]
       invalid_instructors = []
@@ -112,23 +178,37 @@ def nerd_input_handler(
         selected_instructors = ["All"]
       else:
         for instructor in selected_instructors:
-          found_instructor = (any(instructor in instructor_in_list.split(" ") for instructor_in_list in instructor_list)
+          found_instructor = (
+            any(instructor in instructor_in_list.split(" ") for instructor_in_list in instructor_list)
             or any(instructor == instructor_in_list for instructor_in_list in instructor_list)
-            or any(instructor == instructor_in_list.split(".")[0] for instructor_in_list in instructor_list))
+            or any(instructor == instructor_in_list.split(".")[0] for instructor_in_list in instructor_list)
+          )
           if not found_instructor:
             invalid_instructors.append(instructor)
 
       if len(invalid_instructors) > 0:
-        selected_instructors = [instructor for instructor in selected_instructors if instructor not in invalid_instructors]
+        selected_instructors = [
+          instructor for instructor in selected_instructors if instructor not in invalid_instructors
+        ]
         text = f"Failed to find instructor(s): {', '.join(invalid_instructors)}"
-        chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
+        chat_manager.send_prompt(
+          chat_id=message.chat.id,
+          text=text,
+          reply_markup=None,
+          delete_sent_msg_in_future=False,
+        )
 
       if len(selected_instructors) == 0:
         text = f"Failed to handle query. No instructor selected for {current_studio.value}"
-        chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
+        chat_manager.send_prompt(
+          chat_id=message.chat.id,
+          text=text,
+          reply_markup=None,
+          delete_sent_msg_in_future=False,
+        )
         return
 
-      query.studios[current_studio] = StudioData(locations=current_studio_locations, instructors = selected_instructors)
+      query.studios[current_studio] = StudioData(locations=current_studio_locations, instructors=selected_instructors)
 
   # Get number of weeks
   try:
@@ -190,14 +270,21 @@ def nerd_input_handler(
         return
 
       if end_time < start_time:
-        text = f"Failed to handle query. Invalid input for 'timeslots'. Start time '{start_time_str}' is later than end time '{end_time_str}'"
+        text = (
+          f"Failed to handle query. Invalid input for 'timeslots'. "
+          f"Start time '{start_time_str}' is later than end time '{end_time_str}'"
+        )
         chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
         return
 
-      # Start time from should be at least one minute before existing start time or greater than or equal existing end time
+      # Start time from should be at least one minute before
+      # existing start time or greater than or equal existing end time
       is_valid_start_time = True
       for existing_start_time, existing_end_time in query.start_times:
-        at_least_one_minute_before_existing_start_time = start_time.hour < existing_start_time.hour or start_time.hour == existing_start_time.hour and start_time.minute < existing_start_time.minute
+        at_least_one_minute_before_existing_start_time = (
+          start_time.hour < existing_start_time.hour
+          or start_time.hour == existing_start_time.hour and start_time.minute < existing_start_time.minute
+        )
         greater_than_or_equal_existing_end_time = start_time >= existing_end_time
         if not at_least_one_minute_before_existing_start_time and not greater_than_or_equal_existing_end_time:
           conflicting_start_time_str = existing_start_time.strftime("%H%M")
@@ -206,7 +293,10 @@ def nerd_input_handler(
           break
 
         # Edge case where existing timeslot start time and end time are the same
-        if existing_start_time.hour == existing_end_time.hour and existing_start_time.minute == existing_end_time.minute:
+        if (
+          existing_start_time.hour == existing_end_time.hour
+          and existing_start_time.minute == existing_end_time.minute
+        ):
           if start_time.hour == existing_start_time.hour and start_time.minute == existing_start_time.minute:
             conflicting_start_time_str = existing_start_time.strftime("%H%M")
             conflicting_end_time_str = existing_end_time.strftime("%H%M")
@@ -214,7 +304,10 @@ def nerd_input_handler(
             break
 
       if not is_valid_start_time:
-        text = f"Start time '{start_time_str}' conflicts with existing timeslot '{conflicting_start_time_str} - {conflicting_end_time_str}'"
+        text = (
+          f"Start time '{start_time_str}' conflicts with existing timeslot "
+          f"'{conflicting_start_time_str} - {conflicting_end_time_str}'"
+        )
         chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
         return
 
@@ -234,13 +327,24 @@ def nerd_input_handler(
           if start_time < existing_end_time:
             conflicting_start_time_str = existing_start_time.strftime("%H%M")
             conflicting_end_time_str = existing_end_time.strftime("%H%M")
-            text = f"Time range '{start_time_str} - {end_time_str}' conflicts with existing timeslot '{conflicting_start_time_str} - {conflicting_end_time_str}'"
-            chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
+            text = (
+              f"Time range '{start_time_str} - {end_time_str}' conflicts with existing timeslot "
+              f"'{conflicting_start_time_str} - {conflicting_end_time_str}'"
+            )
+            chat_manager.send_prompt(
+              chat_id=message.chat.id,
+              text=text,
+              reply_markup=None,
+              delete_sent_msg_in_future=False,
+            )
             return
 
 
       if not is_valid_end_time:
-        text = f"End time '{end_time_str}' conflicts with existing timeslot '{conflicting_start_time_str} - {conflicting_end_time_str}'"
+        text = (
+          f"End time '{end_time_str}' conflicts with existing timeslot "
+          f"'{conflicting_start_time_str} - {conflicting_end_time_str}'"
+        )
         chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
         return
 
@@ -251,7 +355,7 @@ def nerd_input_handler(
   query.class_name_filter = "" if input_str_list[-1] == "nil" else input_str_list[-1]
 
   # Get and send results
-  result = result_data.get_data(query)
+  result = full_result_data.get_data(query=query)
   schedule_str = result.get_result_str()
   if len(schedule_str) > 4095:
     shortened_message = ""
@@ -259,12 +363,27 @@ def nerd_input_handler(
       is_new_day = any(day in line for day in SORTED_DAYS) and len(shortened_message) > 0
       max_len_reached = len(shortened_message) + len(line) > 4095
       if is_new_day or max_len_reached:
-        chat_manager.send_prompt(chat_id=message.chat.id, text=shortened_message, reply_markup=None, delete_sent_msg_in_future=False)
+        chat_manager.send_prompt(
+          chat_id=message.chat.id,
+          text=shortened_message,
+          reply_markup=None,
+          delete_sent_msg_in_future=False,
+        )
         shortened_message = line + "\n"
       else:
         shortened_message += line + "\n"
 
     if len(shortened_message) > 0:
-      chat_manager.send_prompt(chat_id=message.chat.id, text=shortened_message, reply_markup=None, delete_sent_msg_in_future=False)
+      chat_manager.send_prompt(
+        chat_id=message.chat.id,
+        text=shortened_message,
+        reply_markup=None,
+        delete_sent_msg_in_future=False,
+      )
   else:
-    chat_manager.send_prompt(chat_id=message.chat.id, text=schedule_str, reply_markup=None, delete_sent_msg_in_future=False)
+    chat_manager.send_prompt(
+      chat_id=message.chat.id,
+      text=schedule_str,
+      reply_markup=None,
+      delete_sent_msg_in_future=False,
+    )

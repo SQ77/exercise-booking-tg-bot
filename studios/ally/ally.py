@@ -1,18 +1,54 @@
+"""
+ally.py
+Author: https://github.com/lendrixxx
+Description:
+  This file defines functions to handle the retrieving of
+  class schedules and instructor IDs for Ally studio.
+"""
 import re
 import requests
 from bs4 import BeautifulSoup
-from common.data_types import CapacityInfo, ClassAvailability, ClassData, RESPONSE_AVAILABILITY_MAP, ResultData, StudioLocation
+from common.capacity_info import CapacityInfo
+from common.class_availability import ClassAvailability
+from common.class_data import ClassData
+from common.result_data import ResultData
+from common.studio_location import StudioLocation
+from common.data import RESPONSE_AVAILABILITY_MAP
 from copy import copy
 from datetime import datetime, timedelta
 from studios.ally.data import ROOM_ID_TO_STUDIO_TYPE_MAP
 
 def send_get_schedule_request(week: int) -> requests.models.Response:
+  """
+  Sends a GET request to retrieve the class schedule for the specified locations and week.
+
+  Args:
+    - week (int): The week number to retrieve the schedule for.
+
+  Returns:
+    - requests.models.Response: The response object containing the schedule data.
+  """
   url = "https://ally.zingfit.com/reserve/index.cfm?action=Reserve.chooseClass"
   params = {"wk": week, "site": 1} # Ally only has 1 location currently
   return requests.get(url=url, params=params)
 
-def get_schedule_from_response_soup(logger: "logging.Logger", soup: BeautifulSoup, week: int) -> dict[datetime.date, list[ClassData]]:
-  schedule_table = soup.find("table", id="reserve", class_="scheduleTable")
+def get_schedule_from_response_soup(
+  logger: "logging.Logger",
+  soup: BeautifulSoup,
+  week: int,
+) -> dict[datetime.date, list[ClassData]]:
+  """
+  Parses the response soup to extract the class schedule data.
+
+  Args:
+    - logger (logging.Logger): Logger for logging messages.
+    - soup (BeautifulSoup): The parsed HTML response from the schedule request.
+    - week (int): The week number of the retrieved schedule..
+
+  Returns:
+    - dict[datetime.date, list[ClassData]]: Dictionary of dates and details of classes.
+  """
+  schedule_table = soup.find(name="table", id="reserve", class_="scheduleTable")
   if schedule_table is None:
     logger.warning(f"Failed to get schedule - Schedule table not found: {soup}")
     return {}
@@ -21,12 +57,12 @@ def get_schedule_from_response_soup(logger: "logging.Logger", soup: BeautifulSou
     # No classes for the week
     return {}
 
-  schedule_table_row = schedule_table.tbody.find("tr")
+  schedule_table_row = schedule_table.tbody.find(name="tr")
   if schedule_table_row is None:
     logger.warning(f"Failed to get schedule - Schedule table row not found: {schedule_table}")
     return {}
 
-  schedule_table_data_list = schedule_table_row.find_all("td")
+  schedule_table_data_list = schedule_table_row.find_all(name="td")
   if len(schedule_table_data_list) == 0:
     logger.warning(f"Failed to get schedule - Schedule table data is null: {schedule_table_row}")
     return {}
@@ -36,7 +72,7 @@ def get_schedule_from_response_soup(logger: "logging.Logger", soup: BeautifulSou
   result_dict = {}
   for schedule_table_data in schedule_table_data_list:
     current_date = current_date + timedelta(days=1)
-    reserve_table_data_div_list = schedule_table_data.find_all("div")
+    reserve_table_data_div_list = schedule_table_data.find_all(name="div")
     if len(reserve_table_data_div_list) == 0:
       # Reserve table data div might be empty because schedule is only shown up to 2 weeks in advance
       continue
@@ -48,20 +84,20 @@ def get_schedule_from_response_soup(logger: "logging.Logger", soup: BeautifulSou
       else:
         availability = RESPONSE_AVAILABILITY_MAP[reserve_table_data_div_class_list[1]]
 
-      schedule_class_span = reserve_table_data_div.find("span", class_="scheduleClass")
+      schedule_class_span = reserve_table_data_div.find(name="span", class_="scheduleClass")
       if schedule_class_span is None:
         # Check if class was cancelled or is an actual error
-        is_cancelled = reserve_table_data_div.find("span", class_="scheduleCancelled")
+        is_cancelled = reserve_table_data_div.find(name="span", class_="scheduleCancelled")
         if is_cancelled is None:
           logger.warning(f"Failed to get session name: {reserve_table_data_div}")
         continue
 
-      schedule_instruc_span = reserve_table_data_div.find("span", class_="scheduleInstruc")
+      schedule_instruc_span = reserve_table_data_div.find(name="span", class_="scheduleInstruc")
       if schedule_instruc_span is None:
         logger.warning(f"Failed to get session instructor: {reserve_table_data_div}")
         continue
 
-      schedule_time_span = reserve_table_data_div.find("span", class_="scheduleTime")
+      schedule_time_span = reserve_table_data_div.find(name="span", class_="scheduleTime")
       if schedule_time_span is None:
         logger.warning(f"Failed to get session time: {reserve_table_data_div}")
         continue
@@ -80,7 +116,8 @@ def get_schedule_from_response_soup(logger: "logging.Logger", soup: BeautifulSou
         instructor=schedule_instruc_span.get_text().strip(),
         time=schedule_time,
         availability=availability,
-        capacity_info=CapacityInfo())
+        capacity_info=CapacityInfo(),
+      )
 
       if current_date not in result_dict:
         result_dict[current_date] = [copy(class_details)]
@@ -90,18 +127,28 @@ def get_schedule_from_response_soup(logger: "logging.Logger", soup: BeautifulSou
   return result_dict
 
 def get_instructorid_map_from_response_soup(logger: "logging.Logger", soup: BeautifulSoup) -> dict[str, int]:
-  reserve_filter = soup.find("ul", id="reserveFilter")
+  """
+  Parses the response soup to extract the IDs of instructors.
+
+  Args:
+    - logger (logging.Logger): Logger for logging messages.
+    - soup (BeautifulSoup): The parsed HTML response from the schedule request.
+
+  Returns:
+    - dict[str, int]: Dictionary of instructor names and IDs.
+  """
+  reserve_filter = soup.find(name="ul", id="reserveFilter")
   if reserve_filter is None:
     # No classes for the week so there is no instructor filter as well
     return {}
 
-  instructor_filter = reserve_filter.find("li", id="reserveFilter1")
+  instructor_filter = reserve_filter.find(name="li", id="reserveFilter1")
   if instructor_filter is None:
     logger.warning(f"Failed to get list of instructors - Instructor filter not found: {reserve_filter}")
     return {}
 
   instructorid_map = {}
-  for instructor in instructor_filter.find_all("li"):
+  for instructor in instructor_filter.find_all(name="li"):
     instructor_name = instructor.string
     if instructor.a is None:
       logger.warning(f"Failed to get id of instructor {instructor_name} - A tag is null: {instructor}")
@@ -122,21 +169,29 @@ def get_instructorid_map_from_response_soup(logger: "logging.Logger", soup: Beau
   return instructorid_map
 
 def get_ally_schedule_and_instructorid_map(logger: "logging.Logger") -> tuple[ResultData, dict[str, int]]:
+  """
+  Retrieves class schedules and instructor ID mappings.
+
+  Args:
+    - logger (logging.Logger): Logger for logging messages.
+
+  Returns:
+    - tuple[ResultData, dict[str, int]]: A tuple containing schedule data and instructor ID mappings.
+  """
   result = ResultData()
   instructorid_map = {}
   # REST API can only select one week at a time
   # Ally schedule only shows up to 2 weeks in advance
   for week in range(0, 2):
     get_schedule_response = send_get_schedule_request(week=week)
-    soup = BeautifulSoup(get_schedule_response.text, "html.parser")
+    soup = BeautifulSoup(markup=get_schedule_response.text, features="html.parser")
 
     # Get schedule
     date_class_data_list_dict = get_schedule_from_response_soup(logger=logger, soup=soup, week=week)
-    result.add_classes(date_class_data_list_dict)
+    result.add_classes(classes=date_class_data_list_dict)
 
     # Get instructor id map
     current_instructorid_map = get_instructorid_map_from_response_soup(logger=logger, soup=soup)
     instructorid_map = {**instructorid_map, **current_instructorid_map}
 
   return result, instructorid_map
-
