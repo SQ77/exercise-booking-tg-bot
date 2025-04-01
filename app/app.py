@@ -10,7 +10,6 @@ import os
 import telebot
 import threading
 import time
-import types
 import schedule
 import signal
 from chat.chat_manager import ChatManager
@@ -152,13 +151,13 @@ class App:
     """
     self.bot.infinity_polling(allowed_updates=['message', 'callback_query'])
 
-  def shutdown(self, signum: int, frame: types.FrameType) -> None:
+  def shutdown(self, _: int, __: "types.FrameType") -> None:
     """
     Gracefully shuts down the bot and background threads.
 
     Args:
-      - signum (int): Signal number received.
-      - frame (types.FrameType): Current stack frame at the time of signal reception.
+      - _ (int): Signal number received, but not used in this function.
+      - __ (types.FrameType): Current stack frame at the time of signal reception, but not used in this function.
     """
     self.logger.info("Received termination signal. Stopping bot and background threads...")
     self.bot.stop_polling()
