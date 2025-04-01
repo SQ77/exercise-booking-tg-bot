@@ -1,4 +1,5 @@
 from common.data_types import SORTED_DAYS
+from copy import copy
 from menu.main_page_handler import main_page_handler
 
 def days_callback_query_handler(query: "telebot.types.CallbackQuery", bot: "telebot.TeleBot", chat_manager: "ChatManager", keyboard_manager: "KeyboardManager") -> None:
@@ -7,7 +8,7 @@ def days_callback_query_handler(query: "telebot.types.CallbackQuery", bot: "tele
   if selected_day == "None":
     chat_manager.update_query_data_days(query.message.chat.id, [])
   elif selected_day == "All":
-    chat_manager.update_query_data_days(query.message.chat.id, SORTED_DAYS)
+    chat_manager.update_query_data_days(query.message.chat.id, copy(SORTED_DAYS))
   else:
     query_data = chat_manager.get_query_data(query.message.chat.id)
     if selected_day in query_data.days:
