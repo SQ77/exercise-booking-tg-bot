@@ -43,7 +43,7 @@ class App:
     """
     self.logger = logging.getLogger(__name__)
     logging.basicConfig(
-      format="%(asctime)s %(filename)s:%(lineno)d [%(levelname)-1s] %(message)s",
+      format="%(asctime)s %(filename)s:%(lineno)d [Thread-%(thread)d][%(levelname)-1s] %(message)s",
       level=logging.INFO,
       datefmt="%d-%m-%Y %H:%M:%S")
 
@@ -149,6 +149,7 @@ class App:
     """
     Starts the TeleBot's polling mechanism to listen for messages and callback queries.
     """
+    self.logger.info("Starting bot polling...")
     self.bot.infinity_polling(allowed_updates=['message', 'callback_query'])
 
   def shutdown(self, _: int, __: "types.FrameType") -> None:
@@ -199,7 +200,7 @@ class App:
     self.update_cached_result_data()
 
     # Start threads
-    self.logger.info("Starting bot...")
+    self.logger.info("Starting threads...")
     self.server_thread.start()
     self.update_schedule_thread.start()
     self.bot_polling_thread.start()
