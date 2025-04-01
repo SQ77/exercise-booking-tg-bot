@@ -5,6 +5,7 @@ Description:
   This file defines functions to handle the retrieving of
   class schedules and instructor IDs for Ally studio.
 """
+import pytz
 import re
 import requests
 from bs4 import BeautifulSoup
@@ -68,7 +69,7 @@ def get_schedule_from_response_soup(
     return {}
 
   # Get yesterday's date and update date at the start of each loop
-  current_date = datetime.now().date() + timedelta(weeks=week) - timedelta(days=1)
+  current_date = datetime.now(tz=pytz.timezone("Asia/Singapore")).date() + timedelta(weeks=week) - timedelta(days=1)
   result_dict = {}
   for schedule_table_data in schedule_table_data_list:
     current_date = current_date + timedelta(days=1)

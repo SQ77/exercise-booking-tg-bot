@@ -6,6 +6,7 @@ Description:
   class schedules and instructor IDs for Anarchy studio.
 """
 import json
+import pytz
 import re
 import requests
 from bs4 import BeautifulSoup
@@ -175,7 +176,7 @@ def get_anarchy_schedule_and_instructorid_map(logger: "logging.Logger") -> tuple
   Returns:
     - tuple[ResultData, dict[str, int]]: A tuple containing schedule data and instructor ID mappings.
   """
-  start_date = datetime.now().date()
+  start_date = datetime.now(tz=pytz.timezone("Asia/Singapore")).date()
   end_date = start_date + timedelta(weeks=3) # Anarchy schedule only shows up to 3 weeks in advance
   get_schedule_response = send_get_schedule_request(start_date=start_date, end_date=end_date)
   soup = get_soup_from_response(logger=logger, response=get_schedule_response)

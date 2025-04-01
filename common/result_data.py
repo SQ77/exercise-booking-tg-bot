@@ -77,9 +77,9 @@ class ResultData:
       return ResultData()
 
     classes = {}
-    current_sg_time = datetime.now(pytz.timezone("Asia/Singapore"))
+    current_sg_time = datetime.now(tz=pytz.timezone("Asia/Singapore"))
     for week in range(0, query.weeks):
-      date_to_check = datetime.now().date() + timedelta(weeks=week)
+      date_to_check = datetime.now(tz=pytz.timezone("Asia/Singapore")).date() + timedelta(weeks=week)
       for day in range(7):
         if "All" not in query.days and calendar.day_name[date_to_check.weekday()] not in query.days:
           date_to_check = date_to_check + timedelta(days=1)
