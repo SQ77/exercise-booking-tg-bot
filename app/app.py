@@ -118,11 +118,11 @@ class App:
     self.stop_event.set()
 
     # Wait for non-daemon threads to stop
-    # Thread could be null if shutdown signal was received before thread was created
-    if self.bot_polling_thread is not None:
+    if self.bot_polling_thread.is_alive():
       self.bot_polling_thread.join()
 
     self.logger.info("Successfully exited")
+    exit(0)
 
   def run(self) -> None:
     # Load existing history
@@ -131,24 +131,26 @@ class App:
     # Create threads
     self.stop_event = threading.Event()
 
-    # Register signal handlers
-    signal.signal(signal.SIGTERM, self.shutdown)
-    signal.signal(signal.SIGINT, self.shutdown)
-
-    # Start the server in a separate thread
+    # Setup threads
     self.server_thread = threading.Thread(target=self.server.start_server, daemon=True)
-    self.server_thread.start()
+    self.update_schedule_thread = threading.Thread(
+      target=self.schedule_update_cached_result_data,
+      args=[self.stop_event],
+      daemon=True,
+    )
+    self.bot_polling_thread = threading.Thread(target=self.start_bot_polling)
 
-    # Start updating cached result data periodically in a separate thread
-    self.update_schedule_thread = threading.Thread(target=self.schedule_update_cached_result_data, args=[self.stop_event], daemon=True)
-    self.update_schedule_thread.start()
+    # Register signal handlers
+    signal.signal(signalnum=signal.SIGTERM, handler=self.shutdown)
+    signal.signal(signalnum=signal.SIGINT, handler=self.shutdown)
 
     # Get current schedule and store in cache
-    self.logger.info("Starting bot...")
     self.update_cached_result_data()
 
-    # Start bot polling in a separate thread
-    self.bot_polling_thread = threading.Thread(target=self.start_bot_polling)
+    # Start threads
+    self.logger.info("Starting bot...")
+    self.server_thread.start()
+    self.update_schedule_thread.start()
     self.bot_polling_thread.start()
     self.logger.info("Bot started!")
 
