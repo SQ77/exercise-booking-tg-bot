@@ -71,7 +71,10 @@ class ChatManager:
   def send_prompt(self, chat_id: int, text: str, reply_markup: "telebot.types.InlineKeyboardMarkup", delete_sent_msg_in_future: bool) -> "telebot.types.Message":
     message_ids_to_delete = self.chat_message_ids_to_delete.pop(chat_id, None)
     if message_ids_to_delete is not None:
-      self.bot.delete_messages(chat_id, message_ids_to_delete)
+      try:
+        self.bot.delete_messages(chat_id, message_ids_to_delete)
+      except Exception as e:
+        self.logger.warning(f"Failed to delete messages - {e}")
 
     sent_msg = self.bot.send_message(chat_id, text, reply_markup=reply_markup, parse_mode="Markdown")
     if delete_sent_msg_in_future:
