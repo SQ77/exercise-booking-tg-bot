@@ -23,12 +23,13 @@ class StudiosManager:
 
   Attributes:
     - logger (logging.Logger): Logger for logging messages.
+    - rev_security_token (str): Security token used for sending requests to Rev.
     - cached_result_data_lock (readerwriterlock.rwlock): Read-write lock for cached_result_data.
     - cached_result_data (ResultData): Cached result data containing schedules of all the studios.
     - studios (dict[StudioType, StudioManager]): Dictionary of studio types and studio managers.
   """
 
-  def __init__(self, logger: "logging.Logger") -> None:
+  def __init__(self, logger: "logging.Logger", rev_security_token: str) -> None:
     """
     Initializes the StudiosManager instance.
 
@@ -36,14 +37,15 @@ class StudiosManager:
       - logger (logging.Logger): The logger for logging messages.
     """
     self.logger = logger
+    self.rev_security_token = rev_security_token
     self.cached_result_data_lock = rwlock.RWLockFair()
     self.cached_result_data = ResultData()
     self.studios = {
-      "Absolute": StudioManager(self.logger, get_absolute_schedule_and_instructorid_map),
-      "Ally": StudioManager(self.logger, get_ally_schedule_and_instructorid_map),
-      "Anarchy": StudioManager(self.logger, get_anarchy_schedule_and_instructorid_map),
-      "Barrys": StudioManager(self.logger, get_barrys_schedule_and_instructorid_map),
-      "Rev": StudioManager(self.logger, get_rev_schedule_and_instructorid_map)
+      "Absolute": StudioManager(get_absolute_schedule_and_instructorid_map),
+      "Ally": StudioManager(get_ally_schedule_and_instructorid_map),
+      "Anarchy": StudioManager(get_anarchy_schedule_and_instructorid_map),
+      "Barrys": StudioManager(get_barrys_schedule_and_instructorid_map),
+      "Rev": StudioManager(get_rev_schedule_and_instructorid_map)
     }
 
   def update_cached_result_data(self) -> None:
@@ -51,27 +53,27 @@ class StudiosManager:
     Updates the cached schedule data from all studios.
     """
     def _get_absolute_schedule(self, mutex: threading.Lock, updated_cached_result_data: ResultData) -> None:
-      absolute_schedule = self.studios["Absolute"].get_schedule()
+      absolute_schedule = self.studios["Absolute"].get_schedule(self.logger)
       with mutex:
         updated_cached_result_data += absolute_schedule
 
     def _get_ally_schedule(self, mutex: threading.Lock, updated_cached_result_data: ResultData) -> None:
-      ally_schedule = self.studios["Ally"].get_schedule()
+      ally_schedule = self.studios["Ally"].get_schedule(self.logger)
       with mutex:
         updated_cached_result_data += ally_schedule
 
     def _get_anarchy_schedule(self, mutex: threading.Lock, updated_cached_result_data: ResultData) -> None:
-      anarchy_schedule = self.studios["Anarchy"].get_schedule()
+      anarchy_schedule = self.studios["Anarchy"].get_schedule(self.logger)
       with mutex:
         updated_cached_result_data += anarchy_schedule
 
     def _get_barrys_schedule(self, mutex: threading.Lock, updated_cached_result_data: ResultData) -> None:
-      barrys_schedule = self.studios["Barrys"].get_schedule()
+      barrys_schedule = self.studios["Barrys"].get_schedule(self.logger)
       with mutex:
         updated_cached_result_data += barrys_schedule
 
     def _get_rev_schedule(self, mutex: threading.Lock, updated_cached_result_data: ResultData) -> None:
-      rev_schedule = self.studios["Rev"].get_schedule()
+      rev_schedule = self.studios["Rev"].get_schedule(self.logger, self.rev_security_token)
       with mutex:
         updated_cached_result_data += rev_schedule
 

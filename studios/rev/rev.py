@@ -19,12 +19,11 @@ from copy import copy
 from datetime import datetime, timedelta
 from studios.rev.data import ROOM_NAME_TO_STUDIO_LOCATION_MAP, SITE_ID_MAP
 
-SECURITY_TOKEN = os.environ.get("BOOKING_BOT_REV_SECURITY_TOKEN")
-
 def send_get_schedule_request(
   location: StudioLocation,
   start_date: datetime.date,
   end_date: datetime,
+  security_token: str,
 ) -> requests.models.Response:
   """
   Sends a GET request to retrieve the class schedule for the specified locations and week.
@@ -33,6 +32,7 @@ def send_get_schedule_request(
     - location (StudioLocation): The studio location to retrieve the schedule for.
     - start_date (datetime.date): The start date to retrieve the schedule for.
     - end_date (datetime.date): The end date to retrieve the schedule for.
+    - security_token (str): Security token used for sending requests.
 
   Returns:
     - requests.models.Response: The response object containing the schedule data.
@@ -43,7 +43,7 @@ def send_get_schedule_request(
   params = {"siteID": SITE_ID_MAP[location], "startDate": start_date_str, "endDate": end_date_str}
   headers = {
     "Content-Type": "application/json",
-    "Securitytoken": SECURITY_TOKEN,
+    "Securitytoken": security_token,
   }
   return requests.get(url=url, params=params, headers=headers)
 
@@ -124,12 +124,13 @@ def parse_get_schedule_response(
 
   return result_dict
 
-def get_rev_schedule(logger: "logging.Logger") -> ResultData:
+def get_rev_schedule(logger: "logging.Logger", security_token: str) -> ResultData:
   """
   Retrieves all the available class schedules.
 
   Args:
     - logger (logging.Logger): Logger for logging messages.
+    - security_token (str): Security token used for sending requests.
 
   Returns:
     - ResultData: The schedule data.
@@ -140,18 +141,24 @@ def get_rev_schedule(logger: "logging.Logger") -> ResultData:
 
   # REST API can only select one location at a time
   for location in ["Bugis", "Orchard", "TJPG"]:
-    get_schedule_response = send_get_schedule_request(location=location, start_date=start_date, end_date=end_date)
+    get_schedule_response = send_get_schedule_request(
+      location=location,
+      start_date=start_date,
+      end_date=end_date,
+      security_token=security_token,
+    )
     date_class_data_list_dict = parse_get_schedule_response(logger=logger, response=get_schedule_response)
     result.add_classes(classes=date_class_data_list_dict)
 
   return result
 
-def get_instructorid_map(logger: "logging.Logger") -> dict[str, int]:
+def get_instructorid_map(logger: "logging.Logger", security_token: str) -> dict[str, int]:
   """
   Retrieves the IDs of instructors.
 
   Args:
     - logger (logging.Logger): Logger for logging messages.
+    - security_token (str): Security token used for sending requests.
 
   Returns:
     - dict[str, int]: Dictionary of instructor names and IDs.
@@ -159,7 +166,7 @@ def get_instructorid_map(logger: "logging.Logger") -> dict[str, int]:
   url = "https://widgetapi.hapana.com/v2/wAPI/site/instructor?siteID=WHplM0YwQjVCUmZic3RvV3oveFFSQT09"
   headers = {
     "Content-Type": "application/json",
-    "Securitytoken": SECURITY_TOKEN,
+    "Securitytoken": security_token,
   }
   response = requests.get(url=url, headers=headers)
   if response.status_code != 200:
@@ -182,14 +189,21 @@ def get_instructorid_map(logger: "logging.Logger") -> dict[str, int]:
 
   return instructorid_map
 
-def get_rev_schedule_and_instructorid_map(logger: "logging.Logger") -> tuple[ResultData, dict[str, int]]:
+def get_rev_schedule_and_instructorid_map(
+  logger: "logging.Logger",
+  security_token: str,
+) -> tuple[ResultData, dict[str, int]]:
   """
   Retrieves class schedules and instructor ID mappings.
 
   Args:
     - logger (logging.Logger): Logger for logging messages.
+    - security_token (str): Security token used for sending requests.
 
   Returns:
     - tuple[ResultData, dict[str, int]]: A tuple containing schedule data and instructor ID mappings.
   """
-  return get_rev_schedule(logger=logger), get_instructorid_map(logger=logger)
+  return (
+    get_rev_schedule(logger=logger, security_token=security_token),
+    get_instructorid_map(logger=logger, security_token=security_token)
+  )

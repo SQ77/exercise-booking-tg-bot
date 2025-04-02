@@ -28,7 +28,9 @@ class App:
 
   Attributes:
     - logger (logging.Logger): Logger for logging messages.
+    - base_url (str): Base URL that the Server will be listening on.
     - bot (telebot.TeleBot): The Telegram bot instance.
+    - bot_token (str): The Telegram bot token.
     - chat_manager (ChatManager): The manager handling chat data.
     - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
     - studios_manager (StudiosManager): The manager handling studios data.
@@ -57,8 +59,8 @@ class App:
       level=logging.INFO,
       datefmt="%d-%m-%Y %H:%M:%S")
 
-    bot_token = os.environ.get("BOT_TOKEN")
-    self.bot = telebot.TeleBot(token=bot_token)
+    self.load_env_vars()
+    self.bot = telebot.TeleBot(token=self.bot_token)
     start_command = telebot.types.BotCommand(command="start", description="Check schedules")
     nerd_command = telebot.types.BotCommand(command="nerd", description="Nerd mode")
     instructors_command = telebot.types.BotCommand(command="instructors", description="Show list of instructors")
@@ -66,7 +68,7 @@ class App:
 
     self.chat_manager = ChatManager(bot=self.bot)
     self.keyboard_manager = KeyboardManager()
-    self.studios_manager = StudiosManager(logger=self.logger)
+    self.studios_manager = StudiosManager(logger=self.logger, rev_security_token=self.rev_security_token)
     self.history_manager = HistoryManager(logger=self.logger)
     self.server = Server(logger=self.logger)
     self.menu_manager = MenuManager(
@@ -87,6 +89,31 @@ class App:
       target=self.studios_manager.schedule_update_cached_result_data,
       daemon=True,
     )
+
+  def load_env_vars(self):
+    """
+    Loads the environment variables to be used for the application.
+    Exits the application if a required environment variable could not be loaded.
+    """
+    loaded_successfully = True
+    self.base_url = os.getenv('RENDER_EXTERNAL_URL', os.getenv('TELEGRAM_BOT_EXTERNAL_URL'))
+    if self.base_url is None:
+      self.logger.error("RENDER_EXTERNAL_URL or TELEGRAM_BOT_EXTERNAL_URL env var required but not set")
+      loaded_successfully = False
+
+    self.bot_token = os.getenv("BOT_TOKEN")
+    if self.bot_token is None:
+      self.logger.error("BOT_TOKEN env var required but not set")
+      loaded_successfully = False
+
+    self.rev_security_token = os.getenv("BOOKING_BOT_REV_SECURITY_TOKEN")
+    if self.rev_security_token is None:
+      self.logger.error("BOOKING_BOT_REV_SECURITY_TOKEN env var required but not set")
+      loaded_successfully = False
+
+    if not loaded_successfully:
+      self.logger.error("Failed to initialize app. Exiting...")
+      exit(1)
 
   def keep_alive(self) -> None:
     """
