@@ -46,7 +46,7 @@ class ClassData:
     """
     self.studio = studio
     self.location = location
-    self.name = name.replace("*", "\*").replace("_", "\_").replace("`", "\`")
+    self.name = name.replace("*", r"\*").replace("_", r"\_").replace("`", r"\`")
     self.instructor = instructor
     self.time = time
     self.availability = availability
@@ -55,6 +55,7 @@ class ClassData:
   def __eq__(self, other: "ClassData") -> bool:
     """
     Equality check between two ClassData objects.
+    Only checks studio, location, class name, instructor, and time.
 
     Args:
       - other (ClassData): The other ClassData object to compare.

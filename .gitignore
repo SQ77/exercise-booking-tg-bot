@@ -1,2 +1,5 @@
 # exclude pycache files
 *__pycache__*
+
+# exclude coverage files
+.coverage

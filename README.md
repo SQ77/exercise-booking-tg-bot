@@ -33,6 +33,10 @@ _Note: Screenshots are not updated to show support for all studios. Usage for di
 - PORT (not required, defaults to 80)
   - The port that the server will be listening on.
 
+## Unit Tests
+
+Run `python -m pytest` to run all tests in the repo.
+
 ## Usage (Normal Mode)
 
 The main entry point for the bot can be found in the **main.py** script.

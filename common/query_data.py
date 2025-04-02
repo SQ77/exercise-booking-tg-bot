@@ -51,9 +51,6 @@ class QueryData:
     if studio not in self.studios:
       return []
 
-    if self.studios[studio].locations is None:
-      return []
-
     return self.studios[studio].locations
 
   def get_selected_studios_str(self) -> str:
