@@ -116,9 +116,9 @@ class App:
       self.logger.error("BOT_TOKEN env var required but not set")
       loaded_successfully = False
 
-    self.rev_security_token = os.getenv("BOOKING_BOT_REV_SECURITY_TOKEN")
+    self.rev_security_token = os.getenv("REV_SECURITY_TOKEN")
     if self.rev_security_token is None:
-      self.logger.error("BOOKING_BOT_REV_SECURITY_TOKEN env var required but not set")
+      self.logger.error("REV_SECURITY_TOKEN env var required but not set")
       loaded_successfully = False
 
     self.server_port = os.getenv("PORT")
