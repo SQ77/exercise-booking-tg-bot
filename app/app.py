@@ -29,6 +29,7 @@ class App:
   Attributes:
     - logger (logging.Logger): Logger for logging messages.
     - base_url (str): Base URL that the Server will be listening on.
+    - webhook_path (str): The route for the Telegram bot webhook requests.
     - bot (telebot.TeleBot): The Telegram bot instance.
     - bot_token (str): The Telegram bot token.
     - chat_manager (ChatManager): The manager handling chat data.
@@ -39,7 +40,6 @@ class App:
     - menu_manager (MenuManager): The manager handling menus used for interactions between the Telegram bot and chats.
     - keep_alive_thread (threading.Thread):
       The thread used by the server to ping itself. Used to keep deployment on Render alive.
-    - bot_polling_thread (threading.Thread): The thread used by the bot to poll for messages.
     - server_thread (threading.Thread): The thread used by the server to handle REST requests.
     - studios_manager_thread (threading.Thread):
       The thread used by the schedule manager to handle retrieving of schedules.
@@ -70,7 +70,13 @@ class App:
     self.keyboard_manager = KeyboardManager()
     self.studios_manager = StudiosManager(logger=self.logger, rev_security_token=self.rev_security_token)
     self.history_manager = HistoryManager(logger=self.logger)
-    self.server = Server(logger=self.logger)
+    self.server = Server(
+      logger=self.logger,
+      base_url=self.base_url,
+      port=self.server_port,
+      bot=self.bot,
+      webhook_path=self.webhook_path,
+    )
     self.menu_manager = MenuManager(
       logger=self.logger,
       bot=self.bot,
@@ -83,7 +89,6 @@ class App:
     # Setup threads
     self.stop_event = threading.Event()
     self.keep_alive_thread = threading.Thread(target=self.keep_alive, daemon=True)
-    self.bot_polling_thread = threading.Thread(target=self.start_bot_polling)
     self.server_thread = threading.Thread(target=self.server.start_server, daemon=True)
     self.studios_manager_thread = threading.Thread(
       target=self.studios_manager.schedule_update_cached_result_data,
@@ -101,6 +106,11 @@ class App:
       self.logger.error("RENDER_EXTERNAL_URL or TELEGRAM_BOT_EXTERNAL_URL env var required but not set")
       loaded_successfully = False
 
+    self.webhook_path = os.getenv('WEBHOOK_PATH')
+    if self.webhook_path is None:
+      self.logger.error("WEBHOOK_PATH env var required but not set")
+      loaded_successfully = False
+
     self.bot_token = os.getenv("BOT_TOKEN")
     if self.bot_token is None:
       self.logger.error("BOT_TOKEN env var required but not set")
@@ -111,9 +121,23 @@ class App:
       self.logger.error("BOOKING_BOT_REV_SECURITY_TOKEN env var required but not set")
       loaded_successfully = False
 
+    self.server_port = os.getenv("PORT")
+    if self.server_port is None:
+      # PORT env var not mandatory, default to 80 if not found
+      self.logger.warning("PORT env var not found. Defaulting to 80")
+      self.server_port = 80
+
     if not loaded_successfully:
       self.logger.error("Failed to initialize app. Exiting...")
       exit(1)
+
+  def set_webhook(self):
+    """
+    Sets the webhook url for the Telegram bot.
+    """
+    webhook_url = f"{self.base_url}/{self.webhook_path}"
+    self.bot.set_webhook(url=webhook_url)
+    self.logger.info(f"Webhook for Telegram bot successfully set!")
 
   def keep_alive(self) -> None:
     """
@@ -121,13 +145,6 @@ class App:
     Scheduled runs is triggered in main thread.
     """
     schedule.every(10).minutes.do(job_func=self.server.ping_self)
-
-  def start_bot_polling(self) -> None:
-    """
-    Starts the TeleBot's polling mechanism to listen for messages and callback queries.
-    """
-    self.logger.info("Starting bot polling...")
-    self.bot.infinity_polling(allowed_updates=['message', 'callback_query'])
 
   def shutdown(self, _: int, __: "types.FrameType") -> None:
     """
@@ -137,15 +154,10 @@ class App:
       - _ (int): Signal number received, but not used in this function.
       - __ (types.FrameType): Current stack frame at the time of signal reception, but not used in this function.
     """
-    self.logger.info("Received termination signal. Stopping bot and background threads...")
-    self.bot.stop_polling()
+    self.logger.info("Received termination signal. Shutting down application...")
 
     # Signal threads to stop
     self.stop_event.set()
-
-    # Wait for non-daemon threads to stop
-    if self.bot_polling_thread.is_alive():
-      self.bot_polling_thread.join()
 
     self.logger.info("Successfully exited")
     exit(0)
@@ -164,12 +176,14 @@ class App:
     # Start schedule manager to get current schedule and store in cache
     self.studios_manager.start()
 
+    # Initialize webhook for Telegram bot
+    self.set_webhook()
+
     # Start threads
     self.logger.info("Starting threads...")
     self.server_thread.start()
     self.keep_alive_thread.start()
     self.studios_manager_thread.start()
-    self.bot_polling_thread.start()
     self.logger.info("Bot started!")
 
     # Keep the main thread alive
