@@ -4,14 +4,14 @@ Author: https://github.com/lendrixxx
 Description: This file tests the functions of the main page handler.
 """
 import logging
-import example_html_responses
-import expected_results
 import pytest
 import requests
 from bs4 import BeautifulSoup
 from common.studio_location import StudioLocation
 from datetime import date
 from studios.ally.ally import send_get_schedule_request, get_schedule_from_response_soup, get_instructorid_map_from_response_soup, get_ally_schedule_and_instructorid_map
+from tests.studios.ally import expected_results
+from tests.studios.ally import example_html_responses
 
 def test_send_get_schedule_request_single_location(mocker):
   """

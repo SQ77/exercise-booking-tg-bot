@@ -35,7 +35,17 @@ _Note: Screenshots are not updated to show support for all studios. Usage for di
 
 ## Unit Tests
 
-Run `python -m pytest` to run all tests in the repo.
+### Running all tests
+
+Run `pytest` to run all tests in the repo.
+
+### Running tests in a folder
+
+Run `pytest {folder}` to run all tests in the specified folder.
+
+### Running individual tests
+
+Run `pytest {path/to/file.py}::{test_name}` to run a specific test.
 
 ## Usage (Normal Mode)
 
