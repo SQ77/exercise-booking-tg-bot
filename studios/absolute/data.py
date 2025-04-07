@@ -16,16 +16,6 @@ LOCATION_MAP = {
   StudioLocation.Raffles: 8,
 }
 
-# Dictionary of location strings from response and studio locations
-RESPONSE_LOCATION_TO_STUDIO_LOCATION_MAP = {
-  "The Centrepoint (CTP)": StudioLocation.Centrepoint,
-  "The Star Vista (STV)": StudioLocation.StarVista,
-  "Millenia Walk (MW)": StudioLocation.MilleniaWalk,
-  "i12 Katong (KTG)": StudioLocation.i12,
-  "Great World (GW)": StudioLocation.GreatWorld,
-  "Raffles Place (RP)": StudioLocation.Raffles,
-}
-
 # Dictionary of room IDs and studio types
 ROOM_ID_TO_STUDIO_TYPE_MAP = {
   "2318746084081403485": StudioType.AbsolutePilates, # Centrepoint Wunda Chair
@@ -47,4 +37,27 @@ ROOM_ID_TO_STUDIO_TYPE_MAP = {
   "1973969112329618498": StudioType.AbsolutePilates, # Great World Reformer
 
   "979675880630519234": StudioType.AbsoluteSpin, # Millenia Walk Ride
+}
+
+# Dictionary of room IDs and studio locations
+ROOM_ID_TO_STUDIO_LOCATION_MAP = {
+  "2318746084081403485": StudioLocation.Centrepoint, # Centrepoint Wunda Chair
+  "831322535101466334": StudioLocation.Centrepoint,  # Centrepoint Reformer Room 1
+  "1180495114737288579": StudioLocation.Centrepoint, # Centrepoint Reformer Room 2
+  "816664672039076934": StudioLocation.Centrepoint,  # Centrepoint Ride
+
+  "831322688713656132": StudioLocation.i12,  # i12 Reformer Room 1
+  "2049314421699774164": StudioLocation.i12, # i12 Reformer Room 2
+  "1120160541927540298": StudioLocation.i12, # i12 Ride
+
+  "1666936824318133997": StudioLocation.StarVista, # Star Vista Reformer
+  "831321640959739033": StudioLocation.StarVista,  # Star Vista Ride
+
+  "2062965464820090493": StudioLocation.Raffles, # Raffles Place Reformer Room 1
+  "2062965605622876053": StudioLocation.Raffles, # Raffles Place Reformer Room 2
+  "2062965745611965609": StudioLocation.Raffles, # Raffles Place Ride
+
+  "1973969112329618498": StudioLocation.GreatWorld,  # Great World Reformer
+
+  "979675880630519234": StudioLocation.MilleniaWalk, # Millenia Walk Ride
 }

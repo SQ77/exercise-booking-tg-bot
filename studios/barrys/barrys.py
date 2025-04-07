@@ -147,7 +147,8 @@ def get_instructorid_map_from_response_soup(logger: "logging.Logger", soup: Beau
 
   instructorid_map = {}
   for instructor in instructor_filter.find_all(name="li"):
-    instructor_name = instructor.string
+    instructor_name = " ".join(instructor.get_text().strip().lower().split())
+    instructor_name = instructor_name.replace("\n", " ")
     if instructor.a is None:
       logger.warning(f"Failed to get id of instructor {instructor_name} - A tag is null: {instructor}")
       continue
@@ -162,7 +163,7 @@ def get_instructorid_map_from_response_soup(logger: "logging.Logger", soup: Beau
       logger.warning(f"Failed to get id of instructor {instructor_name} - Regex failed to match: {href}")
       continue
 
-    instructorid_map[instructor_name.lower()] = match.group(1)
+    instructorid_map[instructor_name] = match.group(1)
 
   return instructorid_map
 

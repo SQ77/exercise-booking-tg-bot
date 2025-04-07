@@ -84,3 +84,17 @@ class ClassData:
     self_time = datetime.strptime(self.time, "%I:%M %p")
     other_time = datetime.strptime(other.time, "%I:%M %p")
     return self_time < other_time
+
+
+  def __repr__(self) -> str:
+    """
+    Return a string representation of the ClassData object for debugging and logging.
+
+    Returns:
+      str: A string that represents the ClassData object in a detailed, readable way.
+    """
+    return (
+      f"ClassData(studio={self.studio}, location={self.location}, "
+      f"name={self.name}, instructor={self.instructor}, time={self.time}, "
+      f"availability={self.availability}, capacity_info={self.capacity_info})"
+    )

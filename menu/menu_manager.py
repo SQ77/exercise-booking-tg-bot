@@ -67,8 +67,8 @@ class MenuManager:
     Sets up all the callback query handlers for the different steps and stages of user interaction.
     """
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "main-page-handler")
-    def main_page_handler_callback_query_handler(query: "telebot.types.CallbackQuery") -> None:
-      main_page_handler.main_page_handler_callback_query_handler(
+    def main_page_callback_query_handler(query: "telebot.types.CallbackQuery") -> None:
+      main_page_handler.main_page_callback_query_handler(
         query=query,
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,

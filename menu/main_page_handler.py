@@ -5,7 +5,7 @@ Description: This file defines callback queries related to the main page.
 """
 import telebot
 
-def main_page_handler_callback_query_handler(
+def main_page_callback_query_handler(
   query: telebot.types.CallbackQuery,
   chat_manager: "ChatManager",
   keyboard_manager: "KeyboardManager",

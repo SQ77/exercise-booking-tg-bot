@@ -17,7 +17,7 @@ from common.studio_location import StudioLocation
 from common.data import RESPONSE_AVAILABILITY_MAP
 from copy import copy
 from datetime import datetime, timedelta
-from studios.ally.data import ROOM_ID_TO_STUDIO_TYPE_MAP
+from studios.ally.data import ROOM_ID_TO_STUDIO_LOCATION_MAP, ROOM_ID_TO_STUDIO_TYPE_MAP
 
 def send_get_schedule_request(week: int) -> requests.models.Response:
   """
@@ -36,7 +36,6 @@ def send_get_schedule_request(week: int) -> requests.models.Response:
 def get_schedule_from_response_soup(
   logger: "logging.Logger",
   soup: BeautifulSoup,
-  week: int,
 ) -> dict[datetime.date, list[ClassData]]:
   """
   Parses the response soup to extract the class schedule data.
@@ -44,7 +43,6 @@ def get_schedule_from_response_soup(
   Args:
     - logger (logging.Logger): Logger for logging messages.
     - soup (BeautifulSoup): The parsed HTML response from the schedule request.
-    - week (int): The week number of the retrieved schedule..
 
   Returns:
     - dict[datetime.date, list[ClassData]]: Dictionary of dates and details of classes.
@@ -54,65 +52,102 @@ def get_schedule_from_response_soup(
     logger.warning(f"Failed to get schedule - Schedule table not found: {soup}")
     return {}
 
+  if schedule_table.thead is None:
+    logger.warning(f"Failed to get schedule - Schedule table head not found: {schedule_table}")
+    return {}
+
   if schedule_table.tbody is None:
     # No classes for the week
     return {}
 
-  schedule_table_row = schedule_table.tbody.find(name="tr")
-  if schedule_table_row is None:
-    logger.warning(f"Failed to get schedule - Schedule table row not found: {schedule_table}")
+  schedule_table_head_row = schedule_table.thead.find(name="tr")
+  if schedule_table_head_row is None:
+    logger.warning(f"Failed to get schedule - Schedule table head row not found: {schedule_table.thead}")
     return {}
 
-  schedule_table_data_list = schedule_table_row.find_all(name="td")
-  if len(schedule_table_data_list) == 0:
-    logger.warning(f"Failed to get schedule - Schedule table data is null: {schedule_table_row}")
+  schedule_table_body_row = schedule_table.tbody.find(name="tr")
+  if schedule_table_body_row is None:
+    logger.warning(f"Failed to get schedule - Schedule table body row not found: {schedule_table.tbody}")
     return {}
 
-  # Get yesterday's date and update date at the start of each loop
-  current_date = datetime.now(tz=pytz.timezone("Asia/Singapore")).date() + timedelta(weeks=week) - timedelta(days=1)
+  schedule_table_head_data_list = schedule_table_head_row.find_all(name="td")
+  schedule_table_head_data_list_len = len(schedule_table_head_data_list)
+  if schedule_table_head_data_list_len == 0:
+    logger.warning(f"Failed to get schedule - Schedule table head data is null: {schedule_table_head_row}")
+    return {}
+
+  schedule_table_body_data_list = schedule_table_body_row.find_all(name="td")
+  schedule_table_body_data_list_len = len(schedule_table_body_data_list)
+  if schedule_table_body_data_list_len == 0:
+    logger.warning(f"Failed to get schedule - Schedule table body data is null: {schedule_table_body_row}")
+    return {}
+
+  if schedule_table_head_data_list_len != schedule_table_body_data_list_len:
+    logger.warning(
+      f"Failed to get schedule - Schedule table head and body list length does not match: "
+      f"Head data: {schedule_table_head_data_list}\nBody data: {schedule_table_body_data_list}"
+    )
+    return {}
+
   result_dict = {}
-  for schedule_table_data in schedule_table_data_list:
-    current_date = current_date + timedelta(days=1)
-    reserve_table_data_div_list = schedule_table_data.find_all(name="div")
-    if len(reserve_table_data_div_list) == 0:
+  current_year = datetime.now(tz=pytz.timezone("Asia/Singapore")).year
+  for index, schedule_table_head_data in enumerate(schedule_table_head_data_list):
+    schedule_table_body_data = schedule_table_body_data_list[index]
+    date_string = schedule_table_head_data.find(name="span", class_="thead-date").get_text().strip()
+    current_date = datetime.strptime(date_string, "%m.%d").date()
+    current_date = current_date.replace(year=current_year)
+    reserve_table_body_data_div_list = schedule_table_body_data.find_all(name="div")
+    if len(reserve_table_body_data_div_list) == 0:
       # Reserve table data div might be empty because schedule is only shown up to 2 weeks in advance
       continue
 
-    for reserve_table_data_div in reserve_table_data_div_list:
-      reserve_table_data_div_class_list = reserve_table_data_div.get("class")
-      if len(reserve_table_data_div_class_list) < 2:
+    for reserve_table_body_data_div in reserve_table_body_data_div_list:
+      reserve_table_body_data_div_class_list = reserve_table_body_data_div.get("class")
+      if len(reserve_table_body_data_div_class_list) < 2:
         availability = ClassAvailability.Null # Class is over
       else:
-        availability = RESPONSE_AVAILABILITY_MAP[reserve_table_data_div_class_list[1]]
+        availability = RESPONSE_AVAILABILITY_MAP[reserve_table_body_data_div_class_list[1]]
 
-      schedule_class_span = reserve_table_data_div.find(name="span", class_="scheduleClass")
+      schedule_class_span = reserve_table_body_data_div.find(name="span", class_="scheduleClass")
       if schedule_class_span is None:
         # Check if class was cancelled or is an actual error
-        is_cancelled = reserve_table_data_div.find(name="span", class_="scheduleCancelled")
+        is_cancelled = reserve_table_body_data_div.find(name="span", class_="scheduleCancelled")
         if is_cancelled is None:
-          logger.warning(f"Failed to get session name: {reserve_table_data_div}")
+          logger.warning(f"Failed to get session name: {reserve_table_body_data_div}")
         continue
 
-      schedule_instruc_span = reserve_table_data_div.find(name="span", class_="scheduleInstruc")
+      schedule_instruc_span = reserve_table_body_data_div.find(name="span", class_="scheduleInstruc")
       if schedule_instruc_span is None:
-        logger.warning(f"Failed to get session instructor: {reserve_table_data_div}")
+        logger.warning(f"Failed to get session instructor: {reserve_table_body_data_div}")
         continue
 
-      schedule_time_span = reserve_table_data_div.find(name="span", class_="scheduleTime")
+      schedule_time_span = reserve_table_body_data_div.find(name="span", class_="scheduleTime")
       if schedule_time_span is None:
-        logger.warning(f"Failed to get session time: {reserve_table_data_div}")
+        logger.warning(f"Failed to get session time: {reserve_table_body_data_div}")
         continue
       schedule_time = schedule_time_span.get_text().strip()
       schedule_time = schedule_time[:schedule_time.find("M") + 1]
 
-      room = reserve_table_data_div.get("data-room")
+      room = reserve_table_body_data_div.get("data-room")
       if room is None:
-        logger.warning(f"Failed to get session room: {reserve_table_data_div}")
+        logger.warning(f"Failed to get session room: {reserve_table_body_data_div}")
         continue
 
+      try:
+        studio = ROOM_ID_TO_STUDIO_TYPE_MAP[room]
+      except:
+        logger.warning(f"Failed to get session studio type for room '{room}'")
+        studio = StudioType.AllyUnknown
+
+      try:
+        location = ROOM_ID_TO_STUDIO_LOCATION_MAP[room]
+      except:
+        logger.warning(f"Failed to get session studio location for room '{room}'")
+        location = StudioLocation.Unknown
+
       class_details = ClassData(
-        studio=ROOM_ID_TO_STUDIO_TYPE_MAP[room],
-        location=StudioLocation.CrossStreet,
+        studio=studio,
+        location=location,
         name=schedule_class_span.get_text().strip(),
         instructor=schedule_instruc_span.get_text().strip(),
         time=schedule_time,
@@ -150,7 +185,8 @@ def get_instructorid_map_from_response_soup(logger: "logging.Logger", soup: Beau
 
   instructorid_map = {}
   for instructor in instructor_filter.find_all(name="li"):
-    instructor_name = instructor.string
+    instructor_name = " ".join(instructor.get_text().strip().lower().split())
+    instructor_name = instructor_name.replace("\n", " ")
     if instructor.a is None:
       logger.warning(f"Failed to get id of instructor {instructor_name} - A tag is null: {instructor}")
       continue
@@ -165,7 +201,7 @@ def get_instructorid_map_from_response_soup(logger: "logging.Logger", soup: Beau
       logger.warning(f"Failed to get id of instructor {instructor_name} - Regex failed to match: {href}")
       continue
 
-    instructorid_map[instructor_name.lower()] = match.group(1)
+    instructorid_map[instructor_name] = match.group(1)
 
   return instructorid_map
 
@@ -183,12 +219,12 @@ def get_ally_schedule_and_instructorid_map(logger: "logging.Logger") -> tuple[Re
   instructorid_map = {}
   # REST API can only select one week at a time
   # Ally schedule only shows up to 2 weeks in advance
-  for week in range(0, 2):
+  for week in range(0, 3):
     get_schedule_response = send_get_schedule_request(week=week)
     soup = BeautifulSoup(markup=get_schedule_response.text, features="html.parser")
 
     # Get schedule
-    date_class_data_list_dict = get_schedule_from_response_soup(logger=logger, soup=soup, week=week)
+    date_class_data_list_dict = get_schedule_from_response_soup(logger=logger, soup=soup)
     result.add_classes(classes=date_class_data_list_dict)
 
     # Get instructor id map

@@ -21,4 +21,5 @@ class StudioLocation(str, Enum):
   GreatWorld = "Great World"
   CrossStreet = "Cross Street"
   Robinson = "Robinson"
+  Unknown = "Unknown"
   Null = "Null"
