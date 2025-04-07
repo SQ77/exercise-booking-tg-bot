@@ -35,7 +35,6 @@ def send_get_schedule_request(week: int) -> requests.models.Response:
 def get_schedule_from_response_soup(
   logger: "logging.Logger",
   soup: BeautifulSoup,
-  week: int,
 ) -> dict[datetime.date, list[ClassData]]:
   """
   Parses the response soup to extract the class schedule data.
@@ -43,7 +42,6 @@ def get_schedule_from_response_soup(
   Args:
     - logger (logging.Logger): Logger for logging messages.
     - soup (BeautifulSoup): The parsed HTML response from the schedule request.
-    - week (int): The week number of the retrieved schedule..
 
   Returns:
     - dict[datetime.date, list[ClassData]]: Dictionary of dates and details of classes.
@@ -192,7 +190,7 @@ def get_barrys_schedule_and_instructorid_map(logger: "logging.Logger") -> tuple[
     soup = BeautifulSoup(markup=get_schedule_response.text, features="html.parser")
 
     # Get schedule
-    date_class_data_list_dict = get_schedule_from_response_soup(logger=logger, soup=soup, week=week)
+    date_class_data_list_dict = get_schedule_from_response_soup(logger=logger, soup=soup)
     result.add_classes(classes=date_class_data_list_dict)
 
     # Get instructor id map
