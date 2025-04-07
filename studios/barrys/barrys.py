@@ -102,7 +102,12 @@ def get_schedule_from_response_soup(
       if schedule_site_span is None:
         logger.warning(f"Failed to get session location: {schedule_block}")
         continue
-      location = RESPONSE_LOCATION_TO_STUDIO_LOCATION_MAP[schedule_site_span.get_text().strip()]
+
+      try:
+        location = RESPONSE_LOCATION_TO_STUDIO_LOCATION_MAP[schedule_site_span.get_text().strip()]
+      except:
+        logger.warning(f"Failed to get session studio type for room '{room}'")
+        location = StudioLocation.Unknown
 
       class_details = ClassData(
         studio=StudioType.Barrys,

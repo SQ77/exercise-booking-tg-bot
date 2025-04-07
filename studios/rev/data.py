@@ -5,13 +5,6 @@ Description: This file contains data used for retrieving Rev schedules.
 """
 from common.studio_location import StudioLocation
 
-# Dictionary of location strings from response and studio locations
-RESPONSE_LOCATION_TO_STUDIO_LOCATION_MAP = {
-  "BUGIS": StudioLocation.Bugis,
-  "ORCHARD": StudioLocation.Orchard,
-  "TANJONG PAGAR": StudioLocation.TJPG,
-}
-
 # Dictionary of room name strings from response and studio locations
 ROOM_NAME_TO_STUDIO_LOCATION_MAP = {
   "Revolution - Bugis": StudioLocation.Bugis,
