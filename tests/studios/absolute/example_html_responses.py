@@ -1,3 +1,8 @@
+"""
+example_html_responses.py
+Author: https://github.com/lendrixxx
+Description: This file defines example HTML responses for Absolute.
+"""
 EXAMPLE_RAFFLES_HTML_RESPONSE = """
 <ul class="nav nav-pills" id="reserveFilter">
     <li class="dropdown" id="reserveFilter1">

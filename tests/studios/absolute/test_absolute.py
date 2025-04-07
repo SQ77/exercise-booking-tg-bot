@@ -1,7 +1,7 @@
 """
-test_main_page_handler.py
+test_absolute.py
 Author: https://github.com/lendrixxx
-Description: This file tests the functions of the main page handler.
+Description: This file tests the functions to retrieve information for Absolute.
 """
 import logging
 import pytest
