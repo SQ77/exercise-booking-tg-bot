@@ -3982,7 +3982,7 @@ EXPECTED_CROSSSTREET_8_TO_28_APR_SCHEDULE = {
       capacity_info=CapacityInfo(),
     ),
     ClassData(
-      studio=StudioType.AllyUnknown,
+      studio=StudioType.AllyEvents,
       location=StudioLocation.Unknown,
       name="COMMUNITY RUN: Back to Alexandra Park Connector, 8km",
       instructor="Jaryl.T & Zachary.T",

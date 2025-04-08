@@ -16,6 +16,7 @@ class StudioType(str, Enum):
   AllySpin = "Ally (Spin)"
   AllyPilates = "Ally (Pilates)"
   AllyRecovery = "Ally (Recovery)"
+  AllyEvents = "Ally (Events)"
   AllyUnknown = "Ally"
   Anarchy = "Anarchy"
   Barrys = "Barrys"
