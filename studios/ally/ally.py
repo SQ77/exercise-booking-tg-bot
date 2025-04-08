@@ -14,6 +14,7 @@ from common.class_availability import ClassAvailability
 from common.class_data import ClassData
 from common.result_data import ResultData
 from common.studio_location import StudioLocation
+from common.studio_type import StudioType
 from common.data import RESPONSE_AVAILABILITY_MAP
 from copy import copy
 from datetime import datetime, timedelta
