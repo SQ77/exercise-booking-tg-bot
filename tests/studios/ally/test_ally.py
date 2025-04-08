@@ -11,11 +11,13 @@ from common.studio_location import StudioLocation
 from datetime import date
 from studios.ally.ally import send_get_schedule_request, get_schedule_from_response_soup, get_instructorid_map_from_response_soup, get_ally_schedule_and_instructorid_map
 from tests.studios.ally import expected_results
-from tests.studios.ally import example_html_responses
 
 def test_send_get_schedule_request_single_location(mocker):
   """
   Test send_get_schedule_request flow.
+
+  Args:
+    - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
   """
   # Setup mocks
   mock_get = mocker.patch("requests.get", return_value=mocker.MagicMock(spec=requests.models.Response))
@@ -32,14 +34,18 @@ def test_send_get_schedule_request_single_location(mocker):
   )
   assert response.status_code == 200
 
-def test_get_schedule_from_response_soup(mocker):
+def test_get_schedule_from_response_soup(mocker, load_html):
   """
   Test get_schedule_from_response_soup flow.
+
+  Args:
+    - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
+    - load_html (Callable[[str], str]): Fixture that loads HTML fixture content from the example_html_responses folder.
   """
   # Setup mocks
   mock_logger = logging.getLogger("test_logger")
 
-  mock_soup = BeautifulSoup(example_html_responses.EXAMPLE_HTML_RESPONSE, "html.parser")
+  mock_soup = BeautifulSoup(load_html("crossstreet_7_to_13_apr.html"), "html.parser")
 
   # Call the function to test
   result = get_schedule_from_response_soup(mock_logger, mock_soup)
@@ -53,14 +59,18 @@ def test_get_schedule_from_response_soup(mocker):
       f"does not match actual result list {result[key]}."
     )
 
-def test_get_instructorid_map_from_response_soup(mocker):
+def test_get_instructorid_map_from_response_soup(mocker, load_html):
   """
   Test get_instructorid_map_from_response_soup flow.
+
+  Args:
+    - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
+    - load_html (Callable[[str], str]): Fixture that loads HTML fixture content from the example_html_responses folder.
   """
   # Setup mocks
   mock_logger = logging.getLogger("test_logger")
 
-  mock_soup = BeautifulSoup(example_html_responses.EXAMPLE_HTML_RESPONSE, "html.parser")
+  mock_soup = BeautifulSoup(load_html("crossstreet_7_to_13_apr.html"), "html.parser")
 
   # Call the function to test
   instructorid_map = get_instructorid_map_from_response_soup(mock_logger, mock_soup)

@@ -9,6 +9,9 @@ import menu.main_page_handler as main_page_handler
 def test_main_page_handler(mocker):
   """
   Test main_page_handler flow.
+
+  Args:
+    - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
   """
   # Setup mocks
   test_chat_id = 123
@@ -59,6 +62,9 @@ def test_main_page_handler(mocker):
 def test_main_page_callback_query_handler(mocker):
   """
   Test main_page_callback_query_handler flow.
+
+  Args:
+    - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
   """
   # Setup mocks
   test_chat_id = 123
