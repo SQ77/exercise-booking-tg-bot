@@ -85,7 +85,6 @@ class ClassData:
     other_time = datetime.strptime(other.time, "%I:%M %p")
     return self_time < other_time
 
-
   def __repr__(self) -> str:
     """
     Return a string representation of the ClassData object for debugging and logging.

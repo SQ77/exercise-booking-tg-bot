@@ -163,29 +163,32 @@ def get_instructorid_map(logger: "logging.Logger", security_token: str) -> dict[
   Returns:
     - dict[str, int]: Dictionary of instructor names and IDs.
   """
-  url = "https://widgetapi.hapana.com/v2/wAPI/site/instructor?siteID=WHplM0YwQjVCUmZic3RvV3oveFFSQT09"
+  url = "https://widgetapi.hapana.com/v2/wAPI/site/instructor"
   headers = {
     "Content-Type": "application/json",
     "Securitytoken": security_token,
   }
-  response = requests.get(url=url, headers=headers)
-  if response.status_code != 200:
-    logger.warning(f"Failed to get list of instructors - API callback error {response.status_code}")
-    return {}
+  # REST API can only select one location at a time
+  instructorid_map = {}
+  for location in ["Bugis", "Orchard", "TJPG"]:
+    params = {"siteID": SITE_ID_MAP[location]}
+    response = requests.get(url=url, params=params, headers=headers)
+    if response.status_code != 200:
+      logger.warning(f"Failed to get list of instructors for {location} - API callback error {response.status_code}")
+      continue
 
-  try:
-    response_json = json.loads(s=response.text)
-    instructorid_map = {}
-    if response_json["success"] == False:
-      logger.warning(f"Failed to get list of instructors - API callback failed")
-      return {}
+    try:
+      response_json = json.loads(s=response.text)
+      if response_json["success"] == False:
+        logger.warning(f"Failed to get list of instructors for {location} - API callback failed: {response_json}")
+        continue
 
-    for data in response_json["data"]:
-      instructorid_map[data["instructorName"].lower()] = data["instructorID"]
+      for data in response_json["data"]:
+        instructorid_map[data["instructorName"].lower()] = data["instructorID"]
 
-  except Exception as e:
-    logger.warning(f"Failed to get list of instructors - {e}")
-    return {}
+    except Exception as e:
+      logger.warning(f"Failed to get list of instructors for {location} - {e}")
+      continue
 
   return instructorid_map
 

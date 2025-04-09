@@ -37,3 +37,16 @@ class CapacityInfo:
     self.remaining = remaining
     self.waitlist_capacity = waitlist_capacity
     self.waitlist_reserved = waitlist_reserved
+
+  def __repr__(self) -> str:
+    """
+    Return a string representation of the CapacityInfo object for debugging and logging.
+
+    Returns:
+      str: A string that represents the CapacityInfo object in a detailed, readable way.
+    """
+    return (
+      f"CapacityInfo(has_info={self.has_info}, capacity={self.capacity}, "
+      f"remaining={self.remaining}, waitlist_capacity={self.waitlist_capacity}, "
+      f"waitlist_reserved={self.waitlist_reserved})"
+    )
