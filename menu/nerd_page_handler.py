@@ -159,18 +159,18 @@ def nerd_input_handler(
     elif step == 2: # Studio instructors
       instructor_list = []
       if current_studio == StudioType.Rev:
-        instructor_list = studios_manager.studios["Rev"].instructor_names
+        instructor_list = studios_manager.studios["Rev"].get_instructor_names()
       elif current_studio == StudioType.Barrys:
-        instructor_list = studios_manager.studios["Barrys"].instructor_names
+        instructor_list = studios_manager.studios["Barrys"].get_instructor_names()
       elif current_studio == StudioType.AbsolutePilates or current_studio == StudioType.AbsoluteSpin:
-        instructor_list = studios_manager.studios["Absolute"].instructor_names
+        instructor_list = studios_manager.studios["Absolute"].get_instructor_names()
       elif (
         current_studio == StudioType.AllyPilates or current_studio == StudioType.AllySpin
         or current_studio == StudioType.AllyRecovery
       ):
-        instructor_list = studios_manager.studios["Ally"].instructor_names
+        instructor_list = studios_manager.studios["Ally"].get_instructor_names()
       elif current_studio == StudioType.Anarchy:
-        instructor_list = studios_manager.studios["Anarchy"].instructor_names
+        instructor_list = studios_manager.studios["Anarchy"].get_instructor_names()
 
       selected_instructors = [x.strip().lower() for x in input_str.split(",")]
       invalid_instructors = []

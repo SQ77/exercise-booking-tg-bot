@@ -124,7 +124,7 @@ class MenuManager:
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,
         bot=self.bot,
-        instructorid_map=self.studios_manager.studios["Rev"].instructorid_map,
+        instructorid_map=self.studios_manager.studios["Rev"].get_instructorid_map(),
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "barrys-instructors")
@@ -134,7 +134,7 @@ class MenuManager:
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,
         bot=self.bot,
-        instructorid_map=self.studios_manager.studios["Barrys"].instructorid_map,
+        instructorid_map=self.studios_manager.studios["Barrys"].get_instructorid_map(),
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "absolute-spin-instructors")
@@ -144,7 +144,7 @@ class MenuManager:
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,
         bot=self.bot,
-        instructorid_map=self.studios_manager.studios["Absolute"].instructorid_map,
+        instructorid_map=self.studios_manager.studios["Absolute"].get_instructorid_map(),
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "absolute-pilates-instructors")
@@ -154,7 +154,7 @@ class MenuManager:
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,
         bot=self.bot,
-        instructorid_map=self.studios_manager.studios["Absolute"].instructorid_map,
+        instructorid_map=self.studios_manager.studios["Absolute"].get_instructorid_map(),
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "ally-spin-instructors")
@@ -164,7 +164,7 @@ class MenuManager:
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,
         bot=self.bot,
-        instructorid_map=self.studios_manager.studios["Ally"].instructorid_map,
+        instructorid_map=self.studios_manager.studios["Ally"].get_instructorid_map(),
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "ally-pilates-instructors")
@@ -174,7 +174,7 @@ class MenuManager:
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,
         bot=self.bot,
-        instructorid_map=self.studios_manager.studios["Ally"].instructorid_map,
+        instructorid_map=self.studios_manager.studios["Ally"].get_instructorid_map(),
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "anarchy-instructors")
@@ -184,7 +184,7 @@ class MenuManager:
         chat_manager=self.chat_manager,
         keyboard_manager=self.keyboard_manager,
         bot=self.bot,
-        instructorid_map=self.studios_manager.studios["Anarchy"].instructorid_map,
+        instructorid_map=self.studios_manager.studios["Anarchy"].get_instructorid_map(),
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "weeks-selection")
