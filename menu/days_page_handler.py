@@ -7,7 +7,7 @@ from common.data import SORTED_DAYS
 from copy import copy
 from menu.main_page_handler import main_page_handler
 
-def days_callback_query_handler(
+def days_page_callback_query_handler(
   query: "telebot.types.CallbackQuery",
   bot: "telebot.TeleBot",
   chat_manager: "ChatManager",

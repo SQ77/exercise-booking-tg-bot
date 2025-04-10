@@ -204,8 +204,8 @@ class MenuManager:
       )
 
     @self.bot.callback_query_handler(func=lambda query: eval(query.data)["step"] == "days")
-    def days_callback_query_handler(query: "telebot.types.CallbackQuery") -> None:
-      days_page_handler.days_callback_query_handler(
+    def days_page_callback_query_handler(query: "telebot.types.CallbackQuery") -> None:
+      days_page_handler.days_page_callback_query_handler(
         query=query,
         bot=self.bot,
         chat_manager=self.chat_manager,
