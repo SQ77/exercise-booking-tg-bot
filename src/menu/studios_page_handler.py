@@ -26,7 +26,6 @@ def studios_selection_callback_query_handler(
       - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
 
     """
-    query_data_dict = eval(query.data)
     query_data = chat_manager.get_query_data(chat_id=query.message.chat.id)
     text = "*Currently selected studio(s)*\n"
     text += query_data.get_query_str(include_studio=True)

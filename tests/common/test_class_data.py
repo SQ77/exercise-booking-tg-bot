@@ -4,8 +4,6 @@ Author: https://github.com/lendrixxx
 Description: This file tests the implementation of the ClassData class.
 """
 
-import pytest
-
 from common.capacity_info import CapacityInfo
 from common.class_availability import ClassAvailability
 from common.class_data import ClassData

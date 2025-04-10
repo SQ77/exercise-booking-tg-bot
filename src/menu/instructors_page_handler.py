@@ -61,7 +61,6 @@ def instructors_selection_callback_query_handler(
       - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
 
     """
-    query_data_dict = eval(query.data)
     instructors_selection_handler(message=query.message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
 
 

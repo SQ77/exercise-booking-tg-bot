@@ -6,7 +6,6 @@ Description:
 """
 
 import threading
-import time
 from copy import deepcopy
 
 import schedule

@@ -6,7 +6,6 @@ Description: This file tests the functions to retrieve information for Barrys.
 
 import logging
 
-import pytest
 import requests
 from bs4 import BeautifulSoup
 

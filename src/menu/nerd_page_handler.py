@@ -130,7 +130,6 @@ def nerd_input_handler(
     for index, input_str in enumerate(input_str_list[:-4]):
         step = index % 3
         if step == 0:  # Studio name
-            selected_studio = None
             found_studio = False
             for studio in StudioType:
                 if input_str.lower() == studio.value.lower():
@@ -224,8 +223,8 @@ def nerd_input_handler(
     # Get number of weeks
     try:
         query.weeks = int(input_str_list[-4])
-    except:
-        text = f"Failed to handle query. Invalid input for 'weeks'. Expected number, got {input_str_list[-2]}"
+    except Exception as e:
+        text = f"Failed to handle query. Invalid input for 'weeks'. Expected number, got {input_str_list[-2]} - {e}"
         chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
         return
 

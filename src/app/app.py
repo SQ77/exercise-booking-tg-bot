@@ -17,11 +17,10 @@ import telebot
 
 from chat.chat_manager import ChatManager
 from chat.keyboard_manager import KeyboardManager
-from common.result_data import ResultData
 from history.history_manager import HistoryManager
 from menu.menu_manager import MenuManager
 from server.server import Server
-from studios.studios_manager import StudioManager, StudiosManager
+from studios.studios_manager import StudiosManager
 
 
 class App:
@@ -146,7 +145,7 @@ class App:
         """
         webhook_url = f"{self.base_url}/{self.webhook_path}"
         self.bot.set_webhook(url=webhook_url)
-        self.logger.info(f"Webhook for Telegram bot successfully set!")
+        self.logger.info("Webhook for Telegram bot successfully set!")
 
     def keep_alive(self) -> None:
         """

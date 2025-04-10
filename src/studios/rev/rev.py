@@ -7,7 +7,6 @@ Description:
 """
 
 import json
-import os
 from copy import copy
 from datetime import datetime, timedelta
 
@@ -192,7 +191,7 @@ def get_instructorid_map(logger: "logging.Logger", security_token: str) -> dict[
 
         try:
             response_json = json.loads(s=response.text)
-            if response_json["success"] == False:
+            if not response_json["success"]:
                 logger.warning(
                     f"Failed to get list of instructors for {location} - API callback failed: {response_json}"
                 )

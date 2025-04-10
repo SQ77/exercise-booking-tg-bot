@@ -6,7 +6,6 @@ Description:
   used for interactions between the Telegram bot and the chats it is being used in.
 """
 
-from common.result_data import ResultData
 from menu import (
     days_page_handler,
     get_schedule_handler,

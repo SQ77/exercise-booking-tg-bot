@@ -7,7 +7,6 @@ Description: This file tests the functions to retrieve information for Anarchy.
 import logging
 from datetime import date
 
-import pytest
 import requests
 from bs4 import BeautifulSoup
 

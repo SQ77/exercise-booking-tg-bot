@@ -8,7 +8,7 @@ Description:
 
 import re
 from copy import copy
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pytz
 import requests
@@ -144,14 +144,14 @@ def get_schedule_from_response_soup(
 
             try:
                 studio = ROOM_ID_TO_STUDIO_TYPE_MAP[room]
-            except:
-                logger.warning(f"Failed to get session studio type for room '{room}'")
+            except Exception as e:
+                logger.warning(f"Failed to get session studio type for room '{room}' - {e}")
                 studio = StudioType.AllyUnknown
 
             try:
                 location = ROOM_ID_TO_STUDIO_LOCATION_MAP[room]
-            except:
-                logger.warning(f"Failed to get session studio location for room '{room}'")
+            except Exception as e:
+                logger.warning(f"Failed to get session studio location for room '{room}' - {e}")
                 location = StudioLocation.Unknown
 
             class_details = ClassData(

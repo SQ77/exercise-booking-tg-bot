@@ -5,7 +5,6 @@ Description: This file defines the Server class which is the main handler for RE
 """
 
 import logging
-import os
 
 import requests
 import telebot

@@ -7,9 +7,7 @@ Description: This file tests the functions to retrieve information for Rev.
 import logging
 from datetime import date
 
-import pytest
 import requests
-from bs4 import BeautifulSoup
 
 from common.result_data import ResultData
 from common.studio_location import StudioLocation
