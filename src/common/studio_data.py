@@ -17,6 +17,9 @@ class StudioData:
 
     """
 
-    def __init__(self, locations: list[StudioLocation] = None, instructors: list[str] = None) -> None:
+    locations: list[StudioLocation]
+    instructors: list[str]
+
+    def __init__(self, locations: list[StudioLocation] = [], instructors: list[str] = ["All"]) -> None:
         self.locations = locations
-        self.instructors = ["All"] if instructors is None else instructors
+        self.instructors = instructors

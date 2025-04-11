@@ -5,7 +5,8 @@ Description: This file defines the QueryData class used to store the details for
 """
 
 from copy import copy
-from datetime import datetime
+from datetime import date
+from typing import Optional
 
 from common.studio_data import StudioData
 from common.studio_location import StudioLocation
@@ -22,18 +23,25 @@ class QueryData:
       - current_studio (StudioType): The current studio being queried.
       - weeks (int): Number of weeks to query for.
       - days (list[str]): A list of selected days for the query.
-      - start_times (list[tuple[datetime.date, datetime.date]]): A list of time ranges for the query.
+      - start_times (list[tuple[date, date]]): A list of time ranges for the query.
       - class_name_filter (str): A filter for class name for the query.
 
     """
 
+    studios: dict[StudioType, StudioData]
+    current_studio: StudioType
+    weeks: int
+    days: list[str]
+    start_times: list[tuple[date, date]]
+    class_name_filter: str
+
     def __init__(
         self,
-        studios: dict[StudioType, StudioData],
+        studios: Optional[dict[StudioType, StudioData]],
         current_studio: StudioType,
         weeks: int,
         days: list[str],
-        start_times: list[tuple[datetime.date, datetime.date]],
+        start_times: list[tuple[date, date]],
         class_name_filter: str,
     ) -> None:
         self.studios = {} if studios is None else copy(studios)

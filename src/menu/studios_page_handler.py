@@ -6,6 +6,10 @@ Description: This file defines callback queries related to selecting studios for
 
 from copy import copy
 
+import telebot
+
+from chat.chat_manager import ChatManager
+from chat.keyboard_manager import KeyboardManager
 from common.data import STUDIO_LOCATIONS_MAP
 from common.studio_data import StudioData
 from common.studio_location import StudioLocation
@@ -13,9 +17,9 @@ from common.studio_type import StudioType
 
 
 def studios_selection_callback_query_handler(
-    query: "telebot.types.CallbackQuery",
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    query: telebot.types.CallbackQuery,
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles the callback query when the step to select studios is triggered.
@@ -40,10 +44,10 @@ def studios_selection_callback_query_handler(
 
 
 def studios_callback_query_handler(
-    query: "telebot.types.CallbackQuery",
-    bot: "telebot.TeleBot",
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    query: telebot.types.CallbackQuery,
+    bot: telebot.TeleBot,
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles callback queries for selecting the studios selection page.
@@ -99,10 +103,10 @@ def studios_callback_query_handler(
 
 
 def locations_handler(
-    message: "telebot.types.Message",
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
-):
+    message: telebot.types.Message,
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
+) -> None:
     """
     Handles the step for selecting the studio locations.
 
@@ -127,9 +131,9 @@ def locations_handler(
 
 
 def select_location_handler(
-    message: "telebot.types.Message",
+    message: telebot.types.Message,
     selected_studio_location: StudioLocation,
-    chat_manager: "ChatManager",
+    chat_manager: ChatManager,
 ) -> None:
     """
     Handles the selection of a studio location.
@@ -172,10 +176,10 @@ def select_location_handler(
 
 
 def locations_callback_query_handler(
-    query: "telebot.types.CallbackQuery",
-    bot: "telebot.TeleBot",
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    query: telebot.types.CallbackQuery,
+    bot: telebot.TeleBot,
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles callback queries for selecting the locations selection page.

@@ -6,7 +6,9 @@ Description: This file tests the functions to retrieve information for Anarchy.
 
 import logging
 from datetime import date
+from typing import Callable
 
+import pytest_mock
 import requests
 from bs4 import BeautifulSoup
 
@@ -21,7 +23,7 @@ from studios.anarchy.anarchy import (
 from tests.studios.anarchy import expected_results
 
 
-def test_send_get_schedule_request(mocker):
+def test_send_get_schedule_request(mocker: pytest_mock.plugin.MockerFixture) -> None:
     """
     Test send_get_schedule_request flow.
 
@@ -50,7 +52,9 @@ def test_send_get_schedule_request(mocker):
     assert response.status_code == 200
 
 
-def test_get_soup_from_response_valid_jsonp(mocker, load_response_file):
+def test_get_soup_from_response_valid_jsonp(
+    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+) -> None:
     """
     Test get_schedule_from_response_soup flow.
 
@@ -72,7 +76,7 @@ def test_get_soup_from_response_valid_jsonp(mocker, load_response_file):
     assert isinstance(soup, BeautifulSoup)
 
 
-def test_get_soup_from_response_invalid_jsonp(mocker):
+def test_get_soup_from_response_invalid_jsonp(mocker: pytest_mock.plugin.MockerFixture) -> None:
     """
     Test get_schedule_from_response_soup flow.
 
@@ -94,7 +98,9 @@ def test_get_soup_from_response_invalid_jsonp(mocker):
     mock_logger.warning.assert_called_once_with(f"Failed to parse response {mock_response.text}")
 
 
-def test_get_schedule_from_response_soup(mocker, load_response_file):
+def test_get_schedule_from_response_soup(
+    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+) -> None:
     """
     Test get_schedule_from_response_soup flow.
 
@@ -126,7 +132,9 @@ def test_get_schedule_from_response_soup(mocker, load_response_file):
         )
 
 
-def test_get_instructorid_map_from_response_soup(mocker, load_response_file):
+def test_get_instructorid_map_from_response_soup(
+    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+) -> None:
     """
     Test get_instructorid_map_from_response_soup flow.
 
@@ -152,7 +160,9 @@ def test_get_instructorid_map_from_response_soup(mocker, load_response_file):
     assert instructorid_map == expected_results.EXPECTED_ROBINSON_8_TO_28_APR_INSTRUCTORID_MAP
 
 
-def test_get_anarchy_schedule_and_instructorid_map(mocker, load_response_file):
+def test_get_anarchy_schedule_and_instructorid_map(
+    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+) -> None:
     """
     Test get_anarchy_schedule_and_instructorid_map flow.
 

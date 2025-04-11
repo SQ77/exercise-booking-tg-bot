@@ -6,11 +6,14 @@ Description: This file defines callback queries related to entering class name f
 
 import telebot
 
+from chat.chat_manager import ChatManager
+from chat.keyboard_manager import KeyboardManager
+
 
 def class_name_filter_selection_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles the callback query when the step to enter a class name filter is triggered.
@@ -30,8 +33,8 @@ def class_name_filter_selection_callback_query_handler(
 
 def class_name_filter_selection_handler(
     message: telebot.types.Message,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Displays the current class name filter and provides options to set or reset the
@@ -58,8 +61,8 @@ def class_name_filter_selection_handler(
 def class_name_filter_set_callback_query_handler(
     query: telebot.types.CallbackQuery,
     bot: telebot.TeleBot,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Initiates the process of setting a class name filter by prompting the user for
@@ -89,8 +92,8 @@ def class_name_filter_set_callback_query_handler(
 
 def class_name_filter_input_handler(
     message: telebot.types.Message,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Processes the user's input for setting a class name filter and updates the query
@@ -109,8 +112,8 @@ def class_name_filter_input_handler(
 
 def class_name_filter_reset_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Resets the class name filter to an empty value.

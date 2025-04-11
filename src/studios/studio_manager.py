@@ -4,9 +4,11 @@ Author: https://github.com/lendrixxx
 Description: This file defines the StudioManager class which is the main handler for storing of studio data.
 """
 
-from typing import Callable
+from typing import Any, Callable
 
-from readerwriterlock import rwlock
+from readerwriterlock.rwlock import RWLockFair
+
+from common.result_data import ResultData
 
 
 class StudioManager:
@@ -14,39 +16,45 @@ class StudioManager:
     Manages studio data.
 
     Attributes:
-      - get_schedule_and_instructorid_map_func (Callable[..., tuple["ResultData", dict[str, int]]]):
+      - get_schedule_and_instructorid_map_func (Callable[..., tuple[ResultData, dict[str, str]]]):
         Callback function to get the schedule and instructor id map for the studio.
-      - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs.
-      - instructorid_map_lock (readerwriterlock.rwlock): Read-write lock for instructorid_map.
+      - instructorid_map (dict[str, str]): Dictionary of instructor names and IDs.
+      - instructorid_map_lock (RWLockFair): Read-write lock for instructorid_map.
       - instructor_names (list[str]): List of instructor names.
-      - instructor_names_lock (readerwriterlock.rwlock): Read-write lock for instructor_names.
+      - instructor_names_lock (RWLockFair): Read-write lock for instructor_names.
 
     """
 
+    get_schedule_and_instructorid_map_func: Callable[..., tuple[ResultData, dict[str, str]]]
+    instructorid_map: dict[str, str]
+    instructorid_map_lock: RWLockFair
+    instructor_names: list[str]
+    instructor_names_lock: RWLockFair
+
     def __init__(
         self,
-        get_schedule_and_instructorid_map_func: Callable[..., tuple["ResultData", dict[str, int]]],
+        get_schedule_and_instructorid_map_func: Callable[..., tuple[ResultData, dict[str, str]]],
     ) -> None:
         """
         Initializes the StudioManager instance.
 
         Args:
-          - get_schedule_and_instructorid_map_func (Callable[..., tuple["ResultData", dict[str, int]]]):
+          - get_schedule_and_instructorid_map_func (Callable[..., tuple[ResultData, dict[str, str]]]):
             The callback function to get the schedule and instructor id map for the studio.
 
         """
-        self.instructorid_map = {}
-        self.instructorid_map_lock = rwlock.RWLockFair()
-        self.instructor_names = []
-        self.instructor_names_lock = rwlock.RWLockFair()
+        self.instructorid_map: dict[str, str] = {}
+        self.instructorid_map_lock = RWLockFair()
+        self.instructor_names: list[str] = []
+        self.instructor_names_lock = RWLockFair()
         self.get_schedule_and_instructorid_map_func = get_schedule_and_instructorid_map_func
 
-    def get_schedule(self, *args: any) -> "ResultData":
+    def get_schedule(self, *args: Any) -> ResultData:
         """
         Retrieves the full schedule of the studio.
 
         Args:
-          - args (any): The arguments to pass to the get_schedule_and_instructorid_map_func callback.
+          - args (Any): The arguments to pass to the get_schedule_and_instructorid_map_func callback.
 
         Returns:
           ResultData: The full schedule of the studio.
@@ -64,12 +72,12 @@ class StudioManager:
 
         return schedule
 
-    def get_instructorid_map(self) -> dict[str, int]:
+    def get_instructorid_map(self) -> dict[str, str]:
         """
         Retrieves the dictionary of instructor names and IDs.
 
         Returns:
-          dict[str, int]: The stored dictionary of instructor names and IDs.
+          dict[str, str]: The stored dictionary of instructor names and IDs.
 
         """
         with self.instructorid_map_lock.gen_rlock():

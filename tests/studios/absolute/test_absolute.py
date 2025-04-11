@@ -5,7 +5,9 @@ Description: This file tests the functions to retrieve information for Absolute.
 """
 
 import logging
+from typing import Callable
 
+import pytest_mock
 import requests
 from bs4 import BeautifulSoup
 
@@ -21,7 +23,7 @@ from studios.absolute.data import LOCATION_MAP
 from tests.studios.absolute import expected_results
 
 
-def test_send_get_schedule_request_single_location(mocker):
+def test_send_get_schedule_request_single_location(mocker: pytest_mock.plugin.MockerFixture) -> None:
     """
     Test send_get_schedule_request flow with a single location.
 
@@ -46,7 +48,7 @@ def test_send_get_schedule_request_single_location(mocker):
     assert response.status_code == 200
 
 
-def test_send_get_schedule_request_multiple_locations(mocker):
+def test_send_get_schedule_request_multiple_locations(mocker: pytest_mock.plugin.MockerFixture) -> None:
     """
     Test send_get_schedule_request flow with multiple locations.
 
@@ -84,7 +86,9 @@ def test_send_get_schedule_request_multiple_locations(mocker):
     assert response.status_code == 200
 
 
-def test_get_schedule_from_response_soup_single_location(mocker, load_response_file):
+def test_get_schedule_from_response_soup_single_location(
+    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+) -> None:
     """
     Test get_schedule_from_response_soup flow with a single location.
 
@@ -111,7 +115,9 @@ def test_get_schedule_from_response_soup_single_location(mocker, load_response_f
         )
 
 
-def test_get_schedule_from_response_soup_multiple_locations(mocker, load_response_file):
+def test_get_schedule_from_response_soup_multiple_locations(
+    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+) -> None:
     """
     Test get_schedule_from_response_soup flow with multiple locations.
 
@@ -138,7 +144,9 @@ def test_get_schedule_from_response_soup_multiple_locations(mocker, load_respons
         )
 
 
-def test_get_instructorid_map_from_response_soup_single_location(mocker, load_response_file):
+def test_get_instructorid_map_from_response_soup_single_location(
+    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+) -> None:
     """
     Test get_instructorid_map_from_response_soup flow with a single location.
 
@@ -159,7 +167,9 @@ def test_get_instructorid_map_from_response_soup_single_location(mocker, load_re
     assert instructorid_map == expected_results.EXPECTED_RAFFLES_6_TO_12_APR_INSTRUCTORID_MAP
 
 
-def test_get_instructorid_map_from_response_soup_multiple_locations(mocker, load_response_file):
+def test_get_instructorid_map_from_response_soup_multiple_locations(
+    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+) -> None:
     """
     Test get_instructorid_map_from_response_soup flow with a multiple locations.
 
@@ -180,7 +190,9 @@ def test_get_instructorid_map_from_response_soup_multiple_locations(mocker, load
     assert instructorid_map == expected_results.EXPECTED_MW_AND_I12_7_TO_12_APR_INSTRUCTORID_MAP
 
 
-def test_get_absolute_schedule_and_instructorid_map(mocker, load_response_file):
+def test_get_absolute_schedule_and_instructorid_map(
+    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+) -> None:
     """
     Test get_absolute_schedule_and_instructorid_map flow.
 

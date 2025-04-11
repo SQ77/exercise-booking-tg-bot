@@ -5,7 +5,9 @@ Description: This file tests the functions to retrieve information for Barrys.
 """
 
 import logging
+from typing import Callable
 
+import pytest_mock
 import requests
 from bs4 import BeautifulSoup
 
@@ -19,7 +21,7 @@ from studios.barrys.barrys import (
 from tests.studios.barrys import expected_results
 
 
-def test_send_get_schedule_request(mocker):
+def test_send_get_schedule_request(mocker: pytest_mock.plugin.MockerFixture) -> None:
     """
     Test send_get_schedule_request flow.
 
@@ -43,7 +45,9 @@ def test_send_get_schedule_request(mocker):
     assert response.status_code == 200
 
 
-def test_get_schedule_from_response_soup(mocker, load_response_file):
+def test_get_schedule_from_response_soup(
+    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+) -> None:
     """
     Test get_schedule_from_response_soup flow.
 
@@ -70,7 +74,9 @@ def test_get_schedule_from_response_soup(mocker, load_response_file):
         )
 
 
-def test_get_instructorid_map_from_response_soup(mocker, load_response_file):
+def test_get_instructorid_map_from_response_soup(
+    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+) -> None:
     """
     Test get_instructorid_map_from_response_soup flow.
 
@@ -91,7 +97,9 @@ def test_get_instructorid_map_from_response_soup(mocker, load_response_file):
     assert instructorid_map == expected_results.EXPECTED_RAFFLES_AND_ORCHARD_7_TO_13_APR_INSTRUCTORID_MAP
 
 
-def test_get_barrys_schedule_and_instructorid_map(mocker, load_response_file):
+def test_get_barrys_schedule_and_instructorid_map(
+    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+) -> None:
     """
     Test get_barrys_schedule_and_instructorid_map flow.
 

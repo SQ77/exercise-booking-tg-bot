@@ -4,15 +4,20 @@ Author: https://github.com/lendrixxx
 Description: This file defines callback queries related to retrieving schedules.
 """
 
+import telebot
+
+from chat.chat_manager import ChatManager
+from chat.keyboard_manager import KeyboardManager
 from common.data import SORTED_DAYS
+from common.result_data import ResultData
 from menu.main_page_handler import main_page_handler
 
 
 def get_schedule_callback_query_handler(
-    query: "telebot.types.CallbackQuery",
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
-    full_result_data: "ResultData",
+    query: telebot.types.CallbackQuery,
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
+    full_result_data: ResultData,
 ) -> None:
     """
     Handles the callback query when there is a request to retrieve schedules. Checks if
@@ -52,9 +57,9 @@ def get_schedule_callback_query_handler(
 
 
 def send_results(
-    query: "telebot.types.CallbackQuery",
-    chat_manager: "ChatManager",
-    full_result_data: "ResultData",
+    query: telebot.types.CallbackQuery,
+    chat_manager: ChatManager,
+    full_result_data: ResultData,
 ) -> None:
     """
     Processes and sends the schedule results based on the query data of the chat.

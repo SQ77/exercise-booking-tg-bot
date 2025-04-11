@@ -28,6 +28,14 @@ class ClassData:
 
     """
 
+    studio: StudioType
+    location: StudioLocation
+    name: str
+    instructor: str
+    time: str
+    availability: ClassAvailability
+    capacity_info: CapacityInfo
+
     def __init__(
         self,
         studio: StudioType,
@@ -59,18 +67,21 @@ class ClassData:
         self.availability = availability
         self.capacity_info = capacity_info
 
-    def __eq__(self, other: "ClassData") -> bool:
+    def __eq__(self, other: object) -> bool:
         """
-        Equality check between two ClassData objects. Only checks studio, location,
-        class name, instructor, and time.
+        Equality check between the ClassData and another object. Only checks studio,
+        location, class name, instructor, and time.
 
         Args:
-          - other (ClassData): The other ClassData object to compare.
+          - other (object): The other object to compare.
 
         Returns:
           bool: True if both objects are equal, false otherwise.
 
         """
+        if not isinstance(other, ClassData):
+            return False
+
         return (
             self.studio == other.studio
             and self.location == other.location

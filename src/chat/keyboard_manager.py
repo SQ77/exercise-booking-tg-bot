@@ -8,6 +8,7 @@ Description:
 
 import telebot
 
+from common.query_data import QueryData
 from common.studio_location import StudioLocation
 from common.studio_type import StudioType
 
@@ -58,6 +59,34 @@ class KeyboardManager:
       - class_name_filter_keyboard (telebot.types.InlineKeyboardMarkup): Keyboard used for the class name filter page.
 
     """
+
+    main_page_keyboard: telebot.types.InlineKeyboardMarkup
+    studios_select_all_button: telebot.types.InlineKeyboardButton
+    studios_unselect_all_button: telebot.types.InlineKeyboardButton
+    studios_buttons_unselected_map: dict[str, telebot.types.InlineKeyboardButton]
+    studios_buttons_selected_map: dict[str, telebot.types.InlineKeyboardButton]
+    locations_select_all_button: telebot.types.InlineKeyboardButton
+    locations_unselect_all_button: telebot.types.InlineKeyboardButton
+    locations_select_more_studios_button: telebot.types.InlineKeyboardButton
+    studios_locations_buttons_unselected_map: dict[str, dict[str, telebot.types.InlineKeyboardButton]]
+    studios_locations_buttons_selected_map: dict[str, dict[str, telebot.types.InlineKeyboardButton]]
+    rev_instructors_button: telebot.types.InlineKeyboardButton
+    barrys_instructors_button: telebot.types.InlineKeyboardButton
+    absolute_spin_instructors_button: telebot.types.InlineKeyboardButton
+    absolute_pilates_instructors_button: telebot.types.InlineKeyboardButton
+    ally_spin_instructors_button: telebot.types.InlineKeyboardButton
+    ally_pilates_instructors_button: telebot.types.InlineKeyboardButton
+    anarchy_instructors_button: telebot.types.InlineKeyboardButton
+    show_instructors_button: telebot.types.InlineKeyboardButton
+    next_button_to_main_page: telebot.types.InlineKeyboardButton
+    weeks_page_keyboard: telebot.types.InlineKeyboardMarkup
+    days_select_all_button: telebot.types.InlineKeyboardButton
+    days_unselect_all_button: telebot.types.InlineKeyboardButton
+    days_next_button: telebot.types.InlineKeyboardButton
+    days_buttons_unselected_map: dict[str, telebot.types.InlineKeyboardButton]
+    days_buttons_selected_map: dict[str, telebot.types.InlineKeyboardButton]
+    timeslot_filter_keyboard: telebot.types.InlineKeyboardMarkup
+    class_name_filter_keyboard: telebot.types.InlineKeyboardMarkup
 
     def __init__(self) -> None:
         """
@@ -550,7 +579,7 @@ class KeyboardManager:
         """
         return self.main_page_keyboard
 
-    def get_studios_keyboard(self, query: "QueryData") -> telebot.types.InlineKeyboardMarkup:
+    def get_studios_keyboard(self, query: QueryData) -> telebot.types.InlineKeyboardMarkup:
         """
         Constructs the studios keyboard to be used based on the specified query.
 
@@ -586,7 +615,7 @@ class KeyboardManager:
         studios_keyboard.add(self.next_button_to_main_page)
         return studios_keyboard
 
-    def get_locations_keyboard(self, query: "QueryData") -> telebot.types.InlineKeyboardMarkup:
+    def get_locations_keyboard(self, query: QueryData) -> telebot.types.InlineKeyboardMarkup:
         """
         Constructs the locations keyboard to be used based on the specified query.
 
@@ -676,7 +705,7 @@ class KeyboardManager:
         locations_keyboard.add(self.locations_select_more_studios_button, self.next_button_to_main_page)
         return locations_keyboard
 
-    def get_instructors_keyboard(self, query: "QueryData") -> telebot.types.InlineKeyboardMarkup:
+    def get_instructors_keyboard(self, query: QueryData) -> telebot.types.InlineKeyboardMarkup:
         """
         Constructs the instructors keyboard to be used based on the specified query.
 
@@ -717,7 +746,7 @@ class KeyboardManager:
         """
         return self.weeks_page_keyboard
 
-    def get_days_keyboard(self, query: "QueryData") -> telebot.types.InlineKeyboardMarkup:
+    def get_days_keyboard(self, query: QueryData) -> telebot.types.InlineKeyboardMarkup:
         """
         Constructs the days keyboard to be used based on the specified query.
 

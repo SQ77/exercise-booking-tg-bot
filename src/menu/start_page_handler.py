@@ -6,14 +6,19 @@ Description: This file defines callback queries related to the start message com
 
 import time
 
+import telebot
+
+from chat.chat_manager import ChatManager
+from chat.keyboard_manager import KeyboardManager
+from history.history_manager import HistoryManager
 from menu.main_page_handler import main_page_handler
 
 
 def start_message_handler(
-    message: "telebot.types.Message",
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
-    history_manager: "HistoryManager",
+    message: telebot.types.Message,
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
+    history_manager: HistoryManager,
 ) -> None:
     """
     Handles the request to start the process of retrieving schedules.

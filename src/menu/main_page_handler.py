@@ -6,11 +6,14 @@ Description: This file defines callback queries related to the main page.
 
 import telebot
 
+from chat.chat_manager import ChatManager
+from chat.keyboard_manager import KeyboardManager
+
 
 def main_page_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles the callback query for the main page.
@@ -26,8 +29,8 @@ def main_page_callback_query_handler(
 
 def main_page_handler(
     message: telebot.types.Message,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles the main page interaction, displaying the schedule and options for filtering

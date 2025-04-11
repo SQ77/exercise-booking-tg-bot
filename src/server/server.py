@@ -25,6 +25,13 @@ class Server:
 
     """
 
+    app: Flask
+    logger: logging.Logger
+    bot: telebot.TeleBot
+    base_url: str
+    port: int
+    health_check_url: str
+
     def __init__(
         self,
         logger: logging.Logger,
@@ -67,21 +74,21 @@ class Server:
         """
 
         @self.app.route("/")
-        def home():
+        def home() -> str:
             """
             Home route to indicate that the server is running.
             """
             return "Server is running"
 
         @self.app.route("/health", methods=["GET"])
-        def health_check():
+        def health_check() -> tuple[str, int]:
             """
             Health check route to verify server status.
             """
             return "OK", 200
 
         @self.app.route(f"/{webhook_path}", methods=["POST"])
-        def webhook():
+        def webhook() -> tuple[str, int]:
             """
             Webhook route to receive updates for the Telegram bot.
             """

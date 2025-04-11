@@ -4,15 +4,19 @@ Author: https://github.com/lendrixxx
 Description: This file defines callback queries related to entering time filters for class schedules.
 """
 
+import logging
 from datetime import datetime
 
 import telebot
 
+from chat.chat_manager import ChatManager
+from chat.keyboard_manager import KeyboardManager
+
 
 def time_selection_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles the callback query when the step to enter a time filter is triggered.
@@ -28,8 +32,8 @@ def time_selection_callback_query_handler(
 
 def time_selection_handler(
     message: telebot.types.Message,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Displays the current time filters and provides options to add, remove, or reset the
@@ -55,10 +59,10 @@ def time_selection_handler(
 
 def time_selection_add_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    logger: "logging.Logger",
-    bot: "telebot.TeleBot",
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    logger: logging.Logger,
+    bot: telebot.TeleBot,
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles the callback query when the step to add a time filter is triggered.
@@ -82,10 +86,10 @@ def time_selection_add_callback_query_handler(
 
 def start_time_selection_handler(
     message: telebot.types.Message,
-    logger: "logging.Logger",
-    bot: "telebot.TeleBot",
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    logger: logging.Logger,
+    bot: telebot.TeleBot,
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Initiates the process of setting a time filter by prompting the user for input.
@@ -116,9 +120,9 @@ def start_time_selection_handler(
 
 def timeslot_input_handler(
     message: telebot.types.Message,
-    logger: "logging.Logger",
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    logger: logging.Logger,
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Processes the user's input for a timeslot.
@@ -242,8 +246,8 @@ def timeslot_input_handler(
 
 def time_selection_remove_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles the callback query when the step to remove a time filter is triggered.
@@ -259,8 +263,8 @@ def time_selection_remove_callback_query_handler(
 
 def time_selection_remove_handler(
     message: telebot.types.Message,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles the callback query when the step to remove a time filter is triggered.
@@ -302,8 +306,8 @@ def time_selection_remove_handler(
 
 def time_selection_remove_timeslot_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles the callback query when the step to remove a timeslot is triggered.
@@ -323,8 +327,8 @@ def time_selection_remove_timeslot_callback_query_handler(
 
 def time_selection_reset_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles the callback query when the step to reset the timeslot filter triggered.

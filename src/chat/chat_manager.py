@@ -6,6 +6,13 @@ Description:
   interactions between the Telegram bot and the chats it is being used in.
 """
 
+from __future__ import annotations
+
+import logging
+from typing import Optional
+
+import telebot
+
 from common.data import SORTED_DAYS, STUDIO_LOCATIONS_MAP
 from common.query_data import QueryData
 from common.studio_data import StudioData
@@ -18,6 +25,7 @@ class ChatManager:
     handles query data, messages to be edited or deleted, and communication with chats.
 
     Attributes:
+      - logger (logging.Logger): Logger for logging messages.
       - bot (telebot.TeleBot): The Telegram bot instance.
       - chat_query_data (dict[int, QueryData]): Dictionary of chat ids and query data.
       - chat_message_ids_to_delete (dict[int, list[int]]): Dictionary of chat ids and message ids to delete.
@@ -25,16 +33,26 @@ class ChatManager:
 
     """
 
+    logger: logging.Logger
+    bot: telebot.TeleBot
+    chat_query_data: dict[int, QueryData]
+    chat_message_ids_to_delete: dict[int, list[int]]
+    chat_messages_to_edit: dict[int, ChatManager.MessagesToEdit]
+
     class MessagesToEdit:
         """
         Stores messages that may need to be edited in a chat.
 
         Attributes:
-          - days_selection_message (telebot.types.Message | None): Message for selecting days.
-          - studios_selection_message (telebot.types.Message | None): Message for selecting studios.
-          - locations_selection_message (telebot.types.Message | None): Message for selecting studio locations.
+          - days_selection_message (Optional[telebot.types.Message]): Message for selecting days.
+          - studios_selection_message (Optional[telebot.types.Message]): Message for selecting studios.
+          - locations_selection_message (Optional[telebot.types.Message]): Message for selecting studio locations.
 
         """
+
+        days_selection_message: Optional[telebot.types.Message]
+        studios_selection_message: Optional[telebot.types.Message]
+        locations_selection_message: Optional[telebot.types.Message]
 
         def __init__(self) -> None:
             """
@@ -44,18 +62,20 @@ class ChatManager:
             self.studios_selection_message = None
             self.locations_selection_message = None
 
-    def __init__(self, bot: "telebot.TeleBot") -> None:
+    def __init__(self, logger: logging.Logger, bot: telebot.TeleBot) -> None:
         """
         Initializes the ChatManager instance.
 
         Args:
+          - logger (logging.Logger): The logger for logging messages.
           - bot (telebot.TeleBot): The Telegram bot instance.
 
         """
+        self.logger = logger
         self.bot = bot
-        self.chat_query_data = {}
-        self.chat_message_ids_to_delete = {}
-        self.chat_messages_to_edit = {}
+        self.chat_query_data: dict[int, QueryData] = {}
+        self.chat_message_ids_to_delete: dict[int, list[int]] = {}
+        self.chat_messages_to_edit: dict[int, ChatManager.MessagesToEdit] = {}
 
     def reset_query_and_messages_to_edit_data(self, chat_id: int) -> None:
         """
@@ -66,7 +86,7 @@ class ChatManager:
 
         """
         self.chat_query_data[chat_id] = QueryData(
-            studios={},
+            studios=None,
             current_studio=StudioType.Null,
             weeks=1,
             days=SORTED_DAYS,
@@ -139,9 +159,7 @@ class ChatManager:
         """
         self.chat_query_data[chat_id].weeks = weeks
 
-    def update_studios_selection_message(
-        self, chat_id: int, studios_selection_message: "telebot.types.Message"
-    ) -> None:
+    def update_studios_selection_message(self, chat_id: int, studios_selection_message: telebot.types.Message) -> None:
         """
         Updates the studios selection message for the specified chat.
 
@@ -156,7 +174,7 @@ class ChatManager:
     def update_locations_selection_message(
         self,
         chat_id: int,
-        locations_selection_message: "telebot.types.Message",
+        locations_selection_message: telebot.types.Message,
     ) -> None:
         """
         Updates the locations selection message for the specified chat.
@@ -169,7 +187,7 @@ class ChatManager:
         """
         self.chat_messages_to_edit[chat_id].locations_selection_message = locations_selection_message
 
-    def update_days_selection_message(self, chat_id: int, days_selection_message: "telebot.types.Message") -> None:
+    def update_days_selection_message(self, chat_id: int, days_selection_message: telebot.types.Message) -> None:
         """
         Updates the days selection message for the specified chat.
 
@@ -209,7 +227,7 @@ class ChatManager:
         """
         return self.chat_query_data[chat_id]
 
-    def get_studios_selection_message(self, chat_id: int) -> "telebot.types.Message":
+    def get_studios_selection_message(self, chat_id: int) -> telebot.types.Message:
         """
         Retrieves the studios selection message that was stored.
 
@@ -222,7 +240,7 @@ class ChatManager:
         """
         return self.chat_messages_to_edit[chat_id].studios_selection_message
 
-    def get_locations_selection_message(self, chat_id: int) -> "telebot.types.Message":
+    def get_locations_selection_message(self, chat_id: int) -> telebot.types.Message:
         """
         Retrieves the locations selection message that was stored.
 
@@ -235,7 +253,7 @@ class ChatManager:
         """
         return self.chat_messages_to_edit[chat_id].locations_selection_message
 
-    def get_days_selection_message(self, chat_id: int) -> "telebot.types.Message":
+    def get_days_selection_message(self, chat_id: int) -> telebot.types.Message:
         """
         Retrieves the days selection message that was stored.
 
@@ -252,9 +270,9 @@ class ChatManager:
         self,
         chat_id: int,
         text: str,
-        reply_markup: "telebot.types.InlineKeyboardMarkup",
+        reply_markup: telebot.types.InlineKeyboardMarkup,
         delete_sent_msg_in_future: bool,
-    ) -> "telebot.types.Message":
+    ) -> telebot.types.Message:
         """
         Sends a message to the chat and optionally schedules it for deletion on the next
         call to send_prompt.
@@ -262,7 +280,7 @@ class ChatManager:
         Args:
           - chat_id (int): The ID of the chat to send the prompt to.
           - text (str): The message to send to the chat.
-          - reply_markup (telebot.types.InlineKeyboardMarkup | None): The reply markup to use.
+          - reply_markup (Optional[telebot.types.InlineKeyboardMarkup]): The reply markup to use.
           - delete_sent_msg_in_future (bool):
             True if the message should be deleted on the next call to send_prompt, false otherwise.
 

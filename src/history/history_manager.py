@@ -6,6 +6,7 @@ Description:
   saving the history of interactions between the Telegram bot and the chats it is being used in.
 """
 
+import logging
 import os
 import time
 
@@ -22,7 +23,11 @@ class HistoryManager:
 
     """
 
-    def __init__(self, logger: "logging.Logger") -> None:
+    logger: logging.Logger
+    file_path: str
+    headers: list[str]
+
+    def __init__(self, logger: logging.Logger) -> None:
         """
         Initializes the HistoryManager instance.
 

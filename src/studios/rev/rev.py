@@ -7,8 +7,9 @@ Description:
 """
 
 import json
+import logging
 from copy import copy
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 import pytz
 import requests
@@ -24,7 +25,7 @@ from studios.rev.data import ROOM_NAME_TO_STUDIO_LOCATION_MAP, SITE_ID_MAP
 
 def send_get_schedule_request(
     location: StudioLocation,
-    start_date: datetime.date,
+    start_date: date,
     end_date: datetime,
     security_token: str,
 ) -> requests.models.Response:
@@ -34,8 +35,8 @@ def send_get_schedule_request(
 
     Args:
       - location (StudioLocation): The studio location to retrieve the schedule for.
-      - start_date (datetime.date): The start date to retrieve the schedule for.
-      - end_date (datetime.date): The end date to retrieve the schedule for.
+      - start_date (date): The start date to retrieve the schedule for.
+      - end_date (date): The end date to retrieve the schedule for.
       - security_token (str): Security token used for sending requests.
 
     Returns:
@@ -54,9 +55,9 @@ def send_get_schedule_request(
 
 
 def parse_get_schedule_response(
-    logger: "logging.Logger",
+    logger: logging.Logger,
     response: requests.models.Response,
-) -> dict[datetime.date, list[ClassData]]:
+) -> dict[date, list[ClassData]]:
     """
     Parses the get schedule response to extract the class schedule data.
 
@@ -65,7 +66,7 @@ def parse_get_schedule_response(
       - response: The get schedule response from the schedule request.
 
     Returns:
-      - dict[datetime.date, list[ClassData]]: Dictionary of dates and details of classes.
+      - dict[date, list[ClassData]]: Dictionary of dates and details of classes.
 
     """
     if response.status_code != 200:
@@ -131,7 +132,7 @@ def parse_get_schedule_response(
     return result_dict
 
 
-def get_rev_schedule(logger: "logging.Logger", security_token: str) -> ResultData:
+def get_rev_schedule(logger: logging.Logger, security_token: str) -> ResultData:
     """
     Retrieves all the available class schedules.
 
@@ -161,7 +162,7 @@ def get_rev_schedule(logger: "logging.Logger", security_token: str) -> ResultDat
     return result
 
 
-def get_instructorid_map(logger: "logging.Logger", security_token: str) -> dict[str, int]:
+def get_instructorid_map(logger: logging.Logger, security_token: str) -> dict[str, str]:
     """
     Retrieves the IDs of instructors.
 
@@ -170,7 +171,7 @@ def get_instructorid_map(logger: "logging.Logger", security_token: str) -> dict[
       - security_token (str): Security token used for sending requests.
 
     Returns:
-      - dict[str, int]: Dictionary of instructor names and IDs.
+      - dict[str, str]: Dictionary of instructor names and IDs.
 
     """
     url = "https://widgetapi.hapana.com/v2/wAPI/site/instructor"
@@ -179,7 +180,7 @@ def get_instructorid_map(logger: "logging.Logger", security_token: str) -> dict[
         "Securitytoken": security_token,
     }
     # REST API can only select one location at a time
-    instructorid_map = {}
+    instructorid_map: dict[str, str] = {}
     for location in ["Bugis", "Orchard", "TJPG"]:
         params = {"siteID": SITE_ID_MAP[location]}
         response = requests.get(url=url, params=params, headers=headers)
@@ -208,9 +209,9 @@ def get_instructorid_map(logger: "logging.Logger", security_token: str) -> dict[
 
 
 def get_rev_schedule_and_instructorid_map(
-    logger: "logging.Logger",
+    logger: logging.Logger,
     security_token: str,
-) -> tuple[ResultData, dict[str, int]]:
+) -> tuple[ResultData, dict[str, str]]:
     """
     Retrieves class schedules and instructor ID mappings.
 
@@ -219,7 +220,7 @@ def get_rev_schedule_and_instructorid_map(
       - security_token (str): Security token used for sending requests.
 
     Returns:
-      - tuple[ResultData, dict[str, int]]: A tuple containing schedule data and instructor ID mappings.
+      - tuple[ResultData, dict[str, str]]: A tuple containing schedule data and instructor ID mappings.
 
     """
     return (

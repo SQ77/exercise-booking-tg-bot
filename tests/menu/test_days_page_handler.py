@@ -7,6 +7,7 @@ Description: This file tests the functions of the days page handler.
 from typing import NamedTuple
 
 import pytest
+import pytest_mock
 import telebot
 
 import menu.days_page_handler as days_page_handler
@@ -61,7 +62,9 @@ class DaysPageCallbackQueryHandlerArgs(NamedTuple):
         ),
     ],
 )
-def test_days_page_callback_query_handler(mocker, args):
+def test_days_page_callback_query_handler(
+    mocker: pytest_mock.plugin.MockerFixture, args: DaysPageCallbackQueryHandlerArgs
+) -> None:
     """
     Parametrized test for days_page_callback_query_handler.
 

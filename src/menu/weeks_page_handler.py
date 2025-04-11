@@ -6,13 +6,15 @@ Description: This file defines callback queries related to selecting weeks for c
 
 import telebot
 
+from chat.chat_manager import ChatManager
+from chat.keyboard_manager import KeyboardManager
 from menu.main_page_handler import main_page_handler
 
 
 def weeks_selection_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles the callback query when the step to select week(s) is triggered.
@@ -41,8 +43,8 @@ def weeks_selection_callback_query_handler(
 
 def weeks_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles the callback query when the number of week(s) selected.

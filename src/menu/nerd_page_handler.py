@@ -4,24 +4,31 @@ Author: https://github.com/lendrixxx
 Description: This file defines callback queries related to nerd mode.
 """
 
+import logging
 import time
 from datetime import datetime
 
+import telebot
+
+from chat.chat_manager import ChatManager
 from common.data import SORTED_DAYS
 from common.query_data import QueryData
+from common.result_data import ResultData
 from common.studio_data import StudioData
 from common.studio_location import StudioLocation
 from common.studio_type import StudioType
+from history.history_manager import HistoryManager
+from studios.studios_manager import StudiosManager
 
 
 def nerd_message_handler(
-    message: "telebot.types.Message",
-    logger: "logging.Logger",
-    bot: "telebot.TeleBot",
-    chat_manager: "ChatManager",
-    history_manager: "HistoryManager",
-    studios_manager: "StudiosManager",
-    full_result_data: "ResultData",
+    message: telebot.types.Message,
+    logger: logging.Logger,
+    bot: telebot.TeleBot,
+    chat_manager: ChatManager,
+    history_manager: HistoryManager,
+    studios_manager: StudiosManager,
+    full_result_data: ResultData,
 ) -> None:
     """
     Initiates nerd mode and prompts the user for structured query input.
@@ -94,11 +101,11 @@ def nerd_message_handler(
 
 
 def nerd_input_handler(
-    message: "telebot.types.Message",
-    logger: "logging.Logger",
-    chat_manager: "ChatManager",
-    studios_manager: "StudiosManager",
-    full_result_data: "ResultData",
+    message: telebot.types.Message,
+    logger: logging.Logger,
+    chat_manager: ChatManager,
+    studios_manager: StudiosManager,
+    full_result_data: ResultData,
 ) -> None:
     """
     Processes the user's input, validates it, and retrieves filtered results. See
@@ -123,7 +130,7 @@ def nerd_input_handler(
 
     # Loop through studios
     query = QueryData(
-        studios={}, current_studio=StudioType.Null, weeks=0, days=[], start_times=[], class_name_filter=""
+        studios=None, current_studio=StudioType.Null, weeks=0, days=[], start_times=[], class_name_filter=""
     )
     current_studio = StudioType.Null
     current_studio_locations = []

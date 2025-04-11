@@ -8,15 +8,19 @@ import time
 
 import telebot
 
+from chat.chat_manager import ChatManager
+from chat.keyboard_manager import KeyboardManager
 from common.studio_type import StudioType
+from history.history_manager import HistoryManager
 from menu.main_page_handler import main_page_handler
+from studios.studios_manager import StudiosManager
 
 
 def instructors_message_handler(
     message: telebot.types.Message,
-    chat_manager: "ChatManager",
-    history_manager: "HistoryManager",
-    studios_manager: "StudiosManager",
+    chat_manager: ChatManager,
+    history_manager: HistoryManager,
+    studios_manager: StudiosManager,
 ) -> None:
     """
     Handles the request to display the names of instructors for all the studios.
@@ -49,8 +53,8 @@ def instructors_message_handler(
 
 def instructors_selection_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles the callback query when the step to select instructors is triggered.
@@ -66,9 +70,9 @@ def instructors_selection_callback_query_handler(
 
 def show_instructors_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
-    studios_manager: "StudiosManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
+    studios_manager: StudiosManager,
 ) -> None:
     """
     Handles the callback query when the step to show instructors is triggered.
@@ -107,10 +111,10 @@ def show_instructors_callback_query_handler(
 
 def rev_instructors_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
     bot: telebot.TeleBot,
-    instructorid_map: dict[str, int],
+    instructorid_map: dict[str, str],
 ) -> None:
     """
     Handles the callback query when the step to enter rev instructors is triggered.
@@ -120,7 +124,7 @@ def rev_instructors_callback_query_handler(
       - chat_manager (ChatManager): The manager handling chat data.
       - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
       - bot (telebot.TeleBot): The instance of the Telegram bot.
-      - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
+      - instructorid_map (dict[str, str]): Dictionary of instructor names and IDs
 
     """
     text = (
@@ -145,10 +149,10 @@ def rev_instructors_callback_query_handler(
 
 def barrys_instructors_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
     bot: telebot.TeleBot,
-    instructorid_map: dict[str, int],
+    instructorid_map: dict[str, str],
 ) -> None:
     """
     Handles the callback query when the step to enter barrys instructors is triggered.
@@ -158,7 +162,7 @@ def barrys_instructors_callback_query_handler(
       - chat_manager (ChatManager): The manager handling chat data.
       - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
       - bot (telebot.TeleBot): The instance of the Telegram bot.
-      - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
+      - instructorid_map (dict[str, str]): Dictionary of instructor names and IDs
 
     """
     text = (
@@ -182,10 +186,10 @@ def barrys_instructors_callback_query_handler(
 
 def absolute_spin_instructors_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
     bot: telebot.TeleBot,
-    instructorid_map: dict[str, int],
+    instructorid_map: dict[str, str],
 ) -> None:
     """
     Handles the callback query when the step to enter absolute (spin) instructors is
@@ -196,7 +200,7 @@ def absolute_spin_instructors_callback_query_handler(
       - chat_manager (ChatManager): The manager handling chat data.
       - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
       - bot (telebot.TeleBot): The instance of the Telegram bot.
-      - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
+      - instructorid_map (dict[str, str]): Dictionary of instructor names and IDs
 
     """
     text = (
@@ -220,10 +224,10 @@ def absolute_spin_instructors_callback_query_handler(
 
 def absolute_pilates_instructors_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
     bot: telebot.TeleBot,
-    instructorid_map: dict[str, int],
+    instructorid_map: dict[str, str],
 ) -> None:
     """
     Handles the callback query when the step to enter absolute (pilates) instructors is
@@ -234,7 +238,7 @@ def absolute_pilates_instructors_callback_query_handler(
       - chat_manager (ChatManager): The manager handling chat data.
       - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
       - bot (telebot.TeleBot): The instance of the Telegram bot.
-      - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
+      - instructorid_map (dict[str, str]): Dictionary of instructor names and IDs
 
     """
     text = (
@@ -262,10 +266,10 @@ def absolute_pilates_instructors_callback_query_handler(
 
 def ally_spin_instructors_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
     bot: telebot.TeleBot,
-    instructorid_map: dict[str, int],
+    instructorid_map: dict[str, str],
 ) -> None:
     """
     Handles the callback query when the step to enter ally (spin) instructors is
@@ -276,7 +280,7 @@ def ally_spin_instructors_callback_query_handler(
       - chat_manager (ChatManager): The manager handling chat data.
       - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
       - bot (telebot.TeleBot): The instance of the Telegram bot.
-      - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
+      - instructorid_map (dict[str, str]): Dictionary of instructor names and IDs
 
     """
     text = (
@@ -301,10 +305,10 @@ def ally_spin_instructors_callback_query_handler(
 
 def ally_pilates_instructors_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
     bot: telebot.TeleBot,
-    instructorid_map: dict[str, int],
+    instructorid_map: dict[str, str],
 ) -> None:
     """
     Handles the callback query when the step to enter ally (pilates) instructors is
@@ -315,7 +319,7 @@ def ally_pilates_instructors_callback_query_handler(
       - chat_manager (ChatManager): The manager handling chat data.
       - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
       - bot (telebot.TeleBot): The instance of the Telegram bot.
-      - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
+      - instructorid_map (dict[str, str]): Dictionary of instructor names and IDs
 
     """
     text = (
@@ -340,10 +344,10 @@ def ally_pilates_instructors_callback_query_handler(
 
 def anarchy_instructors_callback_query_handler(
     query: telebot.types.CallbackQuery,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
     bot: telebot.TeleBot,
-    instructorid_map: dict[str, int],
+    instructorid_map: dict[str, str],
 ) -> None:
     """
     Handles the callback query when the step to enter anarchy instructors is triggered.
@@ -353,7 +357,7 @@ def anarchy_instructors_callback_query_handler(
       - chat_manager (ChatManager): The manager handling chat data.
       - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
       - bot (telebot.TeleBot): The instance of the Telegram bot.
-      - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
+      - instructorid_map (dict[str, str]): Dictionary of instructor names and IDs
 
     """
     text = (
@@ -378,9 +382,9 @@ def anarchy_instructors_callback_query_handler(
 
 def instructors_input_handler(
     message: telebot.types.Message,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
-    instructorid_map: dict[str, int],
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
+    instructorid_map: dict[str, str],
 ) -> None:
     """
     Handles user input for instructor names, validating them against the instructor map.
@@ -389,7 +393,7 @@ def instructors_input_handler(
       - message (telebot.types.Message): The message object containing user interaction data.
       - chat_manager (ChatManager): The manager handling chat data.
       - keyboard_manager (KeyboardManager): The manager handling keyboard generation and interaction.
-      - instructorid_map (dict[str, int]): Dictionary of instructor names and IDs
+      - instructorid_map (dict[str, str]): Dictionary of instructor names and IDs
 
     """
     query_data = chat_manager.get_query_data(chat_id=message.chat.id)
@@ -429,8 +433,8 @@ def instructors_input_handler(
 
 def instructors_selection_handler(
     message: telebot.types.Message,
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Displays the instructors selection prompt.

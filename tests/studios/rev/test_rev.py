@@ -6,7 +6,9 @@ Description: This file tests the functions to retrieve information for Rev.
 
 import logging
 from datetime import date
+from typing import Callable
 
+import pytest_mock
 import requests
 
 from common.result_data import ResultData
@@ -22,7 +24,7 @@ from studios.rev.rev import (
 from tests.studios.rev import expected_results
 
 
-def test_send_get_schedule_request(mocker):
+def test_send_get_schedule_request(mocker: pytest_mock.plugin.MockerFixture) -> None:
     """
     Test send_get_schedule_request flow.
 
@@ -57,7 +59,9 @@ def test_send_get_schedule_request(mocker):
     assert response.status_code == 200
 
 
-def test_parse_get_schedule_response(mocker, load_response_file):
+def test_parse_get_schedule_response(
+    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+) -> None:
     """
     Test parse_get_schedule_response flow.
 
@@ -86,7 +90,7 @@ def test_parse_get_schedule_response(mocker, load_response_file):
         )
 
 
-def test_get_rev_schedule(mocker, load_response_file):
+def test_get_rev_schedule(mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]) -> None:
     """
     Test get_rev_schedule flow.
 
@@ -133,7 +137,9 @@ def test_get_rev_schedule(mocker, load_response_file):
         )
 
 
-def test_get_instructorid_map(mocker, load_response_file):
+def test_get_instructorid_map(
+    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+) -> None:
     """
     Test get_instructorid_map flow.
 
@@ -173,7 +179,9 @@ def test_get_instructorid_map(mocker, load_response_file):
     assert instructorid_map == expected_results.EXPECTED_BUGIS_10_TO_12_APR_INSTRUCTORID_MAP
 
 
-def test_get_rev_schedule_and_instructorid_map(mocker, load_response_file):
+def test_get_rev_schedule_and_instructorid_map(
+    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+) -> None:
     """
     Test get_rev_schedule_and_instructorid_map flow.
 

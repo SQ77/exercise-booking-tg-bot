@@ -19,6 +19,12 @@ class CapacityInfo:
 
     """
 
+    has_info: bool
+    capacity: int
+    remaining: int
+    waitlist_capacity: int
+    waitlist_reserved: int
+
     def __init__(
         self,
         has_info: bool = False,

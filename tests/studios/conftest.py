@@ -1,11 +1,12 @@
 import inspect
 from pathlib import Path
+from typing import Callable
 
 import pytest
 
 
 @pytest.fixture
-def load_response_file():
+def load_response_file() -> Callable[[str], str]:
     """
     Fixture to load a file from the "example_responses" directory located next to the
     test file calling this fixture.

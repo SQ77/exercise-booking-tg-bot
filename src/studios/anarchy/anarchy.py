@@ -7,9 +7,10 @@ Description:
 """
 
 import json
+import logging
 import re
 from copy import copy
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from html import unescape
 
 import pytz
@@ -24,13 +25,13 @@ from common.studio_location import StudioLocation
 from common.studio_type import StudioType
 
 
-def send_get_schedule_request(start_date: datetime.date, end_date: datetime.date) -> requests.models.Response:
+def send_get_schedule_request(start_date: date, end_date: date) -> requests.models.Response:
     """
     Sends a GET request to retrieve the class schedule for the specified date range.
 
     Args:
-      - start_date (datetime.date): The start date to retrieve the schedule for.
-      - end_date (datetime.date): The end date to retrieve the schedule for.
+      - start_date (date): The start date to retrieve the schedule for.
+      - end_date (date): The end date to retrieve the schedule for.
 
     Returns:
       - requests.models.Response: The response object containing the schedule data.
@@ -49,9 +50,9 @@ def send_get_schedule_request(start_date: datetime.date, end_date: datetime.date
 
 
 def get_schedule_from_response_soup(
-    logger: "logging.Logger",
+    logger: logging.Logger,
     soup: BeautifulSoup,
-) -> dict[datetime.date, list[ClassData]]:
+) -> dict[date, list[ClassData]]:
     """
     Parses the response soup to extract the class schedule data.
 
@@ -60,7 +61,7 @@ def get_schedule_from_response_soup(
       - soup (BeautifulSoup): The parsed HTML response from the schedule request.
 
     Returns:
-      - dict[datetime.date, list[ClassData]]: Dictionary of dates and details of classes.
+      - dict[date, list[ClassData]]: Dictionary of dates and details of classes.
 
     """
     session_div_list = [div for div in soup.find_all(name="div") if "bw-session" in div.get("class", default=[])]
@@ -115,7 +116,7 @@ def get_schedule_from_response_soup(
     return result_dict
 
 
-def get_soup_from_response(logger: "logging.Logger", response: requests.models.Response) -> BeautifulSoup:
+def get_soup_from_response(logger: logging.Logger, response: requests.models.Response) -> BeautifulSoup:
     """
     Parses the response to a BeautifulSoup.
 
@@ -148,7 +149,7 @@ def get_soup_from_response(logger: "logging.Logger", response: requests.models.R
     return BeautifulSoup(markup=cleaned_html, features="html.parser")
 
 
-def get_instructorid_map_from_response_soup(logger: "logging.Logger", soup: BeautifulSoup) -> dict[str, int]:
+def get_instructorid_map_from_response_soup(logger: logging.Logger, soup: BeautifulSoup) -> dict[str, str]:
     """
     Parses the response soup to extract the IDs of instructors.
 
@@ -157,11 +158,11 @@ def get_instructorid_map_from_response_soup(logger: "logging.Logger", soup: Beau
       - soup (BeautifulSoup): The parsed HTML response from the schedule request.
 
     Returns:
-      - dict[str, int]: Dictionary of instructor names and IDs.
+      - dict[str, str]: Dictionary of instructor names and IDs.
 
     """
     session_div_list = [div for div in soup.find_all(name="div") if "bw-session" in div.get("class", default=[])]
-    instructorid_map = {}
+    instructorid_map: dict[str, str] = {}
     for session_div in session_div_list:
         session_staff_div = session_div.find(name="div", class_="bw-session__staff")
         if session_staff_div is None:
@@ -180,7 +181,7 @@ def get_instructorid_map_from_response_soup(logger: "logging.Logger", soup: Beau
     return instructorid_map
 
 
-def get_anarchy_schedule_and_instructorid_map(logger: "logging.Logger") -> tuple[ResultData, dict[str, int]]:
+def get_anarchy_schedule_and_instructorid_map(logger: logging.Logger) -> tuple[ResultData, dict[str, str]]:
     """
     Retrieves class schedules and instructor ID mappings.
 
@@ -188,7 +189,7 @@ def get_anarchy_schedule_and_instructorid_map(logger: "logging.Logger") -> tuple
       - logger (logging.Logger): Logger for logging messages.
 
     Returns:
-      - tuple[ResultData, dict[str, int]]: A tuple containing schedule data and instructor ID mappings.
+      - tuple[ResultData, dict[str, str]]: A tuple containing schedule data and instructor ID mappings.
 
     """
     start_date = datetime.now(tz=pytz.timezone("Asia/Singapore")).date()

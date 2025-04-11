@@ -11,7 +11,7 @@ from common.studio_location import StudioLocation
 from common.studio_type import StudioType
 
 
-def test_classdata_name_escaping():
+def test_classdata_name_escaping() -> None:
     """
     Test that ClassData escapes special characters in name.
     """
@@ -28,7 +28,7 @@ def test_classdata_name_escaping():
     assert class_data.name == r"Test \*Class\_ \`Spin\`"
 
 
-def test_classdata_equality():
+def test_classdata_equality() -> None:
     """
     Test that two identical ClassData objects are considered equal.
 
@@ -64,7 +64,7 @@ def test_classdata_equality():
     assert class1 == class2, "Class capacity info should not be checked for equality"
 
 
-def test_classdata_inequality():
+def test_classdata_inequality() -> None:
     """
     Test that different ClassData objects are not equal.
     """
@@ -79,7 +79,7 @@ def test_classdata_inequality():
     assert class1 != class2, "Classes should not be equal"
 
 
-def test_classdata_comparison():
+def test_classdata_comparison() -> None:
     """
     Test that ClassData objects are correctly ordered by time.
     """

@@ -6,9 +6,10 @@ Description:
   class schedules and instructor IDs for Absolute studio.
 """
 
+import logging
 import re
 from copy import copy
-from datetime import datetime
+from datetime import date, datetime
 
 import pytz
 import requests
@@ -20,6 +21,7 @@ from common.class_data import ClassData
 from common.data import RESPONSE_AVAILABILITY_MAP
 from common.result_data import ResultData
 from common.studio_location import StudioLocation
+from common.studio_type import StudioType
 from studios.absolute.data import LOCATION_MAP, ROOM_ID_TO_STUDIO_LOCATION_MAP, ROOM_ID_TO_STUDIO_TYPE_MAP
 
 
@@ -56,9 +58,9 @@ def send_get_schedule_request(locations: list[StudioLocation], week: int) -> req
 
 
 def get_schedule_from_response_soup(
-    logger: "logging.Logger",
+    logger: logging.Logger,
     soup: BeautifulSoup,
-) -> dict[datetime.date, list[ClassData]]:
+) -> dict[date, list[ClassData]]:
     """
     Parses the response soup to extract the class schedule data.
 
@@ -67,7 +69,7 @@ def get_schedule_from_response_soup(
       - soup (BeautifulSoup): The parsed HTML response from the schedule request.
 
     Returns:
-      - dict[datetime.date, list[ClassData]]: Dictionary of dates and details of classes.
+      - dict[date, list[ClassData]]: Dictionary of dates and details of classes.
 
     """
     schedule_table = soup.find(name="table", id="reserve", class_="scheduleTable")
@@ -186,7 +188,7 @@ def get_schedule_from_response_soup(
     return result_dict
 
 
-def get_instructorid_map_from_response_soup(logger: "logging.Logger", soup: BeautifulSoup) -> dict[str, int]:
+def get_instructorid_map_from_response_soup(logger: logging.Logger, soup: BeautifulSoup) -> dict[str, str]:
     """
     Parses the response soup to extract the IDs of instructors.
 
@@ -195,7 +197,7 @@ def get_instructorid_map_from_response_soup(logger: "logging.Logger", soup: Beau
       - soup (BeautifulSoup): The parsed HTML response from the schedule request.
 
     Returns:
-      - dict[str, int]: Dictionary of instructor names and IDs.
+      - dict[str, str]: Dictionary of instructor names and IDs.
 
     """
     reserve_filter = soup.find(name="ul", id="reserveFilter")
@@ -208,7 +210,7 @@ def get_instructorid_map_from_response_soup(logger: "logging.Logger", soup: Beau
         logger.warning(f"Failed to get list of instructors - Instructor filter not found: {reserve_filter}")
         return {}
 
-    instructorid_map = {}
+    instructorid_map: dict[str, str] = {}
     for instructor in instructor_filter.find_all(name="li"):
         instructor_name = " ".join(instructor.get_text().strip().lower().split())
         instructor_name = instructor_name.replace("\n", " ")
@@ -226,12 +228,12 @@ def get_instructorid_map_from_response_soup(logger: "logging.Logger", soup: Beau
             logger.warning(f"Failed to get id of instructor {instructor_name} - Regex failed to match: {href}")
             continue
 
-        instructorid_map[instructor_name] = match.group(1)
+        instructorid_map[instructor_name] = str(match.group(1))
 
     return instructorid_map
 
 
-def get_absolute_schedule_and_instructorid_map(logger: "logging.Logger") -> tuple[ResultData, dict[str, int]]:
+def get_absolute_schedule_and_instructorid_map(logger: logging.Logger) -> tuple[ResultData, dict[str, str]]:
     """
     Retrieves class schedules and instructor ID mappings.
 
@@ -239,11 +241,11 @@ def get_absolute_schedule_and_instructorid_map(logger: "logging.Logger") -> tupl
       - logger (logging.Logger): Logger for logging messages.
 
     Returns:
-      - tuple[ResultData, dict[str, int]]: A tuple containing schedule data and instructor ID mappings.
+      - tuple[ResultData, dict[str, str]]: A tuple containing schedule data and instructor ID mappings.
 
     """
     result = ResultData()
-    instructorid_map = {}
+    instructorid_map: dict[str, str] = {}
     location_map_list = list(LOCATION_MAP)
 
     # REST API can only select one week at a time

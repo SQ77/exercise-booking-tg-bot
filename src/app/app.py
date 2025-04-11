@@ -11,6 +11,8 @@ import os
 import signal
 import threading
 import time
+import types
+from typing import Any, Optional
 
 import schedule
 import telebot
@@ -49,6 +51,21 @@ class App:
 
     """
 
+    logger: logging.Logger
+    base_url: str
+    webhook_path: str
+    bot: telebot.TeleBot
+    bot_token: str
+    chat_manager: ChatManager
+    keyboard_manager: KeyboardManager
+    studios_manager: StudiosManager
+    history_manager: HistoryManager
+    server: Server
+    menu_manager: MenuManager
+    keep_alive_thread: threading.Thread
+    server_thread: threading.Thread
+    studios_manager_thread: threading.Thread
+
     def __init__(self) -> None:
         """
         Initializes the App instance.
@@ -72,7 +89,7 @@ class App:
         instructors_command = telebot.types.BotCommand(command="instructors", description="Show list of instructors")
         self.bot.set_my_commands(commands=[start_command, nerd_command, instructors_command])
 
-        self.chat_manager = ChatManager(bot=self.bot)
+        self.chat_manager = ChatManager(logger=self.logger, bot=self.bot)
         self.keyboard_manager = KeyboardManager()
         self.studios_manager = StudiosManager(logger=self.logger, rev_security_token=self.rev_security_token)
         self.history_manager = HistoryManager(logger=self.logger)
@@ -101,45 +118,75 @@ class App:
             daemon=True,
         )
 
-    def load_env_vars(self):
+    def load_env_vars(self) -> None:
         """
         Loads the environment variables to be used for the application.
 
         Exits the application if a required environment variable could not be loaded.
 
         """
-        loaded_successfully = True
-        self.base_url = os.getenv("RENDER_EXTERNAL_URL", os.getenv("TELEGRAM_BOT_EXTERNAL_URL"))
-        if self.base_url is None:
-            self.logger.error("RENDER_EXTERNAL_URL or TELEGRAM_BOT_EXTERNAL_URL env var required but not set")
-            loaded_successfully = False
 
-        self.webhook_path = os.getenv("WEBHOOK_PATH")
-        if self.webhook_path is None:
+        def _load_env_vars_internal(env_var_name: str, default_value: Any) -> tuple[Any, bool]:
+            """
+            Helper to load and set the environment variable.
+
+            Exits the application if a required environment variable could not be loaded.
+
+            Args:
+              - env_var_name (str): The name of the environment variable to load.
+              - default_value (Any): The default value to return if the environment variable could not be loaded.
+
+            Returns:
+              - tuple[Any, bool]: The retrieved environment variable value and the status of retrieval. True if value
+                was loaded successfully, false otherwise.
+
+            """
+            value = os.getenv(env_var_name)
+            if value is None:
+                return (default_value, False)
+
+            return (value, True)
+
+        loaded_successfully = True
+        self.base_url, success = _load_env_vars_internal("RENDER_EXTERNAL_URL", "")
+        if not success:
+            self.base_url, success = _load_env_vars_internal("TELEGRAM_BOT_EXTERNAL_URL", "")
+            if not success:
+                self.logger.error("RENDER_EXTERNAL_URL or TELEGRAM_BOT_EXTERNAL_URL env var required but not set")
+                loaded_successfully = False
+
+        self.webhook_path, success = _load_env_vars_internal("WEBHOOK_PATH", "")
+        if not success:
             self.logger.error("WEBHOOK_PATH env var required but not set")
             loaded_successfully = False
 
-        self.bot_token = os.getenv("BOT_TOKEN")
-        if self.bot_token is None:
+        self.bot_token, success = _load_env_vars_internal("BOT_TOKEN", "")
+        if not success:
             self.logger.error("BOT_TOKEN env var required but not set")
             loaded_successfully = False
 
-        self.rev_security_token = os.getenv("REV_SECURITY_TOKEN")
-        if self.rev_security_token is None:
+        self.rev_security_token, success = _load_env_vars_internal("REV_SECURITY_TOKEN", "")
+        if not success:
             self.logger.error("REV_SECURITY_TOKEN env var required but not set")
             loaded_successfully = False
 
-        self.server_port = os.getenv("PORT")
-        if self.server_port is None:
+        port = os.getenv("PORT")
+        if port is None:
             # PORT env var not mandatory, default to 80 if not found
             self.logger.warning("PORT env var not found. Defaulting to 80")
             self.server_port = 80
+        else:
+            try:
+                self.server_port = int(port)
+            except Exception as e:
+                self.logger.warning(f"Failed to convert port '{port}' to int - {e}. Defaulting to 80")
+                self.server_port = 80
 
         if not loaded_successfully:
             self.logger.error("Failed to initialize app. Exiting...")
             exit(1)
 
-    def set_webhook(self):
+    def set_webhook(self) -> None:
         """
         Sets the webhook url for the Telegram bot.
         """
@@ -157,7 +204,7 @@ class App:
         """
         schedule.every(10).minutes.do(job_func=self.server.ping_self)
 
-    def shutdown(self, _: int, __: "types.FrameType") -> None:
+    def shutdown(self, _: int, __: Optional[types.FrameType]) -> None:
         """
         Gracefully shuts down the bot and background threads.
 

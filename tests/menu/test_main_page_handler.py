@@ -4,12 +4,13 @@ Author: https://github.com/lendrixxx
 Description: This file tests the functions of the main page handler.
 """
 
+import pytest_mock
 import telebot
 
 import menu.main_page_handler as main_page_handler
 
 
-def test_main_page_handler(mocker):
+def test_main_page_handler(mocker: pytest_mock.plugin.MockerFixture) -> None:
     """
     Test main_page_handler flow.
 
@@ -63,7 +64,7 @@ def test_main_page_handler(mocker):
     mock_keyboard_manager.get_main_page_keyboard.assert_called_once()
 
 
-def test_main_page_callback_query_handler(mocker):
+def test_main_page_callback_query_handler(mocker: pytest_mock.plugin.MockerFixture) -> None:
     """
     Test main_page_callback_query_handler flow.
 

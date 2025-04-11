@@ -6,15 +6,19 @@ Description: This file defines callback queries related to selecting days for cl
 
 from copy import copy
 
+import telebot
+
+from chat.chat_manager import ChatManager
+from chat.keyboard_manager import KeyboardManager
 from common.data import SORTED_DAYS
 from menu.main_page_handler import main_page_handler
 
 
 def days_page_callback_query_handler(
-    query: "telebot.types.CallbackQuery",
-    bot: "telebot.TeleBot",
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    query: telebot.types.CallbackQuery,
+    bot: telebot.TeleBot,
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles the callback query when the step to select day(s) is triggered.
@@ -57,9 +61,9 @@ def days_page_callback_query_handler(
 
 
 def days_selection_callback_query_handler(
-    query: "telebot.types.CallbackQuery",
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    query: telebot.types.CallbackQuery,
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles callback queries for selecting the days selection page.
@@ -74,9 +78,9 @@ def days_selection_callback_query_handler(
 
 
 def days_selection_handler(
-    message: "telebot.types.Message",
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    message: telebot.types.Message,
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Displays the days selection prompt and updates the days selection message of the
@@ -102,9 +106,9 @@ def days_selection_handler(
 
 
 def days_next_callback_query_handler(
-    query: "telebot.types.CallbackQuery",
-    chat_manager: "ChatManager",
-    keyboard_manager: "KeyboardManager",
+    query: telebot.types.CallbackQuery,
+    chat_manager: ChatManager,
+    keyboard_manager: KeyboardManager,
 ) -> None:
     """
     Handles the callback query when the user proceeds to the next step after selecting

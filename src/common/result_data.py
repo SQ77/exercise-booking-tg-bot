@@ -6,9 +6,12 @@ Description:
   provide functionality for filtering classes based on various query parameters.
 """
 
+from __future__ import annotations
+
 import calendar
 from copy import copy
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from typing import Optional
 
 import pytz
 
@@ -24,26 +27,28 @@ class ResultData:
     Class to represent the data for class schedules of various studios.
 
     Attributes:
-      - classes (dict[datetime.date, list[ClassData]]): Dictionary of dates and details of classes.
+      - classes (dict[date, list[ClassData]]): Dictionary of dates and details of classes.
 
     """
 
-    def __init__(self, classes: dict[datetime.date, list[ClassData]] = None) -> None:
+    classes: dict[date, list[ClassData]]
+
+    def __init__(self, classes: Optional[dict[date, list[ClassData]]] = None) -> None:
         """
         Initializes the ResultData instance.
 
         Args:
-          - classes (dict[datetime.date, list[ClassData]]): The dictionary of dates and details of classes.
+          - classes (dict[date, list[ClassData]]): The dictionary of dates and details of classes.
 
         """
         self.classes = {} if classes is None else classes
 
-    def add_class(self, date: datetime.date, data: ClassData) -> None:
+    def add_class(self, date: date, data: ClassData) -> None:
         """
         Adds a class to the given date.
 
         Args:
-          - date (datetime.date): The date of the class.
+          - date (date): The date of the class.
           - data (ClassData): The class data to be added.
 
         """
@@ -52,12 +57,12 @@ class ResultData:
 
         self.classes[date].append(data)
 
-    def add_classes(self, classes: dict[datetime.date, list[ClassData]]) -> None:
+    def add_classes(self, classes: dict[date, list[ClassData]]) -> None:
         """
         Adds classes to the given date.
 
         Args:
-          - classes (dict[datetime.date, list[ClassData]]): The dictionary of dates and details of classes to add.
+          - classes (dict[date, list[ClassData]]): The dictionary of dates and details of classes to add.
 
         """
         if classes is None:
@@ -66,13 +71,13 @@ class ResultData:
         if self.classes is None:
             self.classes = {}
 
-        for date in classes:
-            if date in self.classes:
-                self.classes[date] += classes[date]
+        for classes_date in classes:
+            if classes_date in self.classes:
+                self.classes[classes_date] += classes[classes_date]
             else:
-                self.classes[date] = copy(classes[date])
+                self.classes[classes_date] = copy(classes[classes_date])
 
-    def get_data(self, query: QueryData) -> "ResultData":
+    def get_data(self, query: QueryData) -> ResultData:
         """
         Filters and retrieves class data based on the provided query parameters.
 
@@ -86,7 +91,7 @@ class ResultData:
         if self.classes is None:
             return ResultData()
 
-        classes = {}
+        classes: dict[date, list[ClassData]] = {}
         current_sg_time = datetime.now(tz=pytz.timezone("Asia/Singapore"))
         for week in range(0, query.weeks):
             date_to_check = datetime.now(tz=pytz.timezone("Asia/Singapore")).date() + timedelta(weeks=week)
@@ -176,11 +181,11 @@ class ResultData:
             return "No classes found"
 
         result_str = ""
-        for date in sorted(self.classes):
-            date_str = f"*{calendar.day_name[date.weekday()]}, {date.strftime('%d %B')}*"
+        for classes_date in sorted(self.classes):
+            date_str = f"*{calendar.day_name[classes_date.weekday()]}, {classes_date.strftime('%d %B')}*"
             result_str += f"{date_str}\n"
 
-            for class_details in sorted(self.classes[date]):
+            for class_details in sorted(self.classes[classes_date]):
                 availability_str = ""
                 if class_details.availability == ClassAvailability.Waitlist:
                     availability_str = "[W] "
@@ -211,7 +216,7 @@ class ResultData:
 
         return result_str
 
-    def __add__(self, other: "ResultData") -> "ResultData":
+    def __add__(self, other: ResultData) -> ResultData:
         """
         Merges two ResultData instances.
 
