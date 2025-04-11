@@ -20,6 +20,9 @@ _Note: Screenshots are not updated to show support for all studios. Usage for di
 
 ### Environment Variables to set
 
+- PYTHONPATH = "src" (required)
+  - Value should be set to "src" to ensure that Python can locate the modules in the src folder correctly.
+
 - BOT_TOKEN (required)
   - To be able to run the bot, you will need to get a bot token from @botfather. FreeCodeCamp has a nice guide [here](https://www.freecodecamp.org/news/how-to-create-a-telegram-bot-using-python/) that was used as a reference for this project.
 - REV_SECURITY_TOKEN (required)
@@ -46,6 +49,15 @@ Run `pytest {folder}` to run all tests in the specified folder.
 ### Running individual tests
 
 Run `pytest {path/to/file.py}::{test_name}` to run a specific test.
+
+## Pre Commit Hooks
+
+Install pre-commit with `pip install pre-commit`.
+
+### Running all pre commit hooks
+
+Run `pre-commit run --all-files`
+
 
 ## Usage (Normal Mode)
 
