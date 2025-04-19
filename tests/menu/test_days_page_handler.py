@@ -234,12 +234,12 @@ def test_days_page_callback_query_handler_multi_step(
     mock_chat = mocker.Mock(id=test_chat_id)
     mock_message = mocker.Mock(spec=telebot.types.Message, chat=mock_chat)
 
-    query_data_mock = mocker.Mock()
-    query_data_mock.days = args.initial_days.copy()
-    query_data_mock.get_query_str.return_value = args.expected_query_str
+    mock_query_data = mocker.Mock()
+    mock_query_data.days = args.initial_days.copy()
+    mock_query_data.get_query_str.return_value = args.expected_query_str
 
     mock_chat_manager = mocker.Mock()
-    mock_chat_manager.get_query_data.return_value = query_data_mock
+    mock_chat_manager.get_query_data.return_value = mock_query_data
     mock_chat_manager.get_days_selection_message.return_value = mocker.Mock(
         chat=mocker.Mock(id=test_chat_id),
         id=test_message_id,
@@ -278,7 +278,7 @@ def test_days_page_callback_query_handler_multi_step(
         )
 
         # Update return value of get_query_data for the next call
-        query_data_mock.days = args.expected_updated_days_sequence[index]
+        mock_query_data.days = args.expected_updated_days_sequence[index]
 
     # Double check global state is untouched
     assert SORTED_DAYS == ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
