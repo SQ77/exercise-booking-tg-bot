@@ -13,6 +13,7 @@ ROOM_NAME_TO_STUDIO_LOCATION_MAP = {
     "Revolution - Tanjong Pagar": StudioLocation.TJPG,
     "TP - Nov 2024": StudioLocation.TJPG,
     "Orchard - Nov 2024": StudioLocation.Orchard,
+    "TP - Revised April": StudioLocation.TJPG,
 }
 
 # Dictionary of location strings and site ids

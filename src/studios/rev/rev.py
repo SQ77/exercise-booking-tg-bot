@@ -99,11 +99,13 @@ def parse_get_schedule_response(
             class_name = class_name[:class_name_location_split_pos]
             class_time = datetime.strptime(data["startTime"], "%H:%M:%S")
 
-            if data["roomName"] in ROOM_NAME_TO_STUDIO_LOCATION_MAP:
-                location = ROOM_NAME_TO_STUDIO_LOCATION_MAP[data["roomName"]]
+            room_name = data["roomName"]
+            if room_name in ROOM_NAME_TO_STUDIO_LOCATION_MAP:
+                location = ROOM_NAME_TO_STUDIO_LOCATION_MAP[room_name]
             else:
+                logger.warning(f"Failed to map room name {room_name}")
                 location = StudioLocation.Null
-                class_name += " @ " + data["roomName"]
+                class_name += " @ " + room_name
 
             class_details = ClassData(
                 studio=StudioType.Rev,
