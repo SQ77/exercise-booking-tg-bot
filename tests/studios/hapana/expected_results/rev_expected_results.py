@@ -1,5 +1,5 @@
 """
-expected_results.py
+rev_expected_results.py
 Author: https://github.com/lendrixxx
 Description: This file defines the expected results for Rev tests.
 """
@@ -1932,13 +1932,13 @@ EXPECTED_ALL_10_TO_12_APR_SCHEDULE = {
             name="RIDE",
             instructor="Brandon Lim",
             time="6:00 PM",
-            availability=ClassAvailability.Available,
+            availability=ClassAvailability.Full,
             capacity_info=CapacityInfo(
                 has_info=True,
                 capacity=38,
-                remaining=34,
+                remaining=0,
                 waitlist_capacity=20,
-                waitlist_reserved=0,
+                waitlist_reserved=20,
             ),
         ),
         ClassData(

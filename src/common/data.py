@@ -39,7 +39,7 @@ RESPONSE_AVAILABILITY_MAP = {
     "waitlistfull": ClassAvailability.Full,
     "open": ClassAvailability.Available,
     "waitlist": ClassAvailability.Waitlist,
-    "full": ClassAvailability.Waitlist,  # TODO: Confirm session status string
+    "full": ClassAvailability.Full,
     "closed": ClassAvailability.Available,
     "scheduleCancelled": ClassAvailability.Cancelled,
     "cancelled": ClassAvailability.Cancelled,

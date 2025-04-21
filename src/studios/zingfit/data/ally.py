@@ -1,11 +1,25 @@
 """
-data.py
+ally.py
 Author: https://github.com/lendrixxx
 Description: This file contains data used for retrieving Ally schedules.
 """
 
 from common.studio_location import StudioLocation
 from common.studio_type import StudioType
+
+# URL subdomain
+URL_SUBDOMAIN = "ally"
+
+# Max number of weeks that schedule is shown in advance
+MAX_SCHEDULE_WEEKS = 3
+
+# Date format of the table heading
+TABLE_HEADING_DATE_FORMAT = "%m.%d"
+
+# Dictionary of studio locations and site id params used in get request
+LOCATION_TO_SITE_ID_MAP = {
+    StudioLocation.CrossStreet: 1,
+}
 
 # Dictionary of room IDs and studio types
 ROOM_ID_TO_STUDIO_TYPE_MAP = {

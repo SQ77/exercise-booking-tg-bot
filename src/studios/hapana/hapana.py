@@ -1,9 +1,8 @@
 """
-rev.py
+hapana.py
 Author: https://github.com/lendrixxx
 Description:
-  This file defines functions to handle the retrieving of
-  class schedules and instructor IDs for Rev studio.
+  This file defines functions to handle the retrieving of class schedules and instructor IDs for Hapana studios.
 """
 
 import json
@@ -20,7 +19,6 @@ from common.data import RESPONSE_AVAILABILITY_MAP
 from common.result_data import ResultData
 from common.studio_location import StudioLocation
 from common.studio_type import StudioType
-from studios.rev.data import ROOM_NAME_TO_STUDIO_LOCATION_MAP, SITE_ID_MAP
 
 
 def send_get_schedule_request(
@@ -28,6 +26,7 @@ def send_get_schedule_request(
     start_date: date,
     end_date: datetime,
     security_token: str,
+    location_to_site_id_map: dict[str, str],
 ) -> requests.models.Response:
     """
     Sends a GET request to retrieve the class schedule for the specified locations and
@@ -38,6 +37,7 @@ def send_get_schedule_request(
       - start_date (date): The start date to retrieve the schedule for.
       - end_date (date): The end date to retrieve the schedule for.
       - security_token (str): Security token used for sending requests.
+      - location_to_site_id_map (dict[str, str]): Dictionary of location and site IDs.
 
     Returns:
       - requests.models.Response: The response object containing the schedule data.
@@ -48,7 +48,7 @@ def send_get_schedule_request(
     url = "https://widgetapi.hapana.com/v2/wAPI/site/sessions"
     params = {
         "sessionCategory": "classes",
-        "siteID": SITE_ID_MAP[location],
+        "siteID": location_to_site_id_map[location],
         "startDate": start_date_str,
         "endDate": end_date_str,
     }
@@ -61,31 +61,38 @@ def send_get_schedule_request(
 
 def parse_get_schedule_response(
     logger: logging.Logger,
+    studio_name: str,
     response: requests.models.Response,
+    room_id_to_studio_type_map: dict[str, StudioType],
+    room_name_to_studio_location_map: dict[str, StudioLocation],
 ) -> dict[date, list[ClassData]]:
     """
     Parses the get schedule response to extract the class schedule data.
 
     Args:
       - logger (logging.Logger): Logger for logging messages.
-      - response: The get schedule response from the schedule request.
+      - studio_name (str): Name of studio to use for logging.
+      - response (requests.models.Response): The get schedule response from the schedule request.
+      - room_id_to_studio_type_map (dict[str, StudioType]): The dictionary of room IDs and studio types.
+      - room_name_to_studio_location_map (dict[str, StudioLocation]):
+        The dictionary of room name strings and studio locations.
 
     Returns:
       - dict[date, list[ClassData]]: Dictionary of dates and details of classes.
 
     """
     if response.status_code != 200:
-        logger.warning(f"Failed to get schedule - API callback error {response.status_code}")
+        logger.warning(f"Failed to get {studio_name} schedule - API callback error {response.status_code}")
         return {}
 
     result_dict = {}
     try:
         response_json = json.loads(s=response.text)
         if "success" not in response_json:
-            logger.warning(f"Failed to get schedule - API callback failed: {response_json}")
+            logger.warning(f"Failed to get {studio_name} schedule - API callback failed: {response_json}")
             return {}
     except Exception as e:
-        logger.warning(f"Failed to get schedule - {e}: {response.text}")
+        logger.warning(f"Failed to get {studio_name} schedule - {e}: {response.text}")
         return {}
 
     for data in response_json["data"]:
@@ -105,15 +112,21 @@ def parse_get_schedule_response(
             class_time = datetime.strptime(data["startTime"], "%H:%M:%S")
 
             room_name = data["roomName"]
-            if room_name in ROOM_NAME_TO_STUDIO_LOCATION_MAP:
-                location = ROOM_NAME_TO_STUDIO_LOCATION_MAP[room_name]
+            if room_name in room_id_to_studio_type_map:
+                studio = room_id_to_studio_type_map[room_name]
             else:
-                logger.warning(f"Failed to map room name {room_name}")
+                logger.warning(f"Failed to map room name {room_name} to studio type for {studio_name}")
+                studio = StudioType.Unknown
+
+            if room_name in room_name_to_studio_location_map:
+                location = room_name_to_studio_location_map[room_name]
+            else:
+                logger.warning(f"Failed to map room name {room_name} to studio location for {studio_name}")
                 location = StudioLocation.Null
                 class_name += " @ " + room_name
 
             class_details = ClassData(
-                studio=StudioType.Rev,
+                studio=studio,
                 location=location,
                 name=class_name,
                 instructor=instructor_str,
@@ -134,18 +147,30 @@ def parse_get_schedule_response(
                 result_dict[class_date].append(copy(class_details))
 
         except Exception as e:
-            logger.warning(f"Failed to get details of class - {e}. Data: {data}")
+            logger.warning(f"Failed to get details of class for {studio_name} - {e}. Data: {data}")
 
     return result_dict
 
 
-def get_rev_schedule(logger: logging.Logger, security_token: str) -> ResultData:
+def get_hapana_schedule(
+    logger: logging.Logger,
+    studio_name: str,
+    security_token: str,
+    location_to_site_id_map: dict[str, str],
+    room_id_to_studio_type_map: dict[str, StudioType],
+    room_name_to_studio_location_map: dict[str, StudioLocation],
+) -> ResultData:
     """
     Retrieves all the available class schedules.
 
     Args:
       - logger (logging.Logger): Logger for logging messages.
+      - studio_name (str): Name of studio to use for logging.
       - security_token (str): Security token used for sending requests.
+      - location_to_site_id_map (dict[str, str]): Dictionary of location strings and site IDs.
+      - room_id_to_studio_type_map (dict[str, StudioType]): The dictionary of room IDs and studio types.
+      - room_name_to_studio_location_map (dict[str, StudioLocation]):
+        The dictionary of room name strings and studio locations.
 
     Returns:
       - ResultData: The schedule data.
@@ -162,20 +187,34 @@ def get_rev_schedule(logger: logging.Logger, security_token: str) -> ResultData:
             start_date=start_date,
             end_date=end_date,
             security_token=security_token,
+            location_to_site_id_map=location_to_site_id_map,
         )
-        date_class_data_list_dict = parse_get_schedule_response(logger=logger, response=get_schedule_response)
+        date_class_data_list_dict = parse_get_schedule_response(
+            logger=logger,
+            studio_name=studio_name,
+            response=get_schedule_response,
+            room_id_to_studio_type_map=room_id_to_studio_type_map,
+            room_name_to_studio_location_map=room_name_to_studio_location_map,
+        )
         result.add_classes(classes=date_class_data_list_dict)
 
     return result
 
 
-def get_instructorid_map(logger: logging.Logger, security_token: str) -> dict[str, str]:
+def get_instructorid_map(
+    logger: logging.Logger,
+    studio_name: str,
+    security_token: str,
+    location_to_site_id_map: dict[str, str],
+) -> dict[str, str]:
     """
     Retrieves the IDs of instructors.
 
     Args:
       - logger (logging.Logger): Logger for logging messages.
+      - studio_name (str): Name of studio to use for logging.
       - security_token (str): Security token used for sending requests.
+      - location_to_site_id_map (dict[str, str]): Dictionary of location strings and site IDs.
 
     Returns:
       - dict[str, str]: Dictionary of instructor names and IDs.
@@ -188,12 +227,13 @@ def get_instructorid_map(logger: logging.Logger, security_token: str) -> dict[st
     }
     # REST API can only select one location at a time
     instructorid_map: dict[str, str] = {}
-    for location in ["Bugis", "Orchard", "TJPG"]:
-        params = {"siteID": SITE_ID_MAP[location]}
+    for location in location_to_site_id_map:
+        params = {"siteID": location_to_site_id_map[location]}
         response = requests.get(url=url, params=params, headers=headers)
         if response.status_code != 200:
             logger.warning(
-                f"Failed to get list of instructors for {location} - API callback error {response.status_code}"
+                f"Failed to get {studio_name} list of instructors for {location} - "
+                f"API callback error {response.status_code}"
             )
             continue
 
@@ -201,7 +241,8 @@ def get_instructorid_map(logger: logging.Logger, security_token: str) -> dict[st
             response_json = json.loads(s=response.text)
             if not response_json["success"]:
                 logger.warning(
-                    f"Failed to get list of instructors for {location} - API callback failed: {response_json}"
+                    f"Failed to get {studio_name} list of instructors for {location} - "
+                    f"API callback failed: {response_json}"
                 )
                 continue
 
@@ -209,62 +250,87 @@ def get_instructorid_map(logger: logging.Logger, security_token: str) -> dict[st
                 instructorid_map[data["instructorName"].lower()] = data["instructorID"]
 
         except Exception as e:
-            logger.warning(f"Failed to get list of instructors for {location} - {e}")
+            logger.warning(f"Failed to get {studio_name} list of instructors for {location} - {e}")
             continue
 
     return instructorid_map
 
 
-def get_rev_schedule_and_instructorid_map(
+def get_hapana_schedule_and_instructorid_map(
     logger: logging.Logger,
+    studio_name: str,
     security_token: str,
+    location_to_site_id_map: dict[str, str],
+    room_id_to_studio_type_map: dict[str, StudioType],
+    room_name_to_studio_location_map: dict[str, StudioLocation],
 ) -> tuple[ResultData, dict[str, str]]:
     """
     Retrieves class schedules and instructor ID mappings.
 
     Args:
       - logger (logging.Logger): Logger for logging messages.
+      - studio_name (str): Name of studio to use for logging.
       - security_token (str): Security token used for sending requests.
+      - location_to_site_id_map (dict[str, str]): Dictionary of location strings and site IDs.
+      - room_id_to_studio_type_map (dict[str, StudioType]): The dictionary of room IDs and studio types.
+      - room_name_to_studio_location_map (dict[str, StudioLocation]):
+        The dictionary of room name strings and studio locations.
 
     Returns:
       - tuple[ResultData, dict[str, str]]: A tuple containing schedule data and instructor ID mappings.
 
     """
     return (
-        get_rev_schedule(logger=logger, security_token=security_token),
-        get_instructorid_map(logger=logger, security_token=security_token),
+        get_hapana_schedule(
+            logger=logger,
+            studio_name=studio_name,
+            security_token=security_token,
+            location_to_site_id_map=location_to_site_id_map,
+            room_id_to_studio_type_map=room_id_to_studio_type_map,
+            room_name_to_studio_location_map=room_name_to_studio_location_map,
+        ),
+        get_instructorid_map(
+            logger=logger,
+            studio_name=studio_name,
+            security_token=security_token,
+            location_to_site_id_map=location_to_site_id_map,
+        ),
     )
 
 
-def get_rev_security_token(logger: logging.Logger) -> str:
+def get_hapana_security_token(logger: logging.Logger, studio_name: str, site_id: str) -> str:
     """
     Retrieves security token to be used for sending requests.
 
     Args:
       - logger (logging.Logger): Logger for logging messages.
+      - studio_name (str): Name of studio to use for logging.
+      - site_id (str): ID of site to retrieve security token for.
 
     Returns:
       - str: Security token to be used for sending requests.
 
     """
     url = "https://widgetapi.hapana.com/v2/wAPI/site/settings"
-    headers = {"wID": "SUF6aklTN1BLYWVyNGtGVnBuQ2JiUT09"}
+    headers = {"wID": site_id}
     response = requests.get(url=url, headers=headers)
 
     if response.status_code != 200:
-        logger.warning(f"Failed to get security token - API callback error {response.status_code}")
+        logger.warning(f"Failed to get {studio_name} security token - API callback error {response.status_code}")
         return ""
 
     try:
         response_json = json.loads(s=response.text)
     except Exception as e:
-        logger.warning(f"Failed to get security token - {e}: {response.text}")
+        logger.warning(f"Failed to get {studio_name} security token - {e}: {response.text}")
         return ""
 
     if "securityToken" not in response_json:
-        logger.warning(f"Failed to get security token - 'securityToken' not found in response: {response_json}")
+        logger.warning(
+            f"Failed to get {studio_name} security token - 'securityToken' not found in response: {response_json}"
+        )
         return ""
 
     security_token = response_json["securityToken"]
-    logger.info("Successfully retrieved rev security token!")
+    logger.info(f"Successfully retrieved {studio_name} security token!")
     return security_token

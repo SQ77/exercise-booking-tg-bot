@@ -1,5 +1,5 @@
 """
-expected_results.py
+ally_expected_results.py
 Author: https://github.com/lendrixxx
 Description: This file defines the expected results for Ally tests.
 """

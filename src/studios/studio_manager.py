@@ -4,6 +4,7 @@ Author: https://github.com/lendrixxx
 Description: This file defines the StudioManager class which is the main handler for storing of studio data.
 """
 
+from functools import partial
 from typing import Any, Callable
 
 from readerwriterlock.rwlock import RWLockFair
@@ -34,6 +35,7 @@ class StudioManager:
     def __init__(
         self,
         get_schedule_and_instructorid_map_func: Callable[..., tuple[ResultData, dict[str, str]]],
+        **kwargs: Any,
     ) -> None:
         """
         Initializes the StudioManager instance.
@@ -41,26 +43,24 @@ class StudioManager:
         Args:
           - get_schedule_and_instructorid_map_func (Callable[..., tuple[ResultData, dict[str, str]]]):
             The callback function to get the schedule and instructor id map for the studio.
+          - kwargs (Any): The keyword arguments to pass to the get_schedule_and_instructorid_map_func callback.
 
         """
         self.instructorid_map: dict[str, str] = {}
         self.instructorid_map_lock = RWLockFair()
         self.instructor_names: list[str] = []
         self.instructor_names_lock = RWLockFair()
-        self.get_schedule_and_instructorid_map_func = get_schedule_and_instructorid_map_func
+        self.get_schedule_and_instructorid_map_func = partial(get_schedule_and_instructorid_map_func, **kwargs)
 
-    def get_schedule(self, *args: Any) -> ResultData:
+    def get_schedule(self) -> ResultData:
         """
         Retrieves the full schedule of the studio.
-
-        Args:
-          - args (Any): The arguments to pass to the get_schedule_and_instructorid_map_func callback.
 
         Returns:
           ResultData: The full schedule of the studio.
 
         """
-        schedule, new_instructorid_map = self.get_schedule_and_instructorid_map_func(*args)
+        schedule, new_instructorid_map = self.get_schedule_and_instructorid_map_func()
         new_instructor_names = [instructor.lower() for instructor in list(new_instructorid_map)]
         with self.instructorid_map_lock.gen_wlock():
             self.instructorid_map.update(new_instructorid_map)

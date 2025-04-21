@@ -1,5 +1,5 @@
 """
-data.py
+absolute.py
 Author: https://github.com/lendrixxx
 Description: This file contains data used for retrieving Absolute schedules.
 """
@@ -7,8 +7,17 @@ Description: This file contains data used for retrieving Absolute schedules.
 from common.studio_location import StudioLocation
 from common.studio_type import StudioType
 
-# Dictionary of studio locations and params used in get request
-LOCATION_MAP = {
+# URL subdomain
+URL_SUBDOMAIN = "absoluteboutiquefitness"
+
+# Max number of weeks that schedule is shown in advance
+MAX_SCHEDULE_WEEKS = 2
+
+# Date format of the table heading
+TABLE_HEADING_DATE_FORMAT = "%d.%m"
+
+# Dictionary of studio locations and site id params used in get request
+LOCATION_TO_SITE_ID_MAP = {
     StudioLocation.Centrepoint: 1,
     StudioLocation.StarVista: 2,
     StudioLocation.MilleniaWalk: 3,
