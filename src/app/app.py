@@ -91,7 +91,7 @@ class App:
 
         self.chat_manager = ChatManager(logger=self.logger, bot=self.bot)
         self.keyboard_manager = KeyboardManager()
-        self.studios_manager = StudiosManager(logger=self.logger, rev_security_token=self.rev_security_token)
+        self.studios_manager = StudiosManager(logger=self.logger)
         self.history_manager = HistoryManager(logger=self.logger)
         self.server = Server(
             logger=self.logger,
@@ -163,11 +163,6 @@ class App:
         self.bot_token, success = _load_env_vars_internal("BOT_TOKEN", "")
         if not success:
             self.logger.error("BOT_TOKEN env var required but not set")
-            loaded_successfully = False
-
-        self.rev_security_token, success = _load_env_vars_internal("REV_SECURITY_TOKEN", "")
-        if not success:
-            self.logger.error("REV_SECURITY_TOKEN env var required but not set")
             loaded_successfully = False
 
         port = os.getenv("PORT")

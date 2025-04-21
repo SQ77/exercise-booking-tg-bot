@@ -18,7 +18,7 @@ from studios.absolute.absolute import get_absolute_schedule_and_instructorid_map
 from studios.ally.ally import get_ally_schedule_and_instructorid_map
 from studios.anarchy.anarchy import get_anarchy_schedule_and_instructorid_map
 from studios.barrys.barrys import get_barrys_schedule_and_instructorid_map
-from studios.rev.rev import get_rev_schedule_and_instructorid_map
+from studios.rev.rev import get_rev_schedule_and_instructorid_map, get_rev_security_token
 from studios.studio_manager import StudioManager
 
 
@@ -28,7 +28,6 @@ class StudiosManager:
 
     Attributes:
       - logger (logging.Logger): Logger for logging messages.
-      - rev_security_token (str): Security token used for sending requests to Rev.
       - cached_result_data_lock (RWLockFair): Read-write lock for cached_result_data.
       - cached_result_data (ResultData): Cached result data containing schedules of all the studios.
       - studios (dict[StudioType, StudioManager]): Dictionary of studio types and studio managers.
@@ -36,12 +35,11 @@ class StudiosManager:
     """
 
     logger: logging.Logger
-    rev_security_token: str
     cached_result_data_lock: RWLockFair
     cached_result_data: ResultData
     studios: dict[StudioType, StudioManager]
 
-    def __init__(self, logger: logging.Logger, rev_security_token: str) -> None:
+    def __init__(self, logger: logging.Logger) -> None:
         """
         Initializes the StudiosManager instance.
 
@@ -50,15 +48,17 @@ class StudiosManager:
 
         """
         self.logger = logger
-        self.rev_security_token = rev_security_token
+        self.rev_security_token = get_rev_security_token(logger)
         self.cached_result_data_lock = RWLockFair()
         self.cached_result_data = ResultData()
         self.studios = {
-            "Absolute": StudioManager(get_absolute_schedule_and_instructorid_map),
-            "Ally": StudioManager(get_ally_schedule_and_instructorid_map),
-            "Anarchy": StudioManager(get_anarchy_schedule_and_instructorid_map),
-            "Barrys": StudioManager(get_barrys_schedule_and_instructorid_map),
-            "Rev": StudioManager(get_rev_schedule_and_instructorid_map),
+            "Absolute": StudioManager(
+                get_schedule_and_instructorid_map_func=get_absolute_schedule_and_instructorid_map
+            ),
+            "Ally": StudioManager(get_schedule_and_instructorid_map_func=get_ally_schedule_and_instructorid_map),
+            "Anarchy": StudioManager(get_schedule_and_instructorid_map_func=get_anarchy_schedule_and_instructorid_map),
+            "Barrys": StudioManager(get_schedule_and_instructorid_map_func=get_barrys_schedule_and_instructorid_map),
+            "Rev": StudioManager(get_schedule_and_instructorid_map_func=get_rev_schedule_and_instructorid_map),
         }
 
     def update_cached_result_data(self) -> None:

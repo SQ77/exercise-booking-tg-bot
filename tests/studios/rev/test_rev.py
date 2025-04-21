@@ -4,6 +4,7 @@ Author: https://github.com/lendrixxx
 Description: This file tests the functions to retrieve information for Rev.
 """
 
+import json
 import logging
 from datetime import date
 from typing import Callable
@@ -18,10 +19,116 @@ from studios.rev.rev import (
     get_instructorid_map,
     get_rev_schedule,
     get_rev_schedule_and_instructorid_map,
+    get_rev_security_token,
     parse_get_schedule_response,
     send_get_schedule_request,
 )
 from tests.studios.rev import expected_results
+
+
+def test_get_rev_security_token_success(mocker: pytest_mock.plugin.MockerFixture) -> None:
+    """
+    Test send_get_schedule_request success flow.
+
+    Args:
+      - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
+
+    """
+    expected_security_token = "test_security_token"
+
+    # Setup mocks
+    mock_logger = mocker.Mock(spec=logging.Logger)
+
+    mock_get = mocker.patch("requests.get", return_value=mocker.MagicMock(spec=requests.models.Response))
+    mock_get.return_value.status_code = 200
+    mock_get.return_value.text = json.dumps({"securityToken": expected_security_token})
+
+    # Call the function to test
+    security_token = get_rev_security_token(mock_logger)
+
+    # Assert that flow was called with the expected arguments
+    mock_get.assert_called_once_with(
+        url="https://widgetapi.hapana.com/v2/wAPI/site/settings",
+        headers={"wID": "SUF6aklTN1BLYWVyNGtGVnBuQ2JiUT09"},
+    )
+    assert security_token == expected_security_token
+
+
+def test_get_rev_security_token_api_failure(mocker: pytest_mock.plugin.MockerFixture) -> None:
+    """
+    Test send_get_schedule_request API failure flow.
+
+    Args:
+      - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
+
+    """
+    # Setup mocks
+    mock_logger = mocker.Mock(spec=logging.Logger)
+
+    mock_get = mocker.patch("requests.get", return_value=mocker.MagicMock(spec=requests.models.Response))
+    mock_get.return_value.status_code = 500
+
+    # Call the function to test
+    security_token = get_rev_security_token(mock_logger)
+
+    # Assert that flow was called with the expected arguments
+    mock_get.assert_called_once_with(
+        url="https://widgetapi.hapana.com/v2/wAPI/site/settings",
+        headers={"wID": "SUF6aklTN1BLYWVyNGtGVnBuQ2JiUT09"},
+    )
+    assert security_token == ""
+
+
+def test_get_rev_security_token_parse_json_failure(mocker: pytest_mock.plugin.MockerFixture) -> None:
+    """
+    Test send_get_schedule_request parse json failure flow.
+
+    Args:
+      - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
+
+    """
+    # Setup mocks
+    mock_logger = mocker.Mock(spec=logging.Logger)
+
+    mock_get = mocker.patch("requests.get", return_value=mocker.MagicMock(spec=requests.models.Response))
+    mock_get.return_value.status_code = 200
+    mock_get.return_value.text = "not_a_json"
+
+    # Call the function to test
+    security_token = get_rev_security_token(mock_logger)
+
+    # Assert that flow was called with the expected arguments
+    mock_get.assert_called_once_with(
+        url="https://widgetapi.hapana.com/v2/wAPI/site/settings",
+        headers={"wID": "SUF6aklTN1BLYWVyNGtGVnBuQ2JiUT09"},
+    )
+    assert security_token == ""
+
+
+def test_get_rev_security_token_response_failure(mocker: pytest_mock.plugin.MockerFixture) -> None:
+    """
+    Test send_get_schedule_request security token not in response failure flow.
+
+    Args:
+      - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
+
+    """
+    # Setup mocks
+    mock_logger = mocker.Mock(spec=logging.Logger)
+
+    mock_get = mocker.patch("requests.get", return_value=mocker.MagicMock(spec=requests.models.Response))
+    mock_get.return_value.status_code = 200
+    mock_get.return_value.text = json.dumps({"no_security_token": "test"})
+
+    # Call the function to test
+    security_token = get_rev_security_token(mock_logger)
+
+    # Assert that flow was called with the expected arguments
+    mock_get.assert_called_once_with(
+        url="https://widgetapi.hapana.com/v2/wAPI/site/settings",
+        headers={"wID": "SUF6aklTN1BLYWVyNGtGVnBuQ2JiUT09"},
+    )
+    assert security_token == ""
 
 
 def test_send_get_schedule_request(mocker: pytest_mock.plugin.MockerFixture) -> None:
@@ -45,8 +152,9 @@ def test_send_get_schedule_request(mocker: pytest_mock.plugin.MockerFixture) -> 
 
     # Assert that flow was called with the expected arguments
     mock_get.assert_called_once_with(
-        url="https://widgetapi.hapana.com/v2/wAPI/site/sessions?sessionCategory=classes",
+        url="https://widgetapi.hapana.com/v2/wAPI/site/sessions",
         params={
+            "sessionCategory": "classes",
             "siteID": SITE_ID_MAP[location],
             "startDate": start_date.strftime("%Y-%m-%d"),
             "endDate": end_date.strftime("%Y-%m-%d"),

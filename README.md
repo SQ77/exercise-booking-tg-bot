@@ -25,9 +25,6 @@ _Note: Screenshots are not updated to show support for all studios. Usage for di
 
 - BOT_TOKEN (required)
   - To be able to run the bot, you will need to get a bot token from @botfather. FreeCodeCamp has a nice guide [here](https://www.freecodecamp.org/news/how-to-create-a-telegram-bot-using-python/) that was used as a reference for this project.
-- REV_SECURITY_TOKEN (required)
-  - Requests to Hapana (used by Revolution) requires a security token that can be attained by inspecting a request on your browser under the headers.\
-  ![image](https://github.com/user-attachments/assets/deba27e8-e3ec-4449-82f5-999d15c0a6d4)
 - TELEGRAM_BOT_EXTERNAL_URL (required)
   - This will be used as the base URL for the server that listens for webhook requests.
   - For local testing, [ngrok](https://ngrok.com) can be used. After setting it up and running it with `ngrok http <port>`, you will get a URL like <https://43b1-121-192-143-222.ngrok-free.app>. Set TELEGRAM_BOT_EXTERNAL_URL to this value.

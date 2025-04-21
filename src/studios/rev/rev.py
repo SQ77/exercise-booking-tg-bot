@@ -45,8 +45,13 @@ def send_get_schedule_request(
     """
     start_date_str = start_date.strftime("%Y-%m-%d")
     end_date_str = end_date.strftime("%Y-%m-%d")
-    url = "https://widgetapi.hapana.com/v2/wAPI/site/sessions?sessionCategory=classes"
-    params = {"siteID": SITE_ID_MAP[location], "startDate": start_date_str, "endDate": end_date_str}
+    url = "https://widgetapi.hapana.com/v2/wAPI/site/sessions"
+    params = {
+        "sessionCategory": "classes",
+        "siteID": SITE_ID_MAP[location],
+        "startDate": start_date_str,
+        "endDate": end_date_str,
+    }
     headers = {
         "Content-Type": "application/json",
         "Securitytoken": security_token,
@@ -229,3 +234,37 @@ def get_rev_schedule_and_instructorid_map(
         get_rev_schedule(logger=logger, security_token=security_token),
         get_instructorid_map(logger=logger, security_token=security_token),
     )
+
+
+def get_rev_security_token(logger: logging.Logger) -> str:
+    """
+    Retrieves security token to be used for sending requests.
+
+    Args:
+      - logger (logging.Logger): Logger for logging messages.
+
+    Returns:
+      - str: Security token to be used for sending requests.
+
+    """
+    url = "https://widgetapi.hapana.com/v2/wAPI/site/settings"
+    headers = {"wID": "SUF6aklTN1BLYWVyNGtGVnBuQ2JiUT09"}
+    response = requests.get(url=url, headers=headers)
+
+    if response.status_code != 200:
+        logger.warning(f"Failed to get security token - API callback error {response.status_code}")
+        return ""
+
+    try:
+        response_json = json.loads(s=response.text)
+    except Exception as e:
+        logger.warning(f"Failed to get security token - {e}: {response.text}")
+        return ""
+
+    if "securityToken" not in response_json:
+        logger.warning(f"Failed to get security token - 'securityToken' not found in response: {response_json}")
+        return ""
+
+    security_token = response_json["securityToken"]
+    logger.info("Successfully retrieved rev security token!")
+    return security_token
