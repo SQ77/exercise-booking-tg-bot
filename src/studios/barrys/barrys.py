@@ -36,8 +36,8 @@ def send_get_schedule_request(week: int) -> requests.models.Response:
       - requests.models.Response: The response object containing the schedule data.
 
     """
-    url = "https://apac.barrysbootcamp.com.au/reserve/index.cfm?action=Reserve.chooseClass"
-    params = {"wk": max(0, min(week, 2)), "site": 1, "site2": 12}
+    url = "https://apac.barrysbootcamp.com.au/reserve/index.cfm"
+    params: dict[str, str | int] = {"wk": max(0, min(week, 2)), "site": 1, "site2": 12, "action": "Reserve.chooseClass"}
     return requests.get(url=url, params=params)
 
 

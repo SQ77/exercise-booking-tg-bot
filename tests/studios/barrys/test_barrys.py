@@ -39,8 +39,8 @@ def test_send_get_schedule_request(mocker: pytest_mock.plugin.MockerFixture) -> 
 
     # Assert that flow was called with the expected arguments
     mock_get.assert_called_once_with(
-        url="https://apac.barrysbootcamp.com.au/reserve/index.cfm?action=Reserve.chooseClass",
-        params={"wk": week, "site": 1, "site2": 12},
+        url="https://apac.barrysbootcamp.com.au/reserve/index.cfm",
+        params={"wk": week, "site": 1, "site2": 12, "action": "Reserve.chooseClass"},
     )
     assert response.status_code == 200
 

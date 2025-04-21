@@ -39,7 +39,8 @@ def test_send_get_schedule_request_single_location(mocker: pytest_mock.plugin.Mo
 
     # Assert that flow was called with the expected arguments
     mock_get.assert_called_once_with(
-        url="https://ally.zingfit.com/reserve/index.cfm?action=Reserve.chooseClass", params={"wk": week, "site": 1}
+        url="https://ally.zingfit.com/reserve/index.cfm",
+        params={"wk": week, "site": 1, "action": "Reserve.chooseClass"},
     )
     assert response.status_code == 200
 

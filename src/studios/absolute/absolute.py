@@ -38,8 +38,8 @@ def send_get_schedule_request(locations: list[StudioLocation], week: int) -> req
       - requests.models.Response: The response object containing the schedule data.
 
     """
-    url = "https://absoluteboutiquefitness.zingfit.com/reserve/index.cfm?action=Reserve.chooseClass"
-    params = {"wk": week}
+    url = "https://absoluteboutiquefitness.zingfit.com/reserve/index.cfm"
+    params: dict[str, str | int] = {"wk": week, "action": "Reserve.chooseClass"}
 
     if "All" in locations:
         params = {**params, **{"site": 1, "site2": 2, "site3": 3, "site4": 5, "site5": 6, "site6": 8}}

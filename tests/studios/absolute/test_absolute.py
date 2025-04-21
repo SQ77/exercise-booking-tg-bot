@@ -42,8 +42,8 @@ def test_send_get_schedule_request_single_location(mocker: pytest_mock.plugin.Mo
 
     # Assert that flow was called with the expected arguments
     mock_get.assert_called_once_with(
-        url="https://absoluteboutiquefitness.zingfit.com/reserve/index.cfm?action=Reserve.chooseClass",
-        params={"wk": week, "site": LOCATION_MAP[locations[0]]},
+        url="https://absoluteboutiquefitness.zingfit.com/reserve/index.cfm",
+        params={"wk": week, "site": LOCATION_MAP[locations[0]], "action": "Reserve.chooseClass"},
     )
     assert response.status_code == 200
 
@@ -73,7 +73,7 @@ def test_send_get_schedule_request_multiple_locations(mocker: pytest_mock.plugin
 
     # Assert that flow was called with the expected arguments
     mock_get.assert_called_once_with(
-        url="https://absoluteboutiquefitness.zingfit.com/reserve/index.cfm?action=Reserve.chooseClass",
+        url="https://absoluteboutiquefitness.zingfit.com/reserve/index.cfm",
         params={
             "wk": week,
             "site": LOCATION_MAP[locations[0]],
@@ -81,6 +81,7 @@ def test_send_get_schedule_request_multiple_locations(mocker: pytest_mock.plugin
             "site3": LOCATION_MAP[locations[2]],
             "site4": LOCATION_MAP[locations[3]],
             "site5": LOCATION_MAP[locations[4]],
+            "action": "Reserve.chooseClass",
         },
     )
     assert response.status_code == 200

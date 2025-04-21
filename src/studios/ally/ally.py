@@ -37,8 +37,12 @@ def send_get_schedule_request(week: int) -> requests.models.Response:
       - requests.models.Response: The response object containing the schedule data.
 
     """
-    url = "https://ally.zingfit.com/reserve/index.cfm?action=Reserve.chooseClass"
-    params = {"wk": week, "site": 1}  # Ally only has 1 location currently
+    url = "https://ally.zingfit.com/reserve/index.cfm"
+    params: dict[str, str | int] = {
+        "wk": week,
+        "site": 1,  # Ally only has 1 location currently
+        "action": "Reserve.chooseClass",
+    }
     return requests.get(url=url, params=params)
 
 
