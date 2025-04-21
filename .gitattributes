@@ -1,4 +1,1 @@
-tests/studios/absolute/example_responses/*.html linguist-detectable=false
-tests/studios/ally/example_responses/*.html linguist-detectable=false
-tests/studios/anarchy/example_responses/*.html linguist-detectable=false
-tests/studios/barrys/example_responses/*.html linguist-detectable=false
+tests/**/*.html linguist-detectable=false
