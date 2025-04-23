@@ -25,6 +25,7 @@ ROOM_NAME_TO_STUDIO_LOCATION_MAP = {
     "TP - Nov 2024": StudioLocation.TJPG,
     "Orchard - Nov 2024": StudioLocation.Orchard,
     "TP - Revised April": StudioLocation.TJPG,
+    "SAFRA Punggol": StudioLocation.Unknown,
 }
 
 # Dictionary of location strings and site ids
