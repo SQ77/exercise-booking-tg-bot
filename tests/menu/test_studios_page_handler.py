@@ -5,39 +5,38 @@ Description: This file tests the functions of the studios page handler.
 """
 
 from typing import NamedTuple
+from unittest.mock import Mock
 
 import pytest
 import pytest_mock
 import telebot
 
 import menu.studios_page_handler as studios_page_handler
+from common.query_data import QueryData
 from common.studio_data import StudioData
 from common.studio_location import StudioLocation
 from common.studio_type import StudioType
 
 
-def test_studios_selection_callback_query_handler(mocker: pytest_mock.plugin.MockerFixture) -> None:
+def test_studios_selection_callback_query_handler(
+    mocker: pytest_mock.plugin.MockerFixture,
+    mock_message: Mock,
+    sample_query_data: QueryData,
+) -> None:
     """
     Test for studios_selection_callback_query_handler.
 
     Args:
       - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
+      - mock_message (Mock): Mock instance of telebot.types.Message.
+      - sample_query_data (QueryData): Sample QueryData object for the test.
 
     """
-
-    test_chat_id = 123
-    expected_query_str = "Ally (Spin) - CrossStreet"
-
     # Setup mocks
-    mock_chat = mocker.Mock(id=test_chat_id)
-    mock_message = mocker.Mock(spec=telebot.types.Message, chat=mock_chat)
     mock_query = mocker.Mock(spec=telebot.types.CallbackQuery, message=mock_message)
 
-    mock_query_data = mocker.Mock()
-    mock_query_data.get_query_str.return_value = expected_query_str
-
     mock_chat_manager = mocker.Mock()
-    mock_chat_manager.get_query_data.return_value = mock_query_data
+    mock_chat_manager.get_query_data.return_value = sample_query_data
 
     sent_msg_mock = mocker.Mock()
     mock_chat_manager.send_prompt.return_value = sent_msg_mock
@@ -45,7 +44,7 @@ def test_studios_selection_callback_query_handler(mocker: pytest_mock.plugin.Moc
     mock_keyboard_manager = mocker.Mock()
     mock_keyboard_manager.get_studios_keyboard.return_value = "Mock Keyboard"
 
-    # Run function to test
+    # Call the function to test
     studios_page_handler.studios_selection_callback_query_handler(
         query=mock_query,
         chat_manager=mock_chat_manager,
@@ -54,14 +53,14 @@ def test_studios_selection_callback_query_handler(mocker: pytest_mock.plugin.Moc
 
     # Assert that flow was called with the expected arguments
     mock_chat_manager.send_prompt.assert_called_once_with(
-        chat_id=test_chat_id,
-        text=f"*Currently selected studio(s)*\n{expected_query_str}",
+        chat_id=mock_message.chat.id,
+        text=f"*Currently selected studio(s)*\n{sample_query_data.get_query_str(include_studio=True)}",
         reply_markup="Mock Keyboard",
         delete_sent_msg_in_future=True,
     )
 
     mock_chat_manager.update_studios_selection_message.assert_called_once_with(
-        chat_id=test_chat_id,
+        chat_id=mock_message.chat.id,
         studios_selection_message=sent_msg_mock,
     )
 
@@ -236,29 +235,29 @@ class StudiosCallbackQueryHandlerArgs(NamedTuple):
 def test_studios_callback_query_handler(
     mocker: pytest_mock.plugin.MockerFixture,
     args: StudiosCallbackQueryHandlerArgs,
+    mock_message: Mock,
 ) -> None:
     """
     Test for the studios_callback_query_handler function.
 
     Args:
-        mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities.
-        args (StudiosCallbackQueryHandlerArgs): Provides arguments for the test case.
+      - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities.
+      - args (StudiosCallbackQueryHandlerArgs): Provides arguments for the test case.
+      - mock_message (Mock): Mock instance of telebot.types.Message.
 
     """
-    test_chat_id = 123
     test_studios_selection_message_chat_id = 234
     test_studios_selection_message_message_id = 567
 
     # Setup mocks
-    mock_chat = mocker.Mock(id=test_chat_id)
-    mock_message = mocker.Mock(spec=telebot.types.Message, chat=mock_chat)
-    mock_query = mocker.Mock(spec=telebot.types.CallbackQuery, message=mock_message)
-    mock_query.data = str(args.query_data)
+    mock_query = mocker.Mock(spec=telebot.types.CallbackQuery, message=mock_message, data=str(args.query_data))
 
-    mock_query_data = mocker.Mock()
+    mock_query_data = mocker.Mock(
+        spec=QueryData,
+        studios=args.initial_studios,
+        current_studio=args.current_studio,
+    )
     mock_query_data.get_query_str.return_value = args.expected_query_str
-    mock_query_data.studios = args.initial_studios
-    mock_query_data.current_studio = args.current_studio
 
     sent_msg_mock = mocker.Mock()
     mock_chat_manager = mocker.Mock()
@@ -289,7 +288,7 @@ def test_studios_callback_query_handler(
     # Assert that flow was called with the expected arguments
     if args.is_update_query_data_current_studio_called:
         mock_chat_manager.update_query_data_current_studio.assert_called_with(
-            chat_id=test_chat_id,
+            chat_id=mock_message.chat.id,
             current_studio=args.current_studio,
         )
     else:
@@ -311,13 +310,13 @@ def test_studios_callback_query_handler(
             keyboard_manager=mock_keyboard_manager,
         )
         mock_chat_manager.send_prompt.assert_called_once_with(
-            chat_id=test_chat_id,
+            chat_id=mock_message.chat.id,
             text=f"*Currently selected studio(s)*\n{args.expected_query_str}",
             reply_markup="Mock Keyboard",
             delete_sent_msg_in_future=True,
         )
         mock_chat_manager.update_locations_selection_message.assert_called_once_with(
-            chat_id=test_chat_id,
+            chat_id=mock_message.chat.id,
             locations_selection_message=sent_msg_mock,
         )
     else:
@@ -325,7 +324,7 @@ def test_studios_callback_query_handler(
 
     if args.is_update_query_data_studios_called:
         mock_chat_manager.update_query_data_studios.assert_called_with(
-            chat_id=test_chat_id,
+            chat_id=mock_message.chat.id,
             studios=args.expected_update_query_data_studios,
         )
     else:

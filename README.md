@@ -47,6 +47,10 @@ Run `pytest {folder}` to run all tests in the specified folder.
 
 Run `pytest {path/to/file.py}::{test_name}` to run a specific test.
 
+### Generating coverage report
+
+Run `pytest --cov=. --cov-report=html`. This will generate a `/htmlcov` folder which will contain a `index.html` coverage report.
+
 ## Pre Commit Hooks
 
 Install pre-commit with `pip install pre-commit`.
@@ -54,7 +58,6 @@ Install pre-commit with `pip install pre-commit`.
 ### Running all pre commit hooks
 
 Run `pre-commit run --all-files`
-
 
 ## Usage (Normal Mode)
 

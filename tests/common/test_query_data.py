@@ -6,74 +6,9 @@ Description: This file tests the implementation of the QueryData class.
 
 from datetime import datetime
 
-import pytest
-
 from common.query_data import QueryData
-from common.studio_data import StudioData
 from common.studio_location import StudioLocation
 from common.studio_type import StudioType
-
-
-@pytest.fixture
-def sample_studios() -> dict[StudioType, StudioData]:
-    """
-    Fixture to create sample studio data.
-
-    Returns:
-        Dictionary of studios and studio data.
-
-    """
-    return {
-        StudioType.AbsoluteSpin: StudioData(
-            locations=[StudioLocation.Orchard, StudioLocation.Raffles],
-            instructors=["Absolute Instructor", "Spin Instructor"],
-        ),
-        StudioType.Rev: StudioData(locations=[StudioLocation.Bugis], instructors=["Rev Instructor"]),
-    }
-
-
-@pytest.fixture
-def sample_empty_query_data() -> QueryData:
-    """
-    Fixture to create an empty sample QueryData instance.
-
-    Returns:
-        QueryData: Empty query data.
-
-    """
-    return QueryData(
-        studios=None,
-        current_studio=StudioType.AbsoluteSpin,
-        weeks=2,
-        days=[],
-        start_times=[],
-        class_name_filter="",
-    )
-
-
-@pytest.fixture
-def sample_query_data(sample_studios: dict[StudioType, StudioData]) -> QueryData:
-    """
-    Fixture to create a sample QueryData instance.
-
-    Args:
-      - sample_studios (dict[StudioType, StudioData]): Dictionary of studios and studio data to use for the QueryData.
-
-    Returns:
-        QueryData: Query data with the specified studios.
-
-    """
-    start_time = datetime.strptime("06:00", "%H:%M")
-    end_time = datetime.strptime("07:00", "%H:%M")
-
-    return QueryData(
-        studios=sample_studios,
-        current_studio=StudioType.AbsoluteSpin,
-        weeks=3,
-        days=["Monday", "Wednesday", "Friday"],
-        start_times=[(start_time, end_time)],
-        class_name_filter="RIDE",
-    )
 
 
 def test_query_data_initialization(sample_query_data: QueryData) -> None:

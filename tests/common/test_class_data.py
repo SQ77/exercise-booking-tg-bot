@@ -43,8 +43,24 @@ def test_classdata_equality() -> None:
     availability = ClassAvailability.Available
     capacity_info = CapacityInfo()
 
-    class1 = ClassData(studio, location, class_name, instructor, class_time, availability, capacity_info)
-    class2 = ClassData(studio, location, class_name, instructor, class_time, availability, capacity_info)
+    class1 = ClassData(
+        studio=studio,
+        location=location,
+        name=class_name,
+        instructor=instructor,
+        time=class_time,
+        availability=availability,
+        capacity_info=capacity_info,
+    )
+    class2 = ClassData(
+        studio=studio,
+        location=location,
+        name=class_name,
+        instructor=instructor,
+        time=class_time,
+        availability=availability,
+        capacity_info=capacity_info,
+    )
 
     assert class1 == class2, "Classes should be equal"
 
@@ -73,10 +89,44 @@ def test_classdata_inequality() -> None:
     availability = ClassAvailability.Available
     capacity_info = CapacityInfo()
 
-    class1 = ClassData(studio, location, "RIDE: ESSENTIALS 50", "Instructor A", "08:00 AM", availability, capacity_info)
-    class2 = ClassData(studio, location, "RIDE: SIGNATURE 60", "Instructor B", "09:00 AM", availability, capacity_info)
+    class1 = ClassData(
+        studio=studio,
+        location=location,
+        name="RIDE: ESSENTIALS 50",
+        instructor="Instructor A",
+        time="08:00 AM",
+        availability=availability,
+        capacity_info=capacity_info,
+    )
+    class2 = ClassData(
+        studio=studio,
+        location=location,
+        name="RIDE: SIGNATURE 60",
+        instructor="Instructor B",
+        time="09:00 AM",
+        availability=availability,
+        capacity_info=capacity_info,
+    )
 
     assert class1 != class2, "Classes should not be equal"
+
+
+def test_classdata_inequality_non_class_data_object() -> None:
+    """
+    Test inequality with a ClassData object and a non-ClassData object.
+    """
+    class_data = ClassData(
+        studio=StudioType.AllySpin,
+        location=StudioType.AllySpin,
+        name="Test",
+        instructor="Instructor",
+        time="08:00 AM",
+        availability=ClassAvailability.Available,
+        capacity_info=CapacityInfo(),
+    )
+    non_class_data = 1
+
+    assert class_data != non_class_data, "Classes should not be equal"
 
 
 def test_classdata_comparison() -> None:
@@ -89,16 +139,57 @@ def test_classdata_comparison() -> None:
     capacity_info = CapacityInfo()
 
     class1 = ClassData(
-        studio, location, "PILATES (Wunda Chair) Essential 60", "Instructor A", "08:00 AM", availability, capacity_info
+        studio=studio,
+        location=location,
+        name="PILATES (Wunda Chair) Essential 60",
+        instructor="Instructor A",
+        time="08:00 AM",
+        availability=availability,
+        capacity_info=capacity_info,
     )
     class2 = ClassData(
-        studio,
-        location,
-        "PILATES (Reformer) Fit & Tone 60 - Rm1",
-        "Instructor B",
-        "09:00 AM",
-        availability,
-        capacity_info,
+        studio=studio,
+        location=location,
+        name="PILATES (Reformer) Fit & Tone 60 - Rm1",
+        instructor="Instructor B",
+        time="09:00 AM",
+        availability=availability,
+        capacity_info=capacity_info,
+    )
+
+    assert class1 < class2, "Classes should only be compared by class time"
+
+    class1.time = "01:00 PM"
+
+    assert class2 < class1, "Expected class 2 (09:00 AM) to be less than class 1 (01:00 PM)"
+
+
+def test_classdata_repr() -> None:
+    """
+    Test that ClassData string representation is as expected.
+    """
+    studio = StudioType.AbsolutePilates
+    location = StudioLocation.Centrepoint
+    availability = ClassAvailability.Available
+    capacity_info = CapacityInfo()
+
+    class1 = ClassData(
+        studio=studio,
+        location=location,
+        name="PILATES (Wunda Chair) Essential 60",
+        instructor="Instructor A",
+        time="08:00 AM",
+        availability=availability,
+        capacity_info=capacity_info,
+    )
+    class2 = ClassData(
+        studio=studio,
+        location=location,
+        name="PILATES (Reformer) Fit & Tone 60 - Rm1",
+        instructor="Instructor B",
+        time="09:00 AM",
+        availability=availability,
+        capacity_info=capacity_info,
     )
 
     assert class1 < class2, "Classes should only be compared by class time"

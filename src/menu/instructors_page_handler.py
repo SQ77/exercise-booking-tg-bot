@@ -405,6 +405,7 @@ def instructors_input_handler(
         invalid_instructors = []
         if "/" in updated_instructors_list:  # Some names contain "/" which should not be considered as a valid name
             invalid_instructors.append("/")
+            updated_instructors_list.remove("/")
 
         for instructor in updated_instructors_list:
             instructor_in_map = (
@@ -419,7 +420,6 @@ def instructors_input_handler(
             updated_instructors_list = [
                 instructor for instructor in updated_instructors_list if instructor not in invalid_instructors
             ]
-            chat_manager.update_query_data_studios(chat_id=message.chat.id, studios=query_data.studios)
             text = f"Failed to find instructor(s): {', '.join(invalid_instructors)}"
             chat_manager.send_prompt(
                 chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False
@@ -427,6 +427,7 @@ def instructors_input_handler(
 
         if len(updated_instructors_list) > 0:
             query_data.studios[query_data.current_studio].instructors = updated_instructors_list
+            chat_manager.update_query_data_studios(chat_id=message.chat.id, studios=query_data.studios)
 
     instructors_selection_handler(message=message, chat_manager=chat_manager, keyboard_manager=keyboard_manager)
 

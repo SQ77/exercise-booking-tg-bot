@@ -5,6 +5,7 @@ Description: This file tests the functions of the days page handler.
 """
 
 from typing import NamedTuple
+from unittest.mock import Mock
 
 import pytest
 import pytest_mock
@@ -12,6 +13,7 @@ import telebot
 
 import menu.days_page_handler as days_page_handler
 from common.data import SORTED_DAYS
+from common.query_data import QueryData
 
 
 class DaysPageCallbackQueryHandlerArgs(NamedTuple):
@@ -210,6 +212,7 @@ class DaysPageCallbackQueryHandlerArgs(NamedTuple):
 def test_days_page_callback_query_handler_multi_step(
     mocker: pytest_mock.plugin.MockerFixture,
     args: DaysPageCallbackQueryHandlerArgs,
+    mock_message: Mock,
 ) -> None:
     """
     Parametrized test for days_page_callback_query_handler. Multi-step test to simulate
@@ -218,6 +221,7 @@ def test_days_page_callback_query_handler_multi_step(
     Args:
       - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
       - args (DaysPageCallbackQueryHandlerArgs): Provides arguments for the test case.
+      - mock_message (Mock): Mock instance of telebot.types.Message.
 
     """
     assert len(args.selected_days_sequence) == len(args.expected_updated_days_sequence), (
@@ -227,21 +231,19 @@ def test_days_page_callback_query_handler_multi_step(
         "Each selected day must have a corresponding expected update."
     )
 
-    test_chat_id = 123
     test_message_id = 456
 
     # Setup mocks
-    mock_chat = mocker.Mock(id=test_chat_id)
-    mock_message = mocker.Mock(spec=telebot.types.Message, chat=mock_chat)
-
-    mock_query_data = mocker.Mock()
-    mock_query_data.days = args.initial_days.copy()
+    mock_query_data = mocker.Mock(
+        spec=QueryData,
+        days=args.initial_days.copy(),
+    )
     mock_query_data.get_query_str.return_value = args.expected_query_str
 
     mock_chat_manager = mocker.Mock()
     mock_chat_manager.get_query_data.return_value = mock_query_data
     mock_chat_manager.get_days_selection_message.return_value = mocker.Mock(
-        chat=mocker.Mock(id=test_chat_id),
+        chat=mocker.Mock(id=mock_message.chat.id),
         id=test_message_id,
     )
 
@@ -251,9 +253,11 @@ def test_days_page_callback_query_handler_multi_step(
 
     # Run through the sequence of button presses
     for index, selected_day in enumerate(args.selected_days_sequence):
-        mock_query = mocker.Mock(spec=telebot.types.CallbackQuery)
-        mock_query.message = mock_message
-        mock_query.data = str({"days": selected_day})
+        mock_query = mocker.Mock(
+            spec=telebot.types.CallbackQuery,
+            message=mock_message,
+            data=str({"days": selected_day}),
+        )
 
         # Run handler for each button press
         days_page_handler.days_page_callback_query_handler(
@@ -265,7 +269,7 @@ def test_days_page_callback_query_handler_multi_step(
 
         # Assert that flow was called with the expected arguments
         mock_bot.edit_message_text.assert_called_with(
-            chat_id=test_chat_id,
+            chat_id=mock_message.chat.id,
             message_id=test_message_id,
             text=f"*Currently selected day(s)*\n{args.expected_query_str}",
             reply_markup="Mock Keyboard",
@@ -273,7 +277,7 @@ def test_days_page_callback_query_handler_multi_step(
         )
 
         mock_chat_manager.update_query_data_days.assert_called_with(
-            chat_id=test_chat_id,
+            chat_id=mock_message.chat.id,
             days=args.expected_updated_days_sequence[index],
         )
 
