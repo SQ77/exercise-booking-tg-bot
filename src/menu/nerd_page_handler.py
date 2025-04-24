@@ -162,7 +162,7 @@ def nerd_input_handler(
                         found_location = True
                         break
                 if not found_location:
-                    text = f"Failed to handle query. Unexpected studio name '{selected_location}'"
+                    text = f"Failed to handle query. Unexpected studio location '{selected_location}'"
                     chat_manager.send_prompt(
                         chat_id=message.chat.id,
                         text=text,
@@ -231,7 +231,7 @@ def nerd_input_handler(
     try:
         query.weeks = int(input_str_list[-4])
     except Exception as e:
-        text = f"Failed to handle query. Invalid input for 'weeks'. Expected number, got {input_str_list[-2]} - {e}"
+        text = f"Failed to handle query. Invalid input for 'weeks'. Expected number, got {input_str_list[-4]} - {e}"
         chat_manager.send_prompt(chat_id=message.chat.id, text=text, reply_markup=None, delete_sent_msg_in_future=False)
         return
 

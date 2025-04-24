@@ -69,11 +69,11 @@ def test_instructors_message_handler(
     )
 
     expected_text = (
-        "*Rev Instructors:* Rev Instructor A, Rev Instructor B\n\n"
-        "*Barrys Instructors:* Barrys Instructor A, Barrys Instructor B\n\n"
-        "*Absolute Instructors:* Absolute Instructor A, Absolute Instructor B\n\n"
-        "*Ally Instructors:* Ally Instructor A, Ally Instructor B\n\n"
-        "*Anarchy Instructors:* Anarchy Instructor A, Anarchy Instructor B\n\n"
+        "*Rev Instructors:* rev instructor a, rev instructor b\n\n"
+        "*Barrys Instructors:* barrys instructor a, barrys instructor b\n\n"
+        "*Absolute Instructors:* absolute instructor a, absolute instructor b\n\n"
+        "*Ally Instructors:* ally instructor a, ally instructor b\n\n"
+        "*Anarchy Instructors:* anarchy instructor a, anarchy instructor b\n\n"
     )
     mock_chat_manager.send_prompt.assert_called_once_with(
         chat_id=mock_message.chat.id,
@@ -179,12 +179,12 @@ def test_show_instructors_callback_query_handler(
 
     # Assert that flow was called with the expected arguments
     expected_text = (
-        "*Rev Instructors:* Rev Instructor A, Rev Instructor B\n\n"
-        "*Barrys Instructors:* Barrys Instructor A, Barrys Instructor B\n\n"
-        "*Absolute Instructors:* Absolute Instructor A, Absolute Instructor B\n\n"
-        "*Ally Instructors:* Ally Instructor A, Ally Instructor B\n\n"
+        "*Rev Instructors:* rev instructor a, rev instructor b\n\n"
+        "*Barrys Instructors:* barrys instructor a, barrys instructor b\n\n"
+        "*Absolute Instructors:* absolute instructor a, absolute instructor b\n\n"
+        "*Ally Instructors:* ally instructor a, ally instructor b\n\n"
         "No instructors for Ally (Recovery)\n\n"
-        "*Anarchy Instructors:* Anarchy Instructor A, Anarchy Instructor B\n\n"
+        "*Anarchy Instructors:* anarchy instructor a, anarchy instructor b\n\n"
     )
     mock_chat_manager.send_prompt.assert_called_once_with(
         chat_id=mock_message.chat.id,
@@ -318,9 +318,9 @@ def test_studio_instructors_callback_query_handler(
     # Setup mocks
     mock_query = mocker.Mock(spec=telebot.types.CallbackQuery, message=mock_message)
 
-    sent_msg_mock = mocker.Mock()
+    mock_sent_msg = mocker.Mock()
     mock_chat_manager = mocker.Mock(spec=ChatManager)
-    mock_chat_manager.send_prompt.return_value = sent_msg_mock
+    mock_chat_manager.send_prompt.return_value = mock_sent_msg
 
     mock_keyboard_manager = mocker.Mock()
     mock_bot = mocker.Mock()
@@ -348,7 +348,7 @@ def test_studio_instructors_callback_query_handler(
     )
 
     mock_bot.register_next_step_handler.assert_called_once_with(
-        message=sent_msg_mock,
+        message=mock_sent_msg,
         callback=instructors_page_handler.instructors_input_handler,
         chat_manager=mock_chat_manager,
         keyboard_manager=mock_keyboard_manager,

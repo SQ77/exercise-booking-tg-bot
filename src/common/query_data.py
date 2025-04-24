@@ -5,6 +5,7 @@ Description: This file defines the QueryData class used to store the details for
 """
 
 from copy import copy
+from dataclasses import dataclass
 from datetime import date
 from typing import Optional
 
@@ -13,6 +14,7 @@ from common.studio_location import StudioLocation
 from common.studio_type import StudioType
 
 
+@dataclass
 class QueryData:
     """
     Class to represent the data for filtering class schedules.

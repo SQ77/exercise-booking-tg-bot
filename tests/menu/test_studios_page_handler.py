@@ -38,8 +38,8 @@ def test_studios_selection_callback_query_handler(
     mock_chat_manager = mocker.Mock()
     mock_chat_manager.get_query_data.return_value = sample_query_data
 
-    sent_msg_mock = mocker.Mock()
-    mock_chat_manager.send_prompt.return_value = sent_msg_mock
+    mock_sent_msg = mocker.Mock()
+    mock_chat_manager.send_prompt.return_value = mock_sent_msg
 
     mock_keyboard_manager = mocker.Mock()
     mock_keyboard_manager.get_studios_keyboard.return_value = "Mock Keyboard"
@@ -61,7 +61,7 @@ def test_studios_selection_callback_query_handler(
 
     mock_chat_manager.update_studios_selection_message.assert_called_once_with(
         chat_id=mock_message.chat.id,
-        studios_selection_message=sent_msg_mock,
+        studios_selection_message=mock_sent_msg,
     )
 
 
@@ -259,9 +259,9 @@ def test_studios_callback_query_handler(
     )
     mock_query_data.get_query_str.return_value = args.expected_query_str
 
-    sent_msg_mock = mocker.Mock()
+    mock_sent_msg = mocker.Mock()
     mock_chat_manager = mocker.Mock()
-    mock_chat_manager.send_prompt.return_value = sent_msg_mock
+    mock_chat_manager.send_prompt.return_value = mock_sent_msg
     mock_chat_manager.get_query_data.return_value = mock_query_data
     mock_chat_manager.get_studios_selection_message.return_value = mocker.Mock(
         chat=mocker.Mock(id=test_studios_selection_message_chat_id),
@@ -317,7 +317,7 @@ def test_studios_callback_query_handler(
         )
         mock_chat_manager.update_locations_selection_message.assert_called_once_with(
             chat_id=mock_message.chat.id,
-            locations_selection_message=sent_msg_mock,
+            locations_selection_message=mock_sent_msg,
         )
     else:
         locations_handler_spy.assert_not_called()

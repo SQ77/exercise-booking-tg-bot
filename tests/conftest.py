@@ -168,8 +168,8 @@ def mock_studios_manager(mocker: pytest_mock.plugin.MockerFixture) -> Mock:
     def new_mock_studio_manager(studio_name: str) -> mocker.Mock:
         mock_studio_manager = mocker.Mock()
         mock_studio_manager.get_instructor_names.return_value = [
-            f"{studio_name} Instructor A",
-            f"{studio_name} Instructor B",
+            f"{studio_name} Instructor A".lower(),
+            f"{studio_name} Instructor B".lower(),
         ]
         return mock_studio_manager
 
