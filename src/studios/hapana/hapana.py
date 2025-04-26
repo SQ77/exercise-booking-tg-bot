@@ -122,7 +122,7 @@ def parse_get_schedule_response(
                 location = room_name_to_studio_location_map[room_name]
             else:
                 logger.warning(f"Failed to map room name {room_name} to studio location for {studio_name}")
-                location = StudioLocation.Null
+                location = StudioLocation.Unknown
                 class_name += " @ " + room_name
 
             class_details = ClassData(

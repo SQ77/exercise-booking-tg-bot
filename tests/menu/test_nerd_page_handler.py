@@ -183,7 +183,7 @@ class NerdInputHandlerSuccessArgs(NamedTuple):
                     current_studio=StudioType.Null,
                     weeks=1,
                     days=["Monday"],
-                    start_times=[(datetime(1900, 1, 1, 8, 0), datetime(1900, 1, 1, 9, 0))],
+                    start_times=[(datetime.strptime("0800", "%H%M"), datetime.strptime("0900", "%H%M"))],
                     class_name_filter="",
                 ),
             ),
@@ -245,7 +245,8 @@ def test_nerd_input_handler_success_under_4095_chars(
     mock_studios_manager: Mock,
 ) -> None:
     """
-    Test nerd_input_handler flow.
+    Test nerd_input_handler success flow with results under 4095 chars. Should send the
+    full result string to user in one message.
 
     Args:
       - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
@@ -297,7 +298,8 @@ def test_nerd_input_handler_success_over_4095_chars(
     mock_studios_manager: Mock,
 ) -> None:
     """
-    Test nerd_input_handler flow.
+    Tests nerd_input_handler success flow with results over 4095 chars. Should split and
+    send multiple messages.
 
     Args:
       - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
@@ -518,7 +520,7 @@ def test_nerd_input_handler_failures(
     mock_studios_manager: Mock,
 ) -> None:
     """
-    Test nerd_input_handler flow.
+    Test nerd_input_handler failure flows.
 
     Args:
       - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.

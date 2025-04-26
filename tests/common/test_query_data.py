@@ -16,7 +16,7 @@ def test_query_data_initialization(sample_query_data: QueryData) -> None:
     Test QueryData initializes correctly with given values.
 
     Args:
-      - sample_query_data (QueryData): Dictionary of selected studios and locations and instructors to use.
+      - sample_query_data (QueryData): Sample QueryData object for the test.
 
     """
     assert sample_query_data.current_studio == StudioType.AbsoluteSpin
@@ -36,7 +36,7 @@ def test_get_studio_locations(sample_query_data: QueryData) -> None:
 
     Args:
       - sample_empty_query_data (QueryData): Empty dictionary of studios to use.
-      - sample_query_data (QueryData): Dictionary of selected studios and locations and instructors to use.
+      - sample_query_data (QueryData): Sample QueryData object for the test.
 
     """
     assert sample_query_data.get_studio_locations(StudioType.AbsoluteSpin) == [
@@ -53,7 +53,7 @@ def test_get_selected_studios_str(sample_empty_query_data: QueryData, sample_que
 
     Args:
       - sample_empty_query_data (QueryData): Empty dictionary of studios to use.
-      - sample_query_data (QueryData): Dictionary of selected studios and locations and instructors to use.
+      - sample_query_data (QueryData): Sample QueryData object for the test.
 
     """
     assert sample_query_data.get_selected_studios_str() == "Absolute (Spin) - Orchard, Raffles\nRev - Bugis"
@@ -66,7 +66,7 @@ def test_get_selected_days_str(sample_empty_query_data: QueryData, sample_query_
 
     Args:
       - sample_empty_query_data (QueryData): Empty dictionary of studios to use.
-      - sample_query_data (QueryData): Dictionary of selected studios and locations and instructors to use.
+      - sample_query_data (QueryData): Sample QueryData object for the test.
 
     """
     assert sample_empty_query_data.get_selected_days_str() == "None"
@@ -89,7 +89,7 @@ def test_get_selected_time_str(sample_empty_query_data: QueryData, sample_query_
 
     Args:
       - sample_empty_query_data (QueryData): Empty dictionary of studios to use.
-      - sample_query_data (QueryData): Dictionary of selected studios and locations and instructors to use.
+      - sample_query_data (QueryData): Sample QueryData object for the test.
 
     """
     assert sample_empty_query_data.get_selected_time_str() == "All"
@@ -102,7 +102,7 @@ def test_get_selected_class_name_filter_str(sample_empty_query_data: QueryData, 
 
     Args:
       - sample_empty_query_data (QueryData): Empty dictionary of studios to use.
-      - sample_query_data (QueryData): Dictionary of selected studios and locations and instructors to use.
+      - sample_query_data (QueryData): Sample QueryData object for the test.
 
     """
     assert sample_empty_query_data.get_selected_class_name_filter_str() == "None"
@@ -115,7 +115,7 @@ def test_get_selected_instructors_str(sample_empty_query_data: QueryData, sample
 
     Args:
       - sample_empty_query_data (QueryData): Empty dictionary of studios to use.
-      - sample_query_data (QueryData): Dictionary of selected studios and locations and instructors to use.
+      - sample_query_data (QueryData): Sample QueryData object for the test.
 
     """
     assert sample_empty_query_data.get_selected_instructors_str() == "None"
@@ -130,7 +130,7 @@ def test_get_query_str_include_studio(sample_empty_query_data: QueryData, sample
 
     Args:
       - sample_empty_query_data (QueryData): Empty dictionary of studios to use.
-      - sample_query_data (QueryData): Dictionary of selected studios and locations and instructors to use.
+      - sample_query_data (QueryData): Sample QueryData object for the test.
 
     """
     assert sample_empty_query_data.get_query_str(include_studio=True) == "Studio(s):\nNone\n"
@@ -145,7 +145,7 @@ def test_get_query_str_include_instructors(sample_empty_query_data: QueryData, s
 
     Args:
       - sample_empty_query_data (QueryData): Empty dictionary of studios to use.
-      - sample_query_data (QueryData): Dictionary of selected studios and locations and instructors to use.
+      - sample_query_data (QueryData): Sample QueryData object for the test.
 
     """
     assert sample_empty_query_data.get_query_str(include_instructors=True) == "Instructor(s):\nNone\n"
@@ -160,7 +160,7 @@ def test_get_query_str_include_weeks(sample_empty_query_data: QueryData, sample_
 
     Args:
       - sample_empty_query_data (QueryData): Empty dictionary of studios to use.
-      - sample_query_data (QueryData): Dictionary of selected studios and locations and instructors to use.
+      - sample_query_data (QueryData): Sample QueryData object for the test.
 
     """
     assert sample_empty_query_data.get_query_str(include_weeks=True) == "Week(s): 2\n"
@@ -173,7 +173,7 @@ def test_get_query_str_include_days(sample_empty_query_data: QueryData, sample_q
 
     Args:
       - sample_empty_query_data (QueryData): Empty dictionary of studios to use.
-      - sample_query_data (QueryData): Dictionary of selected studios and locations and instructors to use.
+      - sample_query_data (QueryData): Sample QueryData object for the test.
 
     """
     assert sample_empty_query_data.get_query_str(include_days=True) == "Day(s): None\n"
@@ -186,7 +186,7 @@ def test_get_query_str_include_time(sample_empty_query_data: QueryData, sample_q
 
     Args:
       - sample_empty_query_data (QueryData): Empty dictionary of studios to use.
-      - sample_query_data (QueryData): Dictionary of selected studios and locations and instructors to use.
+      - sample_query_data (QueryData): Sample QueryData object for the test.
 
     """
     assert sample_empty_query_data.get_query_str(include_time=True) == "Timeslot(s):\nAll\n"
@@ -199,7 +199,7 @@ def test_get_query_str_include_class_name(sample_empty_query_data: QueryData, sa
 
     Args:
       - sample_empty_query_data (QueryData): Empty dictionary of studios to use.
-      - sample_query_data (QueryData): Dictionary of selected studios and locations and instructors to use.
+      - sample_query_data (QueryData): Sample QueryData object for the test.
 
     """
     assert sample_empty_query_data.get_query_str(include_class_name_filter=True) == "Class Name Filter: None\n"
@@ -212,7 +212,7 @@ def test_get_query_str_include_all(sample_empty_query_data: QueryData, sample_qu
 
     Args:
       - sample_empty_query_data (QueryData): Empty dictionary of studios to use.
-      - sample_query_data (QueryData): Dictionary of selected studios and locations and instructors to use.
+      - sample_query_data (QueryData): Sample QueryData object for the test.
 
     """
     empty_query_expected_output = (
