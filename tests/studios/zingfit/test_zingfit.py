@@ -10,7 +10,6 @@ from typing import Callable, NamedTuple
 
 import pytest
 import pytest_mock
-import requests
 from bs4 import BeautifulSoup
 
 from common.class_data import ClassData
@@ -63,7 +62,7 @@ def test_send_get_schedule_request_single_location(mocker: pytest_mock.plugin.Mo
 
     """
     # Setup mocks
-    mock_get = mocker.patch("requests.get", return_value=mocker.MagicMock(spec=requests.models.Response))
+    mock_get = mocker.patch("requests.get")
     mock_get.return_value.status_code = 200
 
     # Call the function to test
@@ -98,7 +97,7 @@ def test_send_get_schedule_request_multiple_locations(mocker: pytest_mock.plugin
 
     """
     # Setup mocks
-    mock_get = mocker.patch("requests.get", return_value=mocker.MagicMock(spec=requests.models.Response))
+    mock_get = mocker.patch("requests.get")
     mock_get.return_value.status_code = 200
 
     # Call the function to test

@@ -46,7 +46,7 @@ def test_get_hapana_security_token_success(mocker: pytest_mock.plugin.MockerFixt
     # Setup mocks
     mock_logger = mocker.Mock(spec=logging.Logger)
 
-    mock_get = mocker.patch("requests.get", return_value=mocker.MagicMock(spec=requests.models.Response))
+    mock_get = mocker.patch("requests.get")
     mock_get.return_value.status_code = 200
     mock_get.return_value.text = json.dumps({"securityToken": expected_security_token})
 
@@ -77,7 +77,7 @@ def test_get_hapana_security_token_api_failure(mocker: pytest_mock.plugin.Mocker
     # Setup mocks
     mock_logger = mocker.Mock(spec=logging.Logger)
 
-    mock_get = mocker.patch("requests.get", return_value=mocker.MagicMock(spec=requests.models.Response))
+    mock_get = mocker.patch("requests.get")
     mock_get.return_value.status_code = 500
 
     # Call the function to test
@@ -107,7 +107,7 @@ def test_get_hapana_security_token_parse_json_failure(mocker: pytest_mock.plugin
     # Setup mocks
     mock_logger = mocker.Mock(spec=logging.Logger)
 
-    mock_get = mocker.patch("requests.get", return_value=mocker.MagicMock(spec=requests.models.Response))
+    mock_get = mocker.patch("requests.get")
     mock_get.return_value.status_code = 200
     mock_get.return_value.text = "not_a_json"
 
@@ -138,7 +138,7 @@ def test_get_hapana_security_token_response_failure(mocker: pytest_mock.plugin.M
     # Setup mocks
     mock_logger = mocker.Mock(spec=logging.Logger)
 
-    mock_get = mocker.patch("requests.get", return_value=mocker.MagicMock(spec=requests.models.Response))
+    mock_get = mocker.patch("requests.get")
     mock_get.return_value.status_code = 200
     mock_get.return_value.text = json.dumps({"no_security_token": "test"})
 
@@ -167,7 +167,7 @@ def test_send_get_schedule_request(mocker: pytest_mock.plugin.MockerFixture) -> 
 
     """
     # Setup mocks
-    mock_get = mocker.patch("requests.get", return_value=mocker.MagicMock(spec=requests.models.Response))
+    mock_get = mocker.patch("requests.get")
     mock_get.return_value.status_code = 200
 
     # Call the function to test

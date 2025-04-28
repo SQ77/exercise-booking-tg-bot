@@ -32,7 +32,7 @@ def test_send_get_schedule_request(mocker: pytest_mock.plugin.MockerFixture) -> 
 
     """
     # Setup mocks
-    mock_get = mocker.patch("requests.get", return_value=mocker.MagicMock(spec=requests.models.Response))
+    mock_get = mocker.patch("requests.get")
     mock_get.return_value.status_code = 200
 
     # Call the function to test

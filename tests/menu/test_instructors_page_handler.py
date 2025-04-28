@@ -41,7 +41,7 @@ def test_instructors_message_handler(
     mock_chat_manager = mocker.Mock()
     mock_history_manager = mocker.Mock()
 
-    mock_time = mocker.patch("time.time", return_value=mocker.MagicMock(spec=float))
+    mock_time = mocker.patch("time.time")
     mock_time.return_value = test_time
 
     # Call the function to test

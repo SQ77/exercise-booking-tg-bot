@@ -8,7 +8,6 @@ import logging
 from typing import Callable
 
 import pytest_mock
-import requests
 from bs4 import BeautifulSoup
 
 from common.result_data import ResultData
@@ -30,7 +29,7 @@ def test_send_get_schedule_request(mocker: pytest_mock.plugin.MockerFixture) -> 
 
     """
     # Setup mocks
-    mock_get = mocker.patch("requests.get", return_value=mocker.MagicMock(spec=requests.models.Response))
+    mock_get = mocker.patch("requests.get")
     mock_get.return_value.status_code = 200
 
     # Call the function to test

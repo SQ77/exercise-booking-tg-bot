@@ -40,7 +40,7 @@ def test_nerd_message_handler(
     mock_chat_manager = mocker.Mock(spec=ChatManager)
     mock_chat_manager.send_prompt.return_value = mock_sent_msg
 
-    mock_time = mocker.patch("time.time", return_value=mocker.MagicMock(spec=float))
+    mock_time = mocker.patch("time.time")
     mock_time.return_value = test_time
 
     mock_bot = mocker.Mock()
