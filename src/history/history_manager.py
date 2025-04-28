@@ -99,6 +99,6 @@ class HistoryManager:
             f"first_name: {first_name}, last_name: {last_name}, command: {command}"
         )
 
-        with open(self.file_path, "a") as file:
-            file.write(f"{timestamp}, {user_id}, {chat_id}, {username}, {first_name}, {last_name}, {command}\n")
-            file.close()
+        file = open(self.file_path, "a")
+        file.write(f"{timestamp}, {user_id}, {chat_id}, {username}, {first_name}, {last_name}, {command}\n")
+        file.close()
