@@ -65,17 +65,6 @@ def studios_callback_query_handler(
         chat_manager.update_query_data_studios(chat_id=query.message.chat.id, studios={})
     elif selected_studio == StudioType.All:
         chat_manager.update_query_data_select_all_studios(chat_id=query.message.chat.id)
-    elif (
-        selected_studio == StudioType.AllySpin
-        or selected_studio == StudioType.AllyPilates
-        or selected_studio == StudioType.AllyRecovery
-    ):
-        chat_manager.update_query_data_current_studio(chat_id=query.message.chat.id, current_studio=selected_studio)
-        select_location_handler(
-            message=query.message,
-            selected_studio_location=StudioLocation.CrossStreet,
-            chat_manager=chat_manager,
-        )
     elif selected_studio == StudioType.Anarchy:
         chat_manager.update_query_data_current_studio(chat_id=query.message.chat.id, current_studio=selected_studio)
         select_location_handler(

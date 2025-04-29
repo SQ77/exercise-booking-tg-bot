@@ -9,6 +9,7 @@ import logging
 import re
 from copy import copy
 from datetime import date, datetime
+from typing import Callable, Optional
 
 import pytz
 import requests
@@ -66,6 +67,7 @@ def get_schedule_from_response_soup(
     table_heading_date_format: str,
     room_id_to_studio_type_map: dict[str, StudioType],
     room_id_to_studio_location_map: dict[str, StudioLocation],
+    clean_class_name_func: Optional[Callable[[str], str]],
 ) -> dict[date, list[ClassData]]:
     """
     Parses the response soup to extract the class schedule data.
@@ -77,6 +79,7 @@ def get_schedule_from_response_soup(
       - table_heading_date_format (str): The date format of the table heading. e.g. "%m.%d"
       - room_id_to_studio_type_map (dict[str, StudioType]): The dictionary of room IDs and studio types.
       - room_id_to_studio_location_map (dict[str, StudioType]): The dictionary of room IDs and studio locations.
+      - clean_class_name_func (Optional[Callable[[str], str]]): Optional function to format the raw class name string.
 
     Returns:
       - dict[date, list[ClassData]]: Dictionary of dates and details of classes.
@@ -156,6 +159,9 @@ def get_schedule_from_response_soup(
                 if is_cancelled is None:
                     logger.warning(f"Failed to get {studio_name} session name: {reserve_table_body_data_div}")
                 continue
+            class_name = schedule_class_span.get_text().strip()
+            if clean_class_name_func is not None:
+                class_name = clean_class_name_func(class_name)
 
             schedule_instruc_span = reserve_table_body_data_div.find(name="span", class_="scheduleInstruc")
             if schedule_instruc_span is None:
@@ -189,7 +195,7 @@ def get_schedule_from_response_soup(
             class_details = ClassData(
                 studio=studio,
                 location=location,
-                name=schedule_class_span.get_text().strip(),
+                name=class_name,
                 instructor=schedule_instruc_span.get_text().strip(),
                 time=schedule_time,
                 availability=availability,
@@ -271,6 +277,7 @@ def get_zingfit_schedule_and_instructorid_map(
     location_to_site_id_map: dict[StudioLocation, int],
     room_id_to_studio_type_map: dict[str, StudioType],
     room_id_to_studio_location_map: dict[str, StudioLocation],
+    clean_class_name_func: Optional[Callable[[str], str]],
 ) -> tuple[ResultData, dict[str, str]]:
     """
     Retrieves class schedules and instructor ID mappings.
@@ -284,6 +291,7 @@ def get_zingfit_schedule_and_instructorid_map(
       - location_to_site_id_map (dict[StudioLocation, int]): Dictionary of studio location and site IDs.
       - room_id_to_studio_type_map (dict[str, StudioType]): The dictionary of room IDs and studio types.
       - room_id_to_studio_location_map (dict[str, StudioType]): The dictionary of room IDs and studio locations.
+      - clean_class_name_func (Optional[Callable[[str], str]]): Optional function to format the raw class name string.
 
     Returns:
       - tuple[ResultData, dict[str, str]]: A tuple containing schedule data and instructor ID mappings.
@@ -299,6 +307,7 @@ def get_zingfit_schedule_and_instructorid_map(
         location_to_site_id_map: dict[StudioLocation, int],
         room_id_to_studio_type_map: dict[str, StudioType],
         room_id_to_studio_location_map: dict[str, StudioLocation],
+        clean_class_name_func: Optional[Callable[[str], str]],
     ) -> tuple[ResultData, dict[str, str]]:
         """
         Helper to retrieve class schedules and instructor ID mappings.
@@ -312,6 +321,8 @@ def get_zingfit_schedule_and_instructorid_map(
           - location_to_site_id_map (dict[StudioLocation, int]): Dictionary of studio location and site IDs.
           - room_id_to_studio_type_map (dict[str, StudioType]): The dictionary of room IDs and studio types.
           - room_id_to_studio_location_map (dict[str, StudioType]): The dictionary of room IDs and studio locations.
+          - clean_class_name_func (Optional[Callable[[str], str]]):
+            Optional function to format the raw class name string.
 
         Returns:
           - tuple[ResultData, dict[str, str]]: A tuple containing schedule data and instructor ID mappings.
@@ -338,6 +349,7 @@ def get_zingfit_schedule_and_instructorid_map(
                 table_heading_date_format=table_heading_date_format,
                 room_id_to_studio_type_map=room_id_to_studio_type_map,
                 room_id_to_studio_location_map=room_id_to_studio_location_map,
+                clean_class_name_func=clean_class_name_func,
             )
             result.add_classes(classes=date_class_data_list_dict)
 
@@ -362,6 +374,7 @@ def get_zingfit_schedule_and_instructorid_map(
             location_to_site_id_map=location_to_site_id_map,
             room_id_to_studio_type_map=room_id_to_studio_type_map,
             room_id_to_studio_location_map=room_id_to_studio_location_map,
+            clean_class_name_func=clean_class_name_func,
         )
         locations = locations[5:]
 
@@ -374,6 +387,7 @@ def get_zingfit_schedule_and_instructorid_map(
         location_to_site_id_map=location_to_site_id_map,
         room_id_to_studio_type_map=room_id_to_studio_type_map,
         room_id_to_studio_location_map=room_id_to_studio_location_map,
+        clean_class_name_func=clean_class_name_func,
     )
 
     return additional_result + result, {**additional_instructorid_map, **instructorid_map}

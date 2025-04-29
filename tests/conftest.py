@@ -16,6 +16,9 @@ import pytest
 import pytest_mock
 import telebot
 
+from common.capacity_info import CapacityInfo
+from common.class_availability import ClassAvailability
+from common.class_data import ClassData
 from common.query_data import QueryData
 from common.studio_data import StudioData
 from common.studio_location import StudioLocation
@@ -126,6 +129,32 @@ def sample_query_data(sample_studios: dict[StudioType, StudioData]) -> QueryData
         days=["Monday", "Wednesday", "Friday"],
         start_times=[(start_time, end_time)],
         class_name_filter="RIDE",
+    )
+
+
+@pytest.fixture
+def sample_class_data() -> ClassData:
+    """
+    Fixture to create a sample ClassData instance.
+
+    Returns:
+        ClassData: Class data object.
+
+    """
+    return ClassData(
+        studio=StudioType.Rev,
+        location=StudioLocation.Bugis,
+        name="Ride @ BUGIS",
+        instructor="Rev Instructor",
+        time="10:00 AM",
+        availability=ClassAvailability.Available,
+        capacity_info=CapacityInfo(
+            has_info=True,
+            capacity=30,
+            remaining=15,
+            waitlist_capacity=20,
+            waitlist_reserved=0,
+        ),
     )
 
 

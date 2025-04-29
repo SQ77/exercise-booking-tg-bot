@@ -33,6 +33,7 @@ from studios.zingfit.data.ally import ROOM_ID_TO_STUDIO_LOCATION_MAP as ALLY_ROO
 from studios.zingfit.data.ally import ROOM_ID_TO_STUDIO_TYPE_MAP as ALLY_ROOM_ID_TO_STUDIO_TYPE_MAP
 from studios.zingfit.data.ally import TABLE_HEADING_DATE_FORMAT as ALLY_TABLE_HEADING_DATE_FORMAT
 from studios.zingfit.data.ally import URL_SUBDOMAIN as ALLY_URL_SUBDOMAIN
+from studios.zingfit.data.ally import clean_class_name as ally_clean_class_name_func
 from studios.zingfit.zingfit import get_zingfit_schedule_and_instructorid_map
 
 
@@ -75,6 +76,7 @@ class StudiosManager:
                 location_to_site_id_map=ABSOLUTE_LOCATION_TO_SITE_ID_MAP,
                 room_id_to_studio_type_map=ABSOLUTE_ROOM_ID_TO_STUDIO_TYPE_MAP,
                 room_id_to_studio_location_map=ABSOLUTE_ROOM_ID_TO_STUDIO_LOCATION_MAP,
+                clean_class_name_func=None,
             ),
             "Ally": StudioManager(
                 get_schedule_and_instructorid_map_func=get_zingfit_schedule_and_instructorid_map,
@@ -86,6 +88,7 @@ class StudiosManager:
                 location_to_site_id_map=ALLY_LOCATION_TO_SITE_ID_MAP,
                 room_id_to_studio_type_map=ALLY_ROOM_ID_TO_STUDIO_TYPE_MAP,
                 room_id_to_studio_location_map=ALLY_ROOM_ID_TO_STUDIO_LOCATION_MAP,
+                clean_class_name_func=ally_clean_class_name_func,
             ),
             "Anarchy": StudioManager(
                 get_schedule_and_instructorid_map_func=get_anarchy_schedule_and_instructorid_map,

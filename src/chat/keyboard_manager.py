@@ -294,17 +294,29 @@ class KeyboardManager:
                     text="Cross Street",
                     callback_data="{'location': 'CrossStreet', 'step': 'locations'}",
                 ),
+                "Maxwell": telebot.types.InlineKeyboardButton(
+                    text="Maxwell",
+                    callback_data="{'location': 'Maxwell', 'step': 'locations'}",
+                ),
             },
             "Ally (Pilates)": {
                 "Cross Street": telebot.types.InlineKeyboardButton(
                     text="Cross Street",
                     callback_data="{'location': 'CrossStreet', 'step': 'locations'}",
                 ),
+                "Maxwell": telebot.types.InlineKeyboardButton(
+                    text="Maxwell",
+                    callback_data="{'location': 'Maxwell', 'step': 'locations'}",
+                ),
             },
             "Ally (Recovery)": {
                 "Cross Street": telebot.types.InlineKeyboardButton(
                     text="Cross Street",
                     callback_data="{'location': 'CrossStreet', 'step': 'locations'}",
+                ),
+                "Maxwell": telebot.types.InlineKeyboardButton(
+                    text="Maxwell",
+                    callback_data="{'location': 'Maxwell', 'step': 'locations'}",
                 ),
             },
             "Anarchy": {
@@ -388,17 +400,29 @@ class KeyboardManager:
                     text="Cross Street ✅",
                     callback_data="{'location': 'CrossStreet', 'step': 'locations'}",
                 ),
+                "Maxwell": telebot.types.InlineKeyboardButton(
+                    text="Maxwell ✅",
+                    callback_data="{'location': 'Maxwell', 'step': 'locations'}",
+                ),
             },
             "Ally (Pilates)": {
                 "Cross Street": telebot.types.InlineKeyboardButton(
                     text="Cross Street ✅",
                     callback_data="{'location': 'CrossStreet', 'step': 'locations'}",
                 ),
+                "Maxwell": telebot.types.InlineKeyboardButton(
+                    text="Maxwell ✅",
+                    callback_data="{'location': 'Maxwell', 'step': 'locations'}",
+                ),
             },
             "Ally (Recovery)": {
                 "Cross Street": telebot.types.InlineKeyboardButton(
                     text="Cross Street ✅",
                     callback_data="{'location': 'CrossStreet', 'step': 'locations'}",
+                ),
+                "Maxwell": telebot.types.InlineKeyboardButton(
+                    text="Maxwell ✅",
+                    callback_data="{'location': 'Maxwell', 'step': 'locations'}",
                 ),
             },
             "Anarchy": {
@@ -637,6 +661,24 @@ class KeyboardManager:
                 StudioLocation.Orchard: self.studios_locations_buttons_unselected_map["Barrys"]["Orchard"],
                 StudioLocation.Raffles: self.studios_locations_buttons_unselected_map["Barrys"]["Raffles"],
             },
+            StudioType.AllySpin: {
+                StudioLocation.CrossStreet: self.studios_locations_buttons_unselected_map["Ally (Spin)"][
+                    "Cross Street"
+                ],
+                StudioLocation.Maxwell: self.studios_locations_buttons_unselected_map["Ally (Spin)"]["Maxwell"],
+            },
+            StudioType.AllyPilates: {
+                StudioLocation.CrossStreet: self.studios_locations_buttons_unselected_map["Ally (Pilates)"][
+                    "Cross Street"
+                ],
+                StudioLocation.Maxwell: self.studios_locations_buttons_unselected_map["Ally (Pilates)"]["Maxwell"],
+            },
+            StudioType.AllyRecovery: {
+                StudioLocation.CrossStreet: self.studios_locations_buttons_unselected_map["Ally (Recovery)"][
+                    "Cross Street"
+                ],
+                StudioLocation.Maxwell: self.studios_locations_buttons_unselected_map["Ally (Recovery)"]["Maxwell"],
+            },
             StudioType.AbsoluteSpin: {
                 StudioLocation.Centrepoint: self.studios_locations_buttons_unselected_map["Absolute (Spin)"][
                     "Centrepoint"
@@ -680,6 +722,21 @@ class KeyboardManager:
             locations_keyboard.add(
                 studio_locations_buttons["Barrys"]["Orchard"],
                 studio_locations_buttons["Barrys"]["Raffles"],
+            )
+        elif query.current_studio == "Ally (Spin)":
+            locations_keyboard.add(
+                studio_locations_buttons["Ally (Spin)"]["Cross Street"],
+                studio_locations_buttons["Ally (Spin)"]["Maxwell"],
+            )
+        elif query.current_studio == "Ally (Pilates)":
+            locations_keyboard.add(
+                studio_locations_buttons["Ally (Pilates)"]["Cross Street"],
+                studio_locations_buttons["Ally (Pilates)"]["Maxwell"],
+            )
+        elif query.current_studio == "Ally (Recovery)":
+            locations_keyboard.add(
+                studio_locations_buttons["Ally (Recovery)"]["Cross Street"],
+                studio_locations_buttons["Ally (Recovery)"]["Maxwell"],
             )
         elif query.current_studio == "Absolute (Spin)":
             locations_keyboard.add(

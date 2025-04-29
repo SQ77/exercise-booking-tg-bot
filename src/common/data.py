@@ -26,9 +26,9 @@ STUDIO_LOCATIONS_MAP = {
         StudioLocation.Raffles,
         StudioLocation.StarVista,
     ],
-    StudioType.AllySpin: [StudioLocation.CrossStreet],
-    StudioType.AllyPilates: [StudioLocation.CrossStreet],
-    StudioType.AllyRecovery: [StudioLocation.CrossStreet],
+    StudioType.AllySpin: [StudioLocation.CrossStreet, StudioLocation.Maxwell],
+    StudioType.AllyPilates: [StudioLocation.CrossStreet, StudioLocation.Maxwell],
+    StudioType.AllyRecovery: [StudioLocation.CrossStreet, StudioLocation.Maxwell],
     StudioType.Anarchy: [StudioLocation.Robinson],
 }
 

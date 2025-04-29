@@ -325,30 +325,69 @@ class GetLocationsKeyboardArgs(NamedTuple):
         ),
         pytest.param(
             GetLocationsKeyboardArgs(
-                current_studio=StudioType.AbsolutePilates,
+                current_studio=StudioType.AllySpin,
                 selected_studios={
-                    StudioType.AbsolutePilates: StudioData(locations=StudioLocation.i12),
+                    StudioType.AllySpin: StudioData(locations=[StudioLocation.CrossStreet]),
                 },
                 rows_number_of_buttons_list=[
-                    2,  # Centrepoint, i12
-                    2,  # Star Vista, Raffles
-                    1,  # Great World
+                    2,  # Cross Street, Maxwell
                     2,  # Select All, Unselect All
                     2,  # Select More, Next
                 ],
                 expected_buttons_texts_and_callback_data=[
-                    ("Centrepoint", "{'location': 'Centrepoint', 'step': 'locations'}"),
-                    ("i12 ✅", "{'location': 'i12', 'step': 'locations'}"),
-                    ("Star Vista", "{'location': 'StarVista', 'step': 'locations'}"),
-                    ("Raffles", "{'location': 'Raffles', 'step': 'locations'}"),
-                    ("Great World", "{'location': 'GreatWorld', 'step': 'locations'}"),
+                    ("Cross Street ✅", "{'location': 'CrossStreet', 'step': 'locations'}"),
+                    ("Maxwell", "{'location': 'Maxwell', 'step': 'locations'}"),
                     ("Select All", "{'location': 'All', 'step': 'locations'}"),
                     ("Unselect All", "{'location': 'Null', 'step': 'locations'}"),
                     ("◀️ Select More", "{'step': 'studios-selection'}"),
                     ("Next ▶️", "{'step': 'main-page-handler'}"),
                 ],
             ),
-            id="Absolute (Pilates) with i12 selected",
+            id="Ally (Spin) with Cross Street selected",
+        ),
+        pytest.param(
+            GetLocationsKeyboardArgs(
+                current_studio=StudioType.AllyPilates,
+                selected_studios={
+                    StudioType.AllyPilates: StudioData(locations=[StudioLocation.Maxwell]),
+                },
+                rows_number_of_buttons_list=[
+                    2,  # Cross Street, Maxwell
+                    2,  # Select All, Unselect All
+                    2,  # Select More, Next
+                ],
+                expected_buttons_texts_and_callback_data=[
+                    ("Cross Street", "{'location': 'CrossStreet', 'step': 'locations'}"),
+                    ("Maxwell ✅", "{'location': 'Maxwell', 'step': 'locations'}"),
+                    ("Select All", "{'location': 'All', 'step': 'locations'}"),
+                    ("Unselect All", "{'location': 'Null', 'step': 'locations'}"),
+                    ("◀️ Select More", "{'step': 'studios-selection'}"),
+                    ("Next ▶️", "{'step': 'main-page-handler'}"),
+                ],
+            ),
+            id="Ally (Pilates) with Maxwell selected",
+        ),
+        pytest.param(
+            GetLocationsKeyboardArgs(
+                current_studio=StudioType.AllyPilates,
+                selected_studios={
+                    StudioType.AllyPilates: StudioData(locations=[StudioLocation.CrossStreet, StudioLocation.Maxwell]),
+                },
+                rows_number_of_buttons_list=[
+                    2,  # Cross Street, Maxwell
+                    2,  # Select All, Unselect All
+                    2,  # Select More, Next
+                ],
+                expected_buttons_texts_and_callback_data=[
+                    ("Cross Street ✅", "{'location': 'CrossStreet', 'step': 'locations'}"),
+                    ("Maxwell ✅", "{'location': 'Maxwell', 'step': 'locations'}"),
+                    ("Select All", "{'location': 'All', 'step': 'locations'}"),
+                    ("Unselect All", "{'location': 'Null', 'step': 'locations'}"),
+                    ("◀️ Select More", "{'step': 'studios-selection'}"),
+                    ("Next ▶️", "{'step': 'main-page-handler'}"),
+                ],
+            ),
+            id="Ally (Recovery) with Cross Street and Maxwell selected",
         ),
     ],
 )

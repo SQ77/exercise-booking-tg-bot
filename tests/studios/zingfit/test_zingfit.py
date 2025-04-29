@@ -6,7 +6,7 @@ Description: This file tests the functions to retrieve information for Zingfit.
 
 import logging
 from datetime import date
-from typing import Callable, NamedTuple
+from typing import Callable, NamedTuple, Optional
 
 import pytest
 import pytest_mock
@@ -28,6 +28,7 @@ from studios.zingfit.data.ally import ROOM_ID_TO_STUDIO_LOCATION_MAP as ALLY_ROO
 from studios.zingfit.data.ally import ROOM_ID_TO_STUDIO_TYPE_MAP as ALLY_ROOM_ID_TO_STUDIO_TYPE_MAP
 from studios.zingfit.data.ally import TABLE_HEADING_DATE_FORMAT as ALLY_TABLE_HEADING_DATE_FORMAT
 from studios.zingfit.data.ally import URL_SUBDOMAIN as ALLY_URL_SUBDOMAIN
+from studios.zingfit.data.ally import clean_class_name as ally_clean_class_name_func
 from studios.zingfit.zingfit import (
     get_instructorid_map_from_response_soup,
     get_schedule_from_response_soup,
@@ -45,6 +46,7 @@ class GetScheduleTestArgs(NamedTuple):
     table_heading_date_format: str
     room_id_to_studio_type_map: dict[str, StudioType]
     room_id_to_studio_location_map: dict[str, StudioLocation]
+    clean_class_name_func: Optional[Callable[[str], str]]
     expected_result: dict[date, ClassData]
 
 
@@ -142,6 +144,7 @@ def test_send_get_schedule_request_multiple_locations(mocker: pytest_mock.plugin
                 table_heading_date_format=ABSOLUTE_TABLE_HEADING_DATE_FORMAT,
                 room_id_to_studio_type_map=ABSOLUTE_ROOM_ID_TO_STUDIO_TYPE_MAP,
                 room_id_to_studio_location_map=ABSOLUTE_ROOM_ID_TO_STUDIO_LOCATION_MAP,
+                clean_class_name_func=None,
                 expected_result=absolute_expected_results.EXPECTED_RAFFLES_6_TO_12_APR_SCHEDULE,
             ),
             id="Absolute Raffles 6 to 12 April",
@@ -152,6 +155,7 @@ def test_send_get_schedule_request_multiple_locations(mocker: pytest_mock.plugin
                 table_heading_date_format=ALLY_TABLE_HEADING_DATE_FORMAT,
                 room_id_to_studio_type_map=ALLY_ROOM_ID_TO_STUDIO_TYPE_MAP,
                 room_id_to_studio_location_map=ALLY_ROOM_ID_TO_STUDIO_LOCATION_MAP,
+                clean_class_name_func=ally_clean_class_name_func,
                 expected_result=ally_expected_results.EXPECTED_CROSSSTREET_7_TO_13_APR_SCHEDULE,
             ),
             id="Ally Cross Street 7 to 13 April",
@@ -185,6 +189,7 @@ def test_get_schedule_from_response_soup_single_location(
         table_heading_date_format=args.table_heading_date_format,
         room_id_to_studio_type_map=args.room_id_to_studio_type_map,
         room_id_to_studio_location_map=args.room_id_to_studio_location_map,
+        clean_class_name_func=args.clean_class_name_func,
     )
 
     # Assert that the response is as expected
@@ -196,8 +201,37 @@ def test_get_schedule_from_response_soup_single_location(
         )
 
 
+@pytest.mark.parametrize(
+    "args",
+    [
+        pytest.param(
+            GetScheduleTestArgs(
+                response_file_name="absolute_milleniawalk_and_i12_7_to_12_apr.html",
+                table_heading_date_format=ABSOLUTE_TABLE_HEADING_DATE_FORMAT,
+                room_id_to_studio_type_map=ABSOLUTE_ROOM_ID_TO_STUDIO_TYPE_MAP,
+                room_id_to_studio_location_map=ABSOLUTE_ROOM_ID_TO_STUDIO_LOCATION_MAP,
+                clean_class_name_func=None,
+                expected_result=absolute_expected_results.EXPECTED_MW_AND_I12_7_TO_12_APR_SCHEDULE,
+            ),
+            id="Absolute Millenia Walk and i12 7 to 12 April",
+        ),
+        pytest.param(
+            GetScheduleTestArgs(
+                response_file_name="ally_crossstreet_and_maxwell_6_to_12_may.html",
+                table_heading_date_format=ALLY_TABLE_HEADING_DATE_FORMAT,
+                room_id_to_studio_type_map=ALLY_ROOM_ID_TO_STUDIO_TYPE_MAP,
+                room_id_to_studio_location_map=ALLY_ROOM_ID_TO_STUDIO_LOCATION_MAP,
+                clean_class_name_func=ally_clean_class_name_func,
+                expected_result=ally_expected_results.EXPECTED_CROSSSTREET_AND_MAXWELL_6_TO_12_MAY_SCHEDULE,
+            ),
+            id="Ally Cross Street and Maxwell 6 to 12 May",
+        ),
+    ],
+)
 def test_get_schedule_from_response_soup_multiple_locations(
-    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+    mocker: pytest_mock.plugin.MockerFixture,
+    load_response_file: Callable[[str], str],
+    args: GetScheduleTestArgs,
 ) -> None:
     """
     Test get_schedule_from_response_soup flow with multiple locations.
@@ -205,30 +239,31 @@ def test_get_schedule_from_response_soup_multiple_locations(
     Args:
       - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
       - load_response_file (Callable[[str], str]): Fixture that loads file content from the example_responses folder.
+      - args (GetScheduleTestArgs): Provides arguments for the test case.
 
     """
     # Setup mocks
     mock_logger = mocker.Mock(spec=logging.Logger)
 
-    mock_soup = BeautifulSoup(load_response_file("absolute_milleniawalk_and_i12_7_to_12_apr.html"), "html.parser")
+    mock_soup = BeautifulSoup(load_response_file(args.response_file_name), "html.parser")
 
     # Call the function to test
     result = get_schedule_from_response_soup(
         logger=mock_logger,
         soup=mock_soup,
         studio_name="test studio",
-        table_heading_date_format=ABSOLUTE_TABLE_HEADING_DATE_FORMAT,
-        room_id_to_studio_type_map=ABSOLUTE_ROOM_ID_TO_STUDIO_TYPE_MAP,
-        room_id_to_studio_location_map=ABSOLUTE_ROOM_ID_TO_STUDIO_LOCATION_MAP,
+        table_heading_date_format=args.table_heading_date_format,
+        room_id_to_studio_type_map=args.room_id_to_studio_type_map,
+        room_id_to_studio_location_map=args.room_id_to_studio_location_map,
+        clean_class_name_func=args.clean_class_name_func,
     )
 
     # Assert that the response is as expected
     assert isinstance(result, dict)
-    assert result.keys() == absolute_expected_results.EXPECTED_MW_AND_I12_7_TO_12_APR_SCHEDULE.keys()
+    assert result.keys() == args.expected_result.keys()
     for key in result:
-        assert result[key] == absolute_expected_results.EXPECTED_MW_AND_I12_7_TO_12_APR_SCHEDULE[key], (
-            f"Expected result list {absolute_expected_results.EXPECTED_MW_AND_I12_7_TO_12_APR_SCHEDULE[key]} "
-            f"does not match actual result list {result[key]}."
+        assert result[key] == args.expected_result[key], (
+            f"Expected result list {args.expected_result[key]} " f"does not match actual result list {result[key]}."
         )
 
 
@@ -279,8 +314,29 @@ def test_get_instructorid_map_from_response_soup_single_location(
     assert instructorid_map == args.expected_result
 
 
+@pytest.mark.parametrize(
+    "args",
+    [
+        pytest.param(
+            GetInstructorIDTestArgs(
+                response_file_name="absolute_milleniawalk_and_i12_7_to_12_apr.html",
+                expected_result=absolute_expected_results.EXPECTED_MW_AND_I12_7_TO_12_APR_INSTRUCTORID_MAP,
+            ),
+            id="Absolute Millenia Walk and i12 7 to 12 April",
+        ),
+        pytest.param(
+            GetInstructorIDTestArgs(
+                response_file_name="ally_crossstreet_and_maxwell_6_to_12_may.html",
+                expected_result=ally_expected_results.EXPECTED_CROSSSTREET_AND_MAXWELL_6_TO_12_MAY_INSTRUCTORID_MAP,
+            ),
+            id="Ally Cross Street and Maxwell 6 to 12 May",
+        ),
+    ],
+)
 def test_get_instructorid_map_from_response_soup_multiple_locations(
-    mocker: pytest_mock.plugin.MockerFixture, load_response_file: Callable[[str], str]
+    mocker: pytest_mock.plugin.MockerFixture,
+    load_response_file: Callable[[str], str],
+    args: GetInstructorIDTestArgs,
 ) -> None:
     """
     Test get_instructorid_map_from_response_soup flow with a multiple locations.
@@ -288,12 +344,13 @@ def test_get_instructorid_map_from_response_soup_multiple_locations(
     Args:
       - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
       - load_response_file (Callable[[str], str]): Fixture that loads file content from the example_responses folder.
+      - args (GetInstructorIDTestArgs): Provides arguments for the test case.
 
     """
     # Setup mocks
     mock_logger = mocker.Mock(spec=logging.Logger)
 
-    mock_soup = BeautifulSoup(load_response_file("absolute_milleniawalk_and_i12_7_to_12_apr.html"), "html.parser")
+    mock_soup = BeautifulSoup(load_response_file(args.response_file_name), "html.parser")
 
     # Call the function to test
     instructorid_map = get_instructorid_map_from_response_soup(
@@ -301,7 +358,7 @@ def test_get_instructorid_map_from_response_soup_multiple_locations(
     )
 
     # Assert that the response is as expected
-    assert instructorid_map == absolute_expected_results.EXPECTED_MW_AND_I12_7_TO_12_APR_INSTRUCTORID_MAP
+    assert instructorid_map == args.expected_result
 
 
 def test_get_zingfit_schedule_and_instructorid_map_absolute_flow(
@@ -350,6 +407,7 @@ def test_get_zingfit_schedule_and_instructorid_map_absolute_flow(
         location_to_site_id_map=ABSOLUTE_LOCATION_TO_SITE_ID_MAP,
         room_id_to_studio_type_map=ABSOLUTE_ROOM_ID_TO_STUDIO_TYPE_MAP,
         room_id_to_studio_location_map=ABSOLUTE_ROOM_ID_TO_STUDIO_LOCATION_MAP,
+        clean_class_name_func=None,
     )
 
     # Assert that the response is as expected
@@ -406,6 +464,7 @@ def test_get_zingfit_schedule_and_instructorid_map_ally_flow(
         location_to_site_id_map=ALLY_LOCATION_TO_SITE_ID_MAP,
         room_id_to_studio_type_map=ALLY_ROOM_ID_TO_STUDIO_TYPE_MAP,
         room_id_to_studio_location_map=ALLY_ROOM_ID_TO_STUDIO_LOCATION_MAP,
+        clean_class_name_func=ally_clean_class_name_func,
     )
 
     # Assert that the response is as expected
