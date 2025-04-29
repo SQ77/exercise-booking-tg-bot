@@ -108,29 +108,36 @@ def parse_get_schedule_response(
 
             class_name = data["sessionName"]
             class_name_location_split_pos = class_name.find(" @ ")
-            class_name = class_name[:class_name_location_split_pos]
+            cleaned_class_name = class_name[:class_name_location_split_pos]
             class_time = datetime.strptime(data["startTime"], "%H:%M:%S")
+            class_time_str = class_time.strftime("%I:%M %p").lstrip("0")
 
             room_name = data["roomName"]
             if room_name in room_id_to_studio_type_map:
                 studio = room_id_to_studio_type_map[room_name]
             else:
-                logger.warning(f"Failed to map room name {room_name} to studio type for {studio_name}")
+                logger.warning(
+                    f"Failed to map room name '{room_name}' to studio type for {studio_name}: "
+                    f"Class name: {class_name}, Instructor: {instructor_str}, Time: {class_time_str}"
+                )
                 studio = StudioType.Unknown
 
             if room_name in room_name_to_studio_location_map:
                 location = room_name_to_studio_location_map[room_name]
             else:
-                logger.warning(f"Failed to map room name {room_name} to studio location for {studio_name}")
+                logger.warning(
+                    f"Failed to map room name '{room_name}' to studio location for {studio_name}: "
+                    f"Class name: {class_name}, Instructor: {instructor_str}, Time: {class_time_str}"
+                )
                 location = StudioLocation.Unknown
-                class_name += " @ " + room_name
+                cleaned_class_name += " @ " + room_name
 
             class_details = ClassData(
                 studio=studio,
                 location=location,
-                name=class_name,
+                name=cleaned_class_name,
                 instructor=instructor_str,
-                time=class_time.strftime("%I:%M %p").lstrip("0"),
+                time=class_time_str,
                 availability=RESPONSE_AVAILABILITY_MAP[data["sessionStatus"]],
                 capacity_info=CapacityInfo(
                     has_info=True,

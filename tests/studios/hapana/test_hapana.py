@@ -339,8 +339,10 @@ class ParseGetScheduleResponseFailureArgs(NamedTuple):
                     ]
                 },
                 expected_warning_logs=[
-                    "Failed to map room name unknown room to studio type for test studio",
-                    "Failed to map room name unknown room to studio location for test studio",
+                    "Failed to map room name 'unknown room' to studio type for test studio: "
+                    "Class name: test class name @ bugis, Instructor: rev instructor, Time: 1:15 PM",
+                    "Failed to map room name 'unknown room' to studio location for test studio: "
+                    "Class name: test class name @ bugis, Instructor: rev instructor, Time: 1:15 PM",
                 ],
             ),
             id="Unknown room name",
