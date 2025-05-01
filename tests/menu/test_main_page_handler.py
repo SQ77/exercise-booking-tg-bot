@@ -81,6 +81,8 @@ def test_main_page_callback_query_handler(
     test_main_page_keyboard = "Mock Keyboard"
 
     # Setup mocks
+    mock_main_page_handler = mocker.patch("menu.main_page_handler.main_page_handler")
+
     mock_query = mocker.Mock(spec=telebot.types.CallbackQuery, message=mock_message)
 
     mock_chat_manager = mocker.Mock()
@@ -88,9 +90,6 @@ def test_main_page_callback_query_handler(
 
     mock_keyboard_manager = mocker.Mock()
     mock_keyboard_manager.get_main_page_keyboard.return_value = test_main_page_keyboard
-
-    # Spy on main_page_handler
-    spy = mocker.spy(main_page_handler, "main_page_handler")
 
     # Call the function to test
     main_page_handler.main_page_callback_query_handler(
@@ -100,7 +99,7 @@ def test_main_page_callback_query_handler(
     )
 
     # Assert that the internal main_page_handler was called with the expected arguments
-    spy.assert_called_once_with(
+    mock_main_page_handler.assert_called_once_with(
         message=mock_message,
         chat_manager=mock_chat_manager,
         keyboard_manager=mock_keyboard_manager,
