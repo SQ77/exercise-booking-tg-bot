@@ -79,14 +79,14 @@ def test_webhook(
 
     # Setup mocks
     mock_update = {"update_id": 123}
-    mocked_telebot_update = mocker.patch("telebot.types.Update.de_json", return_value=test_parsed_update)
+    mock_telebot_update = mocker.patch("telebot.types.Update.de_json", return_value=test_parsed_update)
 
     # Ping the endpoint to test
     client = mock_server.app.test_client()
     response = client.post("/webhook", json=mock_update)
 
     # Assert that flow was called with the expected arguments
-    mocked_telebot_update.assert_called_once_with(mock_update)
+    mock_telebot_update.assert_called_once_with(mock_update)
     mock_server.bot.process_new_updates.assert_called_once_with([test_parsed_update])
 
     # Assert that the response is as expected
