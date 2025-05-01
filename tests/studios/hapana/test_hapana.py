@@ -16,7 +16,6 @@ import requests
 from common.capacity_info import CapacityInfo
 from common.class_availability import ClassAvailability
 from common.class_data import ClassData
-from common.result_data import ResultData
 from common.studio_location import StudioLocation
 from common.studio_type import StudioType
 from studios.hapana.data.rev import LOCATION_TO_SITE_ID_MAP as REV_LOCATION_TO_SITE_ID_MAP
@@ -30,6 +29,7 @@ from studios.hapana.hapana import (
     parse_get_schedule_response,
     send_get_schedule_request,
 )
+from tests.conftest import is_classes_dict_equal
 from tests.studios.hapana.expected_results import rev_expected_results
 
 
@@ -228,27 +228,10 @@ def test_parse_get_schedule_response_success(
     )
 
     # Assert that the response is as expected
-    assert isinstance(result, dict)
-    assert result.keys() == rev_expected_results.EXPECTED_ORCHARD_9_TO_18_APR_SCHEDULE.keys()
-    for key in result:
-        assert result[key] == rev_expected_results.EXPECTED_ORCHARD_9_TO_18_APR_SCHEDULE[key], (
-            f"Expected result list does not match actual result list\n"
-            f"Expected: {rev_expected_results.EXPECTED_ORCHARD_9_TO_18_APR_SCHEDULE[key]}\n"
-            f"Actual: {result[key]}"
-        )
-
-        for index, actual_class_data in enumerate(result[key]):
-            expected_class_data = rev_expected_results.EXPECTED_ORCHARD_9_TO_18_APR_SCHEDULE[key][index]
-            assert actual_class_data.availability == expected_class_data.availability, (
-                f"Expected class availability does not match actual availability\n"
-                f"Expected: {expected_class_data.availability}\n"
-                f"Actual: {actual_class_data.availability}"
-            )
-            assert actual_class_data.capacity_info == expected_class_data.capacity_info, (
-                f"Expected class capacity info does not match actual capacity info\n"
-                f"Expected: {expected_class_data.capacity_info}\n"
-                f"Actual: {actual_class_data.capacity_info}"
-            )
+    assert is_classes_dict_equal(
+        expected=rev_expected_results.EXPECTED_ORCHARD_9_TO_18_APR_SCHEDULE,
+        actual=result,
+    )
 
 
 class ParseGetScheduleResponseFailureArgs(NamedTuple):
@@ -395,27 +378,10 @@ def test_parse_get_schedule_response_failure(
     assert mock_logger.warning.call_args_list == expected_warning_calls
 
     # Assert that the response is as expected
-    assert isinstance(result, dict)
-    assert result.keys() == args.expected_result_dict.keys()
-    for key in result:
-        assert result[key] == args.expected_result_dict[key], (
-            f"Expected result list does not match actual result list\n"
-            f"Expected: {args.expected_result_dict[key]}\n"
-            f"Actual: {result[key]}"
-        )
-
-        for index, actual_class_data in enumerate(result[key]):
-            expected_class_data = args.expected_result_dict[key][index]
-            assert actual_class_data.availability == expected_class_data.availability, (
-                f"Expected class availability does not match actual availability\n"
-                f"Expected: {expected_class_data.availability}\n"
-                f"Actual: {actual_class_data.availability}"
-            )
-            assert actual_class_data.capacity_info == expected_class_data.capacity_info, (
-                f"Expected class capacity info does not match actual capacity info\n"
-                f"Expected: {expected_class_data.capacity_info}\n"
-                f"Actual: {actual_class_data.capacity_info}"
-            )
+    assert is_classes_dict_equal(
+        expected=args.expected_result_dict,
+        actual=result,
+    )
 
 
 def test_get_hapana_schedule(
@@ -464,28 +430,10 @@ def test_get_hapana_schedule(
     )
 
     # Assert that the response is as expected
-    assert isinstance(schedule, ResultData)
-    assert isinstance(schedule.classes, dict)
-    assert schedule.classes.keys() == rev_expected_results.EXPECTED_ALL_10_TO_12_APR_SCHEDULE.keys()
-    for key in schedule.classes:
-        assert schedule.classes[key] == rev_expected_results.EXPECTED_ALL_10_TO_12_APR_SCHEDULE[key], (
-            f"Expected result list does not match actual result list\n"
-            f"Expected: {rev_expected_results.EXPECTED_ALL_10_TO_12_APR_SCHEDULE[key]}\n"
-            f"Actual: {schedule.classes[key]}"
-        )
-
-        for index, actual_class_data in enumerate(schedule.classes[key]):
-            expected_class_data = rev_expected_results.EXPECTED_ALL_10_TO_12_APR_SCHEDULE[key][index]
-            assert actual_class_data.availability == expected_class_data.availability, (
-                f"Expected class availability does not match actual availability\n"
-                f"Expected: {expected_class_data.availability}\n"
-                f"Actual: {actual_class_data.availability}"
-            )
-            assert actual_class_data.capacity_info == expected_class_data.capacity_info, (
-                f"Expected class capacity info does not match actual capacity info\n"
-                f"Expected: {expected_class_data.capacity_info}\n"
-                f"Actual: {actual_class_data.capacity_info}"
-            )
+    assert is_classes_dict_equal(
+        expected=rev_expected_results.EXPECTED_ALL_10_TO_12_APR_SCHEDULE,
+        actual=schedule.classes,
+    )
 
 
 def test_get_instructorid_map(
@@ -686,26 +634,8 @@ def test_get_hapana_schedule_and_instructorid_map(
     )
 
     # Assert that the response is as expected
-    assert isinstance(schedule, ResultData)
-    assert isinstance(schedule.classes, dict)
-    assert schedule.classes.keys() == rev_expected_results.EXPECTED_ALL_10_TO_12_APR_SCHEDULE.keys()
-    for key in schedule.classes:
-        assert schedule.classes[key] == rev_expected_results.EXPECTED_ALL_10_TO_12_APR_SCHEDULE[key], (
-            f"Expected result list does not match actual result list\n"
-            f"Expected: {rev_expected_results.EXPECTED_ALL_10_TO_12_APR_SCHEDULE[key]}\n"
-            f"Actual: {schedule.classes[key]}"
-        )
-
-        for index, actual_class_data in enumerate(schedule.classes[key]):
-            expected_class_data = rev_expected_results.EXPECTED_ALL_10_TO_12_APR_SCHEDULE[key][index]
-            assert actual_class_data.availability == expected_class_data.availability, (
-                f"Expected class availability does not match actual availability\n"
-                f"Expected: {expected_class_data.availability}\n"
-                f"Actual: {actual_class_data.availability}"
-            )
-            assert actual_class_data.capacity_info == expected_class_data.capacity_info, (
-                f"Expected class capacity info does not match actual capacity info\n"
-                f"Expected: {expected_class_data.capacity_info}\n"
-                f"Actual: {actual_class_data.capacity_info}"
-            )
+    assert is_classes_dict_equal(
+        expected=rev_expected_results.EXPECTED_ALL_10_TO_12_APR_SCHEDULE,
+        actual=schedule.classes,
+    )
     assert instructorid_map == rev_expected_results.EXPECTED_BUGIS_10_TO_12_APR_INSTRUCTORID_MAP

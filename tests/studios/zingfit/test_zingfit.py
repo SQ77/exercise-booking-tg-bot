@@ -13,7 +13,6 @@ import pytest_mock
 from bs4 import BeautifulSoup
 
 from common.class_data import ClassData
-from common.result_data import ResultData
 from common.studio_location import StudioLocation
 from common.studio_type import StudioType
 from studios.zingfit.data.absolute import LOCATION_TO_SITE_ID_MAP as ABSOLUTE_LOCATION_TO_SITE_ID_MAP
@@ -35,6 +34,7 @@ from studios.zingfit.zingfit import (
     get_zingfit_schedule_and_instructorid_map,
     send_get_schedule_request,
 )
+from tests.conftest import is_classes_dict_equal
 from tests.studios.zingfit.expected_results import (
     absolute_expected_results,
     ally_expected_results,
@@ -193,12 +193,10 @@ def test_get_schedule_from_response_soup_single_location(
     )
 
     # Assert that the response is as expected
-    assert isinstance(result, dict)
-    assert result.keys() == args.expected_result.keys()
-    for key in result:
-        assert result[key] == args.expected_result[key], (
-            f"Expected result list {args.expected_result[key]} " f"does not match actual result list {result[key]}."
-        )
+    assert is_classes_dict_equal(
+        expected=args.expected_result,
+        actual=result,
+    )
 
 
 @pytest.mark.parametrize(
@@ -259,12 +257,10 @@ def test_get_schedule_from_response_soup_multiple_locations(
     )
 
     # Assert that the response is as expected
-    assert isinstance(result, dict)
-    assert result.keys() == args.expected_result.keys()
-    for key in result:
-        assert result[key] == args.expected_result[key], (
-            f"Expected result list {args.expected_result[key]} " f"does not match actual result list {result[key]}."
-        )
+    assert is_classes_dict_equal(
+        expected=args.expected_result,
+        actual=result,
+    )
 
 
 @pytest.mark.parametrize(
@@ -411,14 +407,10 @@ def test_get_zingfit_schedule_and_instructorid_map_absolute_flow(
     )
 
     # Assert that the response is as expected
-    assert isinstance(schedule, ResultData)
-    assert isinstance(schedule.classes, dict)
-    assert schedule.classes.keys() == absolute_expected_results.EXPECTED_CTP_AND_GW_7_TO_20_APR_SCHEDULE.keys()
-    for key in schedule.classes:
-        assert schedule.classes[key] == absolute_expected_results.EXPECTED_CTP_AND_GW_7_TO_20_APR_SCHEDULE[key], (
-            f"Expected result list {absolute_expected_results.EXPECTED_CTP_AND_GW_7_TO_20_APR_SCHEDULE[key]} "
-            f"does not match actual result list {schedule.classes[key]}."
-        )
+    assert is_classes_dict_equal(
+        expected=absolute_expected_results.EXPECTED_CTP_AND_GW_7_TO_20_APR_SCHEDULE,
+        actual=schedule.classes,
+    )
     assert instructorid_map == absolute_expected_results.EXPECTED_CTP_AND_GW_7_TO_20_APR_INSTRUCTORID_MAP
 
 
@@ -468,12 +460,8 @@ def test_get_zingfit_schedule_and_instructorid_map_ally_flow(
     )
 
     # Assert that the response is as expected
-    assert isinstance(schedule, ResultData)
-    assert isinstance(schedule.classes, dict)
-    assert schedule.classes.keys() == ally_expected_results.EXPECTED_CROSSSTREET_8_TO_28_APR_SCHEDULE.keys()
-    for key in schedule.classes:
-        assert schedule.classes[key] == ally_expected_results.EXPECTED_CROSSSTREET_8_TO_28_APR_SCHEDULE[key], (
-            f"Expected result list {ally_expected_results.EXPECTED_CROSSSTREET_8_TO_28_APR_SCHEDULE[key]} "
-            f"does not match actual result list {schedule.classes[key]}."
-        )
+    assert is_classes_dict_equal(
+        expected=ally_expected_results.EXPECTED_CROSSSTREET_8_TO_28_APR_SCHEDULE,
+        actual=schedule.classes,
+    )
     assert instructorid_map == ally_expected_results.EXPECTED_CROSSSTREET_8_TO_28_APR_INSTRUCTORID_MAP

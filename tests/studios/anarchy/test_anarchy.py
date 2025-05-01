@@ -12,7 +12,6 @@ import pytest_mock
 import requests
 from bs4 import BeautifulSoup
 
-from common.result_data import ResultData
 from studios.anarchy.anarchy import (
     get_anarchy_schedule_and_instructorid_map,
     get_instructorid_map_from_response_soup,
@@ -20,6 +19,7 @@ from studios.anarchy.anarchy import (
     get_soup_from_response,
     send_get_schedule_request,
 )
+from tests.conftest import is_classes_dict_equal
 from tests.studios.anarchy import expected_results
 
 
@@ -123,13 +123,10 @@ def test_get_schedule_from_response_soup(
     result = get_schedule_from_response_soup(mock_logger, soup)
 
     # Assert that the response is as expected
-    assert isinstance(result, dict)
-    assert result.keys() == expected_results.EXPECTED_ROBINSON_8_TO_28_APR_SCHEDULE.keys()
-    for key in result:
-        assert result[key] == expected_results.EXPECTED_ROBINSON_8_TO_28_APR_SCHEDULE[key], (
-            f"Expected result list {expected_results.EXPECTED_ROBINSON_8_TO_28_APR_SCHEDULE[key]} "
-            f"does not match actual result list {result[key]}."
-        )
+    assert is_classes_dict_equal(
+        expected=expected_results.EXPECTED_ROBINSON_8_TO_28_APR_SCHEDULE,
+        actual=result,
+    )
 
 
 def test_get_instructorid_map_from_response_soup(
@@ -183,12 +180,8 @@ def test_get_anarchy_schedule_and_instructorid_map(
     schedule, instructorid_map = get_anarchy_schedule_and_instructorid_map(mock_logger)
 
     # Assert that the response is as expected
-    assert isinstance(schedule, ResultData)
-    assert isinstance(schedule.classes, dict)
-    assert schedule.classes.keys() == expected_results.EXPECTED_ROBINSON_8_TO_28_APR_SCHEDULE.keys()
-    for key in schedule.classes:
-        assert schedule.classes[key] == expected_results.EXPECTED_ROBINSON_8_TO_28_APR_SCHEDULE[key], (
-            f"Expected result list {expected_results.EXPECTED_ROBINSON_8_TO_28_APR_SCHEDULE[key]} "
-            f"does not match actual result list {schedule.classes[key]}."
-        )
+    assert is_classes_dict_equal(
+        expected=expected_results.EXPECTED_ROBINSON_8_TO_28_APR_SCHEDULE,
+        actual=schedule.classes,
+    )
     assert instructorid_map == expected_results.EXPECTED_ROBINSON_8_TO_28_APR_INSTRUCTORID_MAP

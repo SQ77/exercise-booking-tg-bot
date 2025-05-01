@@ -43,20 +43,6 @@ class ResultData:
         """
         self.classes = {} if classes is None else classes
 
-    def add_class(self, date: date, data: ClassData) -> None:
-        """
-        Adds a class to the given date.
-
-        Args:
-          - date (date): The date of the class.
-          - data (ClassData): The class data to be added.
-
-        """
-        if date not in self.classes:
-            self.classes[date] = []
-
-        self.classes[date].append(data)
-
     def add_classes(self, classes: dict[date, list[ClassData]]) -> None:
         """
         Adds classes to the given date.
@@ -68,12 +54,9 @@ class ResultData:
         if classes is None:
             return
 
-        if self.classes is None:
-            self.classes = {}
-
         for classes_date in classes:
             if classes_date in self.classes:
-                self.classes[classes_date] += classes[classes_date]
+                self.classes[classes_date].extend(classes[classes_date])
             else:
                 self.classes[classes_date] = copy(classes[classes_date])
 
@@ -88,13 +71,14 @@ class ResultData:
           ResultData: A new ResultData instance containing the filtered class data.
 
         """
-        if self.classes is None:
+        if len(self.classes) == 0:
             return ResultData()
 
         classes: dict[date, list[ClassData]] = {}
         current_sg_time = datetime.now(tz=pytz.timezone("Asia/Singapore"))
+        current_sg_date = current_sg_time.date()
         for week in range(0, query.weeks):
-            date_to_check = datetime.now(tz=pytz.timezone("Asia/Singapore")).date() + timedelta(weeks=week)
+            date_to_check = current_sg_date + timedelta(weeks=week)
             for day in range(7):
                 if "All" not in query.days and calendar.day_name[date_to_check.weekday()] not in query.days:
                     date_to_check = date_to_check + timedelta(days=1)
@@ -207,7 +191,7 @@ class ResultData:
 
                 if class_details.capacity_info.has_info:
                     if class_details.availability == ClassAvailability.Waitlist:
-                        result_str += f" - {class_details.capacity_info.waitlist_reserved} Rider(s) on Waitlist"
+                        result_str += f" - {class_details.capacity_info.waitlist_reserved} Member(s) on Waitlist"
                     else:
                         result_str += f" - {class_details.capacity_info.remaining} Spot(s) Remaining"
 

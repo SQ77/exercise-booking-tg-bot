@@ -7,7 +7,7 @@ Description: This file contains pytest configuration, fixtures, and other shared
 """
 
 import inspect
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Callable
 from unittest.mock import Mock
@@ -159,6 +159,139 @@ def sample_class_data() -> ClassData:
 
 
 @pytest.fixture
+def sample_classes_dict() -> dict[date, list[ClassData]]:
+    """
+    Fixture to create a sample classes dictionary.
+
+    Returns:
+        dict[date, list[ClassData]]: Dictionary of date and list of class data.
+
+    """
+    return {
+        # Sunday
+        date(2025, 4, 20): [
+            ClassData(
+                studio=StudioType.Barrys,
+                location=StudioLocation.Raffles,
+                name="Chest, Back, Abs",
+                instructor="Barrys Instructor",
+                time="10:00 AM",
+                availability=ClassAvailability.Available,
+                capacity_info=CapacityInfo(),
+            ),
+        ],
+        # Monday
+        date(2025, 4, 21): [
+            ClassData(
+                studio=StudioType.Barrys,
+                location=StudioLocation.Orchard,
+                name="Arms & Abs",
+                instructor="Barrys Instructor",
+                time="10:00 AM",
+                availability=ClassAvailability.Waitlist,
+                capacity_info=CapacityInfo(
+                    has_info=True,
+                    capacity=40,
+                    remaining=0,
+                    waitlist_capacity=20,
+                    waitlist_reserved=18,
+                ),
+            ),
+            ClassData(
+                studio=StudioType.Rev,
+                location=StudioLocation.TJPG,
+                name="Ride",
+                instructor="Rev Instructor",
+                time="12:00 PM",
+                availability=ClassAvailability.Available,
+                capacity_info=CapacityInfo(
+                    has_info=True,
+                    capacity=40,
+                    remaining=16,
+                    waitlist_capacity=20,
+                    waitlist_reserved=0,
+                ),
+            ),
+        ],
+        # Tuesday
+        date(2025, 4, 22): [
+            ClassData(
+                studio=StudioType.AbsolutePilates,
+                location=StudioLocation.GreatWorld,
+                name="Reformer",
+                instructor="Absolute Instructor",
+                time="5:00 PM",
+                availability=ClassAvailability.Full,
+                capacity_info=CapacityInfo(),
+            ),
+        ],
+        # Wednesday
+        date(2025, 4, 23): [
+            ClassData(
+                studio=StudioType.Anarchy,
+                location=StudioLocation.Robinson,
+                name="Open Gym",
+                instructor="Anarchy Instructor",
+                time="1:00 PM",
+                availability=ClassAvailability.Cancelled,
+                capacity_info=CapacityInfo(),
+            ),
+        ],
+        # Thursday
+        date(2025, 4, 24): [
+            ClassData(
+                studio=StudioType.AbsolutePilates,
+                location=StudioLocation.Null,
+                name="Essentials 60",
+                instructor="Absolute Instructor",
+                time="7:00 PM",
+                availability=ClassAvailability.Available,
+                capacity_info=CapacityInfo(),
+            ),
+        ],
+        # Wednesday (3rd week)
+        date(2025, 5, 6): [
+            ClassData(
+                studio=StudioType.AllySpin,
+                location=StudioLocation.CrossStreet,
+                name="Essentials 50",
+                instructor="Test",
+                time="8:00 AM",
+                availability=ClassAvailability.Available,
+                capacity_info=CapacityInfo(),
+            ),
+            ClassData(
+                studio=StudioType.AllySpin,
+                location=StudioLocation.Maxwell,
+                name="Essentials 50",
+                instructor="Ally Instructor",
+                time="10:00 AM",
+                availability=ClassAvailability.Available,
+                capacity_info=CapacityInfo(),
+            ),
+        ],
+        # Thursday (3rd week)
+        date(2025, 5, 7): [
+            ClassData(
+                studio=StudioType.Rev,
+                location=StudioLocation.TJPG,
+                name="Ride",
+                instructor="Rev Instructor",
+                time="6:45 PM",
+                availability=ClassAvailability.Full,
+                capacity_info=CapacityInfo(
+                    has_info=True,
+                    capacity=40,
+                    remaining=0,
+                    waitlist_capacity=20,
+                    waitlist_reserved=20,
+                ),
+            ),
+        ],
+    }
+
+
+@pytest.fixture
 def mock_message(mocker: pytest_mock.plugin.MockerFixture) -> Mock:
     """
     Creates a mock object with telebot.types.Message spec.
@@ -213,3 +346,25 @@ def mock_studios_manager(mocker: pytest_mock.plugin.MockerFixture) -> Mock:
         },
     )
     return mock_studios_manager
+
+
+def is_classes_dict_equal(expected: dict[date, list[ClassData]], actual: dict[date, list[ClassData]]) -> bool:
+    if not isinstance(actual, dict):
+        return False
+
+    if not actual.keys() == expected.keys():
+        return False
+
+    for key in actual:
+        if actual[key] != expected[key]:
+            return False
+
+        for index, actual_class_data in enumerate(actual[key]):
+            expected_class_data = expected[key][index]
+            if actual_class_data.availability != expected_class_data.availability:
+                return False
+
+            if actual_class_data.capacity_info != expected_class_data.capacity_info:
+                return False
+
+    return True
