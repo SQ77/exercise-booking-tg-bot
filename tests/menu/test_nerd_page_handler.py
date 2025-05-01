@@ -11,12 +11,12 @@ from unittest.mock import Mock
 import pytest
 import pytest_mock
 
-import menu.nerd_page_handler as nerd_page_handler
 from chat.chat_manager import ChatManager
 from common.query_data import QueryData
 from common.studio_data import StudioData
 from common.studio_location import StudioLocation
 from common.studio_type import StudioType
+from menu import nerd_page_handler
 
 
 def test_nerd_message_handler(

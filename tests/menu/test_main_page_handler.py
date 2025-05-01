@@ -9,8 +9,8 @@ from unittest.mock import Mock
 import pytest_mock
 import telebot
 
-import menu.main_page_handler as main_page_handler
 from common.query_data import QueryData
+from menu import main_page_handler
 
 
 def test_main_page_handler(

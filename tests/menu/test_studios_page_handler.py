@@ -11,11 +11,11 @@ import pytest
 import pytest_mock
 import telebot
 
-import menu.studios_page_handler as studios_page_handler
 from common.query_data import QueryData
 from common.studio_data import StudioData
 from common.studio_location import StudioLocation
 from common.studio_type import StudioType
+from menu import studios_page_handler
 
 
 def test_studios_selection_callback_query_handler(

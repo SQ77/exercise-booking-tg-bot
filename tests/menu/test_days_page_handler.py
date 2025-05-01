@@ -11,9 +11,9 @@ import pytest
 import pytest_mock
 import telebot
 
-import menu.days_page_handler as days_page_handler
 from common.data import SORTED_DAYS
 from common.query_data import QueryData
+from menu import days_page_handler
 
 
 class DaysPageCallbackQueryHandlerArgs(NamedTuple):

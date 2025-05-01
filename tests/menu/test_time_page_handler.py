@@ -13,8 +13,8 @@ import pytest
 import pytest_mock
 import telebot
 
-import menu.time_page_handler as time_page_handler
 from common.query_data import QueryData
+from menu import time_page_handler
 
 
 def test_time_selection_callback_query_handler(

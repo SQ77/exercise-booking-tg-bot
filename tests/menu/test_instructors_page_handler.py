@@ -12,13 +12,13 @@ import pytest
 import pytest_mock
 import telebot
 
-import menu.instructors_page_handler as instructors_page_handler
 from chat.chat_manager import ChatManager
 from chat.keyboard_manager import KeyboardManager
 from common.query_data import QueryData
 from common.studio_data import StudioData
 from common.studio_location import StudioLocation
 from common.studio_type import StudioType
+from menu import instructors_page_handler
 
 
 def test_instructors_message_handler(
