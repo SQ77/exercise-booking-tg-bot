@@ -208,7 +208,7 @@ def get_anarchy_schedule_and_instructorid_map(logger: logging.Logger) -> tuple[R
     # Get instructor id map
     instructorid_map = get_instructorid_map_from_response_soup(logger=logger, soup=soup)
     if len(date_class_data_list_dict) == 0:
-        # Anarchy schedule doesn"t show for future dates if there are no more classes today
+        # Anarchy schedule doesn't show for future dates if there are no more classes today
         start_date = start_date + timedelta(days=1)
         get_schedule_response = send_get_schedule_request(start_date=start_date, end_date=end_date)
         soup = get_soup_from_response(logger=logger, response=get_schedule_response)
