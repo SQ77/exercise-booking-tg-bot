@@ -200,7 +200,7 @@ def test_get_schedule_from_response_soup_invalid_soup(
     mock_logger = mocker.Mock(spec=logging.Logger)
 
     # Get soup to test function with
-    soup = BeautifulSoup(markup=load_response_file("invalid_schedule_soup.html"), features="html.parser")
+    soup = BeautifulSoup(markup=load_response_file("invalid_schedule.html"), features="html.parser")
 
     # Call the function to test
     result = get_schedule_from_response_soup(mock_logger, soup)
@@ -253,7 +253,7 @@ def test_get_instructorid_map_from_response_soup_invalid_soup(
     """
     # Setup mocks
     mock_logger = mocker.Mock(spec=logging.Logger)
-    soup = BeautifulSoup(markup=load_response_file("invalid_instructors_soup.html"), features="html.parser")
+    soup = BeautifulSoup(markup=load_response_file("invalid_instructors.html"), features="html.parser")
 
     # Call the function to test
     instructorid_map = get_instructorid_map_from_response_soup(logger=mock_logger, soup=soup)

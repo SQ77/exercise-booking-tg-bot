@@ -52,7 +52,7 @@ def send_get_schedule_request(
         params[site_param_name] = location_to_site_id_map[location]
         if site_param_name == "site":
             site_param_name = "site2"
-        elif site_param_name != "site6":
+        elif site_param_name != "site5":  # API only accepts up to site5
             site_param_name = site_param_name[:-1] + str(int(site_param_name[-1]) + 1)
         else:
             break
