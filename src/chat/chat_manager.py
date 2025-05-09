@@ -9,6 +9,7 @@ Description:
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 from typing import Optional
 
 import telebot
@@ -39,6 +40,7 @@ class ChatManager:
     chat_message_ids_to_delete: dict[int, list[int]]
     chat_messages_to_edit: dict[int, ChatManager.MessagesToEdit]
 
+    @dataclass
     class MessagesToEdit:
         """
         Stores messages that may need to be edited in a chat.

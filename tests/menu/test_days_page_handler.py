@@ -286,3 +286,171 @@ def test_days_page_callback_query_handler_multi_step(
 
     # Double check global state is untouched
     assert SORTED_DAYS == ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+
+def test_days_selection_callback_query_handler(
+    mocker: pytest_mock.plugin.MockerFixture,
+    mock_message: Mock,
+) -> None:
+    """
+    Test days_selection_callback_query_handler flow.
+
+    Args:
+      - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
+      - mock_message (Mock): Mock instance of telebot.types.Message.
+
+    """
+    # Setup mocks
+    mock_query = mocker.Mock(message=mock_message)
+    mock_chat_manager = mocker.Mock()
+    mock_keyboard_manager = mocker.Mock()
+
+    mock_days_selection_handler = mocker.patch("menu.days_page_handler.days_selection_handler")
+
+    # Call the function to test
+    days_page_handler.days_selection_callback_query_handler(
+        query=mock_query,
+        chat_manager=mock_chat_manager,
+        keyboard_manager=mock_keyboard_manager,
+    )
+
+    # Assert that flow was called with the expected arguments
+    mock_days_selection_handler.assert_called_once_with(
+        message=mock_message,
+        chat_manager=mock_chat_manager,
+        keyboard_manager=mock_keyboard_manager,
+    )
+
+
+def test_days_selection_handler(
+    mocker: pytest_mock.plugin.MockerFixture,
+    mock_message: Mock,
+) -> None:
+    """
+    Test days_selection_handler flow.
+
+    Args:
+      - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
+      - mock_message (Mock): Mock instance of telebot.types.Message.
+
+    """
+    test_query_str = "test query str"
+
+    # Setup mocks
+    mock_query_data = mocker.Mock()
+    mock_query_data.get_query_str.return_value = test_query_str
+    mock_chat_manager = mocker.Mock()
+    mock_chat_manager.get_query_data.return_value = mock_query_data
+    mock_sent_msg = mocker.Mock()
+    mock_chat_manager.send_prompt.return_value = mock_sent_msg
+
+    mock_days_keyboard = mocker.Mock()
+    mock_keyboard_manager = mocker.Mock()
+    mock_keyboard_manager.get_days_keyboard.return_value = mock_days_keyboard
+
+    # Call the function to test
+    days_page_handler.days_selection_handler(
+        message=mock_message,
+        chat_manager=mock_chat_manager,
+        keyboard_manager=mock_keyboard_manager,
+    )
+
+    # Assert that flow was called with the expected arguments
+    mock_chat_manager.send_prompt.assert_called_with(
+        chat_id=mock_message.chat.id,
+        text=f"*Currently selected day(s)*\n{test_query_str}",
+        reply_markup=mock_days_keyboard,
+        delete_sent_msg_in_future=True,
+    )
+
+    mock_chat_manager.update_days_selection_message.assert_called_once_with(
+        chat_id=mock_message.chat.id,
+        days_selection_message=mock_sent_msg,
+    )
+
+
+def test_days_next_callback_query_handler(
+    mocker: pytest_mock.plugin.MockerFixture,
+    mock_message: Mock,
+) -> None:
+    """
+    Test days_next_callback_query_handler flow.
+
+    Args:
+      - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
+      - mock_message (Mock): Mock instance of telebot.types.Message.
+
+    """
+    # Setup mocks
+    mock_query = mocker.Mock(message=mock_message)
+    mock_query_data = mocker.Mock()
+    mock_query_data.days = ["Monday", "Wednesday"]
+    mock_chat_manager = mocker.Mock()
+    mock_chat_manager.get_query_data.return_value = mock_query_data
+
+    mock_days_keyboard = mocker.Mock()
+    mock_keyboard_manager = mocker.Mock()
+    mock_keyboard_manager.get_days_keyboard.return_value = mock_days_keyboard
+
+    mock_main_page_handler = mocker.patch("menu.days_page_handler.main_page_handler")
+
+    # Call the function to test
+    days_page_handler.days_next_callback_query_handler(
+        query=mock_query,
+        chat_manager=mock_chat_manager,
+        keyboard_manager=mock_keyboard_manager,
+    )
+
+    # Assert that flow was called with the expected arguments
+    mock_main_page_handler.assert_called_with(
+        message=mock_message,
+        chat_manager=mock_chat_manager,
+        keyboard_manager=mock_keyboard_manager,
+    )
+
+
+def test_days_next_callback_query_handler_no_days_selected(
+    mocker: pytest_mock.plugin.MockerFixture,
+    mock_message: Mock,
+) -> None:
+    """
+    Test days_next_callback_query_handler no days selected flow.
+
+    Args:
+      - mocker (pytest_mock.plugin.MockerFixture): Provides mocking utilities for patching and mocking.
+      - mock_message (Mock): Mock instance of telebot.types.Message.
+
+    """
+    # Setup mocks
+    mock_query = mocker.Mock(message=mock_message)
+    mock_query_data = mocker.Mock()
+    mock_query_data.days = []
+    mock_chat_manager = mocker.Mock()
+    mock_chat_manager.get_query_data.return_value = mock_query_data
+
+    mock_days_keyboard = mocker.Mock()
+    mock_keyboard_manager = mocker.Mock()
+    mock_keyboard_manager.get_days_keyboard.return_value = mock_days_keyboard
+
+    mock_days_selection_handler = mocker.patch("menu.days_page_handler.days_selection_handler")
+
+    # Call the function to test
+    days_page_handler.days_next_callback_query_handler(
+        query=mock_query,
+        chat_manager=mock_chat_manager,
+        keyboard_manager=mock_keyboard_manager,
+    )
+
+    # Assert that flow was called with the expected arguments
+    mock_chat_manager.send_prompt.assert_called_with(
+        chat_id=mock_message.chat.id,
+        text="No day(s) selected. Please select the day(s) to get schedule for",
+        reply_markup=None,
+        delete_sent_msg_in_future=False,
+    )
+
+    mock_days_selection_handler.assert_called_once_with(
+        message=mock_message,
+        chat_manager=mock_chat_manager,
+        keyboard_manager=mock_keyboard_manager,
+    )

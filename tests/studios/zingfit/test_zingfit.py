@@ -561,7 +561,7 @@ def test_get_instructorid_map_from_response_soup_multiple_locations(
         pytest.param(
             "invalid_instructors_missing_reserve_filter_1.html",
             ["Failed to get test studio list of instructors - Instructor filter not found: "],
-            id="Schedule table missing thead",
+            id="Missing reserve filter 1",
         ),
         pytest.param(
             "invalid_instructors_missing_data.html",
