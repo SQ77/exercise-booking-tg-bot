@@ -299,30 +299,13 @@ def get_zingfit_schedule_and_instructorid_map(
     """
 
     def _get_zingfit_schedule_and_instructorid_map(
-        logger: logging.Logger,
-        studio_name: str,
-        table_heading_date_format: str,
-        max_weeks: int,
         locations: list[StudioLocation],
-        location_to_site_id_map: dict[StudioLocation, int],
-        room_id_to_studio_type_map: dict[str, StudioType],
-        room_id_to_studio_location_map: dict[str, StudioLocation],
-        clean_class_name_func: Optional[Callable[[str], str]],
     ) -> tuple[ResultData, dict[str, str]]:
         """
         Helper to retrieve class schedules and instructor ID mappings.
 
         Args:
-          - logger (logging.Logger): Logger for logging messages.
-          - studio_name (str): Name of studio to use for logging.
-          - table_heading_date_format (str): The date format of the table heading. e.g. "%m.%d"
-          - max_weeks (int): Number of weeks to retrieve schedule for.
           - locations (list[StudioLocation]): List of locations to retrieve schedule for.
-          - location_to_site_id_map (dict[StudioLocation, int]): Dictionary of studio location and site IDs.
-          - room_id_to_studio_type_map (dict[str, StudioType]): The dictionary of room IDs and studio types.
-          - room_id_to_studio_location_map (dict[str, StudioType]): The dictionary of room IDs and studio locations.
-          - clean_class_name_func (Optional[Callable[[str], str]]):
-            Optional function to format the raw class name string.
 
         Returns:
           - tuple[ResultData, dict[str, str]]: A tuple containing schedule data and instructor ID mappings.
@@ -366,28 +349,12 @@ def get_zingfit_schedule_and_instructorid_map(
     additional_instructorid_map: dict[str, str] = {}
     if len(locations) > 5:
         additional_result, additional_instructorid_map = _get_zingfit_schedule_and_instructorid_map(
-            logger=logger,
-            studio_name=studio_name,
-            table_heading_date_format=table_heading_date_format,
-            max_weeks=max_weeks,
             locations=locations[0:5],
-            location_to_site_id_map=location_to_site_id_map,
-            room_id_to_studio_type_map=room_id_to_studio_type_map,
-            room_id_to_studio_location_map=room_id_to_studio_location_map,
-            clean_class_name_func=clean_class_name_func,
         )
         locations = locations[5:]
 
     result, instructorid_map = _get_zingfit_schedule_and_instructorid_map(
-        logger=logger,
-        studio_name=studio_name,
-        table_heading_date_format=table_heading_date_format,
-        max_weeks=max_weeks,
         locations=locations,
-        location_to_site_id_map=location_to_site_id_map,
-        room_id_to_studio_type_map=room_id_to_studio_type_map,
-        room_id_to_studio_location_map=room_id_to_studio_location_map,
-        clean_class_name_func=clean_class_name_func,
     )
 
     return additional_result + result, {**additional_instructorid_map, **instructorid_map}
