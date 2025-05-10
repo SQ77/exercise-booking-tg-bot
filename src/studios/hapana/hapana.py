@@ -7,7 +7,8 @@ Description:
 
 import json
 import logging
-from copy import copy
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timedelta
 
 import pytz
@@ -149,9 +150,9 @@ def parse_get_schedule_response(
             )
 
             if class_date not in result_dict:
-                result_dict[class_date] = [copy(class_details)]
+                result_dict[class_date] = [class_details]
             else:
-                result_dict[class_date].append(copy(class_details))
+                result_dict[class_date].append(class_details)
 
         except Exception as e:
             logger.warning(f"Failed to get details of class for {studio_name} - {e}. Data: {data}")
@@ -183,12 +184,20 @@ def get_hapana_schedule(
       - ResultData: The schedule data.
 
     """
-    result = ResultData()
     start_date = datetime.now(tz=pytz.timezone("Asia/Singapore"))
     end_date = start_date + timedelta(weeks=4)  # Rev schedule only shows up to 4 weeks in advance
+    result = ResultData()
+    result_lock = threading.Lock()
 
-    # REST API can only select one location at a time
-    for location in ["Bugis", "Orchard", "TJPG"]:
+    def _get_hapana_schedule_for_single_location(location: str) -> None:
+        """
+        Helper to retrieve schedule for a single location. Stores results directly in
+        result object defined in the main get_hapana_schedule function.
+
+        Args:
+          - location (str): The location to retrieve the schedule for.
+
+        """
         get_schedule_response = send_get_schedule_request(
             location=location,
             start_date=start_date,
@@ -203,7 +212,12 @@ def get_hapana_schedule(
             room_id_to_studio_type_map=room_id_to_studio_type_map,
             room_name_to_studio_location_map=room_name_to_studio_location_map,
         )
-        result.add_classes(classes=date_class_data_list_dict)
+        with result_lock:
+            result.add_classes(classes=date_class_data_list_dict)
+
+    # REST API can only select one location at a time
+    with ThreadPoolExecutor() as executor:
+        executor.map(_get_hapana_schedule_for_single_location, ["Bugis", "Orchard", "TJPG"])
 
     return result
 
@@ -232,9 +246,19 @@ def get_instructorid_map(
         "Content-Type": "application/json",
         "Securitytoken": security_token,
     }
-    # REST API can only select one location at a time
+
     instructorid_map: dict[str, str] = {}
-    for location in location_to_site_id_map:
+    instructorid_map_lock = threading.Lock()
+
+    def _get_hapana_instructorid_map_for_single_location(location: str) -> None:
+        """
+        Helper to retrieve IDs of instructors for a single location. Stores results
+        directly in result object defined in the main get_instructorid_map function.
+
+        Args:
+          - location (str): The location to retrieve IDs for.
+
+        """
         params = {"siteID": location_to_site_id_map[location]}
         response = requests.get(url=url, params=params, headers=headers)
         if response.status_code != 200:
@@ -242,7 +266,7 @@ def get_instructorid_map(
                 f"Failed to get {studio_name} list of instructors for {location} - "
                 f"API callback error {response.status_code}"
             )
-            continue
+            return
 
         try:
             response_json = json.loads(s=response.text)
@@ -251,14 +275,19 @@ def get_instructorid_map(
                     f"Failed to get {studio_name} list of instructors for {location} - "
                     f"API callback failed: {response_json}"
                 )
-                continue
+                return
 
-            for data in response_json["data"]:
-                instructorid_map[data["instructorName"].lower()] = data["instructorID"]
+            with instructorid_map_lock:
+                for data in response_json["data"]:
+                    instructorid_map[data["instructorName"].lower()] = data["instructorID"]
 
         except Exception as e:
             logger.warning(f"Failed to get {studio_name} list of instructors for {location} - {e}")
-            continue
+            return
+
+    # REST API can only select one location at a time
+    with ThreadPoolExecutor() as executor:
+        executor.map(_get_hapana_instructorid_map_for_single_location, location_to_site_id_map.keys())
 
     return instructorid_map
 

@@ -349,6 +349,18 @@ def mock_studios_manager(mocker: pytest_mock.plugin.MockerFixture) -> Mock:
 
 
 def is_classes_dict_equal(expected: dict[date, list[ClassData]], actual: dict[date, list[ClassData]]) -> bool:
+    """
+    Comparison between two dictionaries with date and classes. Does not check for
+    ordering in list.
+
+    Args:
+      - expected (dict[date, list[ClassData]]): The expected result.
+      - actual (dict[date, list[ClassData]]): The actual result.
+
+    Returns:
+      bool: True if the dictionaries are equal.
+
+    """
     if not isinstance(actual, dict):
         return False
 
@@ -356,11 +368,13 @@ def is_classes_dict_equal(expected: dict[date, list[ClassData]], actual: dict[da
         return False
 
     for key in actual:
-        if actual[key] != expected[key]:
+        sorted_actual_classes = sorted(actual[key])
+        sorted_expected_classes = sorted(expected[key])
+        if sorted_actual_classes != sorted_expected_classes:
             return False
 
-        for index, actual_class_data in enumerate(actual[key]):
-            expected_class_data = expected[key][index]
+        for index, actual_class_data in enumerate(sorted_actual_classes):
+            expected_class_data = sorted_expected_classes[index]
             if actual_class_data.availability != expected_class_data.availability:
                 return False
 

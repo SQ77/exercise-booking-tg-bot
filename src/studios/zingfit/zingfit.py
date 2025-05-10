@@ -7,6 +7,8 @@ Description:
 
 import logging
 import re
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from copy import copy
 from datetime import date, datetime
 from typing import Callable, Optional
@@ -297,25 +299,32 @@ def get_zingfit_schedule_and_instructorid_map(
       - tuple[ResultData, dict[str, str]]: A tuple containing schedule data and instructor ID mappings.
 
     """
+    result = ResultData()
+    instructorid_map: dict[str, str] = {}
+    result_lock = threading.Lock()
+    instructorid_map_lock = threading.Lock()
 
-    def _get_zingfit_schedule_and_instructorid_map(
-        locations: list[StudioLocation],
-    ) -> tuple[ResultData, dict[str, str]]:
+    def _get_zingfit_schedule_and_instructorid_map(locations: list[StudioLocation]) -> None:
         """
-        Helper to retrieve class schedules and instructor ID mappings.
+        Helper to retrieve class schedules and instructor ID mappings. Stores results
+        directly in result and instructorid_map objects defined in the main
+        get_zingfit_schedule_and_instructorid_map function.
 
         Args:
           - locations (list[StudioLocation]): List of locations to retrieve schedule for.
 
-        Returns:
-          - tuple[ResultData, dict[str, str]]: A tuple containing schedule data and instructor ID mappings.
-
         """
-        result = ResultData()
-        instructorid_map: dict[str, str] = {}
 
-        # REST API can only select one week at a time
-        for week in range(0, max_weeks):
+        def _get_zingfit_schedule_and_instructorid_map_for_single_week(week: int) -> None:
+            """
+            Helper to retrieve class schedules and instructor ID mappings for a single
+            week. Stores results directly in result and instructorid_map objects defined
+            in the main get_zingfit_schedule_and_instructorid_map function.
+
+            Args:
+              - week (int): The week number to retrieve the schedule for.
+
+            """
             get_schedule_response = send_get_schedule_request(
                 studio_url_subdomain=studio_url_subdomain,
                 locations=locations,
@@ -334,27 +343,25 @@ def get_zingfit_schedule_and_instructorid_map(
                 room_id_to_studio_location_map=room_id_to_studio_location_map,
                 clean_class_name_func=clean_class_name_func,
             )
-            result.add_classes(classes=date_class_data_list_dict)
+            with result_lock:
+                result.add_classes(classes=date_class_data_list_dict)
 
             # Get instructor id map
             current_instructorid_map = get_instructorid_map_from_response_soup(
                 logger=logger, soup=soup, studio_name=studio_name
             )
-            instructorid_map = {**instructorid_map, **current_instructorid_map}
+            with instructorid_map_lock:
+                instructorid_map.update(current_instructorid_map)
 
-        return result, instructorid_map
+        # REST API can only select one week at a time
+        with ThreadPoolExecutor() as executor:
+            executor.map(_get_zingfit_schedule_and_instructorid_map_for_single_week, range(max_weeks))
 
     locations = list(location_to_site_id_map)
-    additional_result = ResultData()
-    additional_instructorid_map: dict[str, str] = {}
     if len(locations) > 5:
-        additional_result, additional_instructorid_map = _get_zingfit_schedule_and_instructorid_map(
-            locations=locations[0:5],
-        )
+        _get_zingfit_schedule_and_instructorid_map(locations=locations[0:5])
         locations = locations[5:]
 
-    result, instructorid_map = _get_zingfit_schedule_and_instructorid_map(
-        locations=locations,
-    )
+    _get_zingfit_schedule_and_instructorid_map(locations=locations)
 
-    return additional_result + result, {**additional_instructorid_map, **instructorid_map}
+    return result, instructorid_map

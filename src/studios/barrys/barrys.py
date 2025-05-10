@@ -8,6 +8,8 @@ Description:
 
 import logging
 import re
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from copy import copy
 from datetime import date, datetime
 
@@ -197,19 +199,35 @@ def get_barrys_schedule_and_instructorid_map(logger: logging.Logger) -> tuple[Re
     """
     result = ResultData()
     instructorid_map: dict[str, str] = {}
+    result_lock = threading.Lock()
+    instructorid_map_lock = threading.Lock()
 
-    # REST API can only select one week at a time
-    # Barrys schedule only shows up to 3 weeks in advance
-    for week in range(0, 3):
+    def _get_barrys_schedule_and_instructorid_map_for_single_week(week: int) -> None:
+        """
+        Helper to retrieve class schedules and instructor ID mappings for a single week.
+        Stores results directly in result and instructorid_map objects defined in the
+        main get_barrys_schedule_and_instructorid_map function.
+
+        Args:
+          - week (int): The week number to retrieve the schedule for.
+
+        """
         get_schedule_response = send_get_schedule_request(week=week)
         soup = BeautifulSoup(markup=get_schedule_response.text, features="html.parser")
 
         # Get schedule
         date_class_data_list_dict = get_schedule_from_response_soup(logger=logger, soup=soup)
-        result.add_classes(classes=date_class_data_list_dict)
+        with result_lock:
+            result.add_classes(classes=date_class_data_list_dict)
 
         # Get instructor id map
         current_instructorid_map = get_instructorid_map_from_response_soup(logger=logger, soup=soup)
-        instructorid_map = {**instructorid_map, **current_instructorid_map}
+        with instructorid_map_lock:
+            instructorid_map.update(current_instructorid_map)
+
+    # REST API can only select one week at a time
+    # Barrys schedule only shows up to 3 weeks in advance
+    with ThreadPoolExecutor() as executor:
+        executor.map(_get_barrys_schedule_and_instructorid_map_for_single_week, range(3))
 
     return result, instructorid_map

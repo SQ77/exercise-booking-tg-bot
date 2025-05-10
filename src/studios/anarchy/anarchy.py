@@ -9,6 +9,8 @@ Description:
 import json
 import logging
 import re
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from copy import copy
 from datetime import date, datetime, timedelta
 from html import unescape
@@ -192,32 +194,53 @@ def get_anarchy_schedule_and_instructorid_map(logger: logging.Logger) -> tuple[R
       - tuple[ResultData, dict[str, str]]: A tuple containing schedule data and instructor ID mappings.
 
     """
-    start_date = datetime.now(tz=pytz.timezone("Asia/Singapore")).date()
-    end_date = start_date + timedelta(weeks=3)  # Anarchy schedule only shows up to 3 weeks in advance
-    get_schedule_response = send_get_schedule_request(start_date=start_date, end_date=end_date)
-    soup = get_soup_from_response(logger=logger, response=get_schedule_response)
-    if soup is None:
-        return ResultData(), {}
+    results: list[tuple[ResultData, dict[str, str]]] = []
+    results_lock = threading.Lock()
 
-    result = ResultData()
+    def _get_anarchy_schedule_and_instructorid_map(start_date: date, end_date: date) -> None:
+        """
+        Helper to retrieve class schedules and instructor ID mappings. Stores results
+        directly in results object defined in the main
+        get_anarchy_schedule_and_instructorid_map function.
 
-    # Get schedule
-    date_class_data_list_dict = get_schedule_from_response_soup(logger=logger, soup=soup)
-    result.add_classes(classes=date_class_data_list_dict)
+        Args:
+          - start_date (date): Start date of the schedule to retrieve.
+          - end_date (date): End date of the schedule to retrieve.
 
-    # Get instructor id map
-    instructorid_map = get_instructorid_map_from_response_soup(logger=logger, soup=soup)
-    if len(date_class_data_list_dict) == 0:
-        # Anarchy schedule doesn't show for future dates if there are no more classes today
-        start_date = start_date + timedelta(days=1)
+        Returns:
+          - tuple[ResultData, dict[str, str]]: A tuple containing schedule data and instructor ID mappings.
+
+        """
         get_schedule_response = send_get_schedule_request(start_date=start_date, end_date=end_date)
         soup = get_soup_from_response(logger=logger, response=get_schedule_response)
+        if soup is None:
+            with results_lock:
+                results.append((ResultData(), {}))
+            return
 
         # Get schedule
+        result = ResultData()
         date_class_data_list_dict = get_schedule_from_response_soup(logger=logger, soup=soup)
         result.add_classes(classes=date_class_data_list_dict)
 
         # Get instructor id map
         instructorid_map = get_instructorid_map_from_response_soup(logger=logger, soup=soup)
+        with results_lock:
+            results.append((result, instructorid_map))
+        return
 
-    return result, instructorid_map
+    current_date = datetime.now(tz=pytz.timezone("Asia/Singapore")).date()
+    tomorrow_date = current_date + timedelta(days=1)
+    end_date = current_date + timedelta(weeks=3)  # Anarchy schedule only shows up to 3 weeks in advance
+    start_dates = [current_date, tomorrow_date]
+    end_dates = [end_date, end_date]
+
+    with ThreadPoolExecutor() as executor:
+        executor.map(_get_anarchy_schedule_and_instructorid_map, start_dates, end_dates)
+
+    # Anarchy schedule doesn't show for future dates if there are no more classes today
+    for result, instructorid_map in results:
+        if len(result.classes) != 0:
+            return result, instructorid_map
+
+    return ResultData(), {}

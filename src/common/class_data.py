@@ -94,15 +94,32 @@ class ClassData:
 
     def __lt__(self, other: "ClassData") -> bool:
         """
-        Comparison between two ClassData objects based on class time.
+        Comparison between two ClassData objects with the following priority:
+        Time, studio, location, instructor, class name, availability, capacity info
 
         Args:
           - other (ClassData): The other ClassData object to compare.
 
         Returns:
-          bool: True if the current object's class time is earlier than the other, false otherwise.
+          bool: True if the current object's is less than the other, false otherwise.
 
         """
-        self_time = datetime.strptime(self.time, "%I:%M %p")
-        other_time = datetime.strptime(other.time, "%I:%M %p")
-        return self_time < other_time
+        self_key = (
+            datetime.strptime(self.time, "%I:%M %p"),
+            self.studio,
+            self.location,
+            self.instructor,
+            self.name,
+            self.availability,
+            self.capacity_info,
+        )
+        other_key = (
+            datetime.strptime(other.time, "%I:%M %p"),
+            other.studio,
+            other.location,
+            other.instructor,
+            other.name,
+            other.availability,
+            other.capacity_info,
+        )
+        return self_key < other_key

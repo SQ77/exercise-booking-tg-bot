@@ -229,7 +229,7 @@ def test_get_schedule_from_response_soup_single_location(
     # Setup mocks
     mock_logger = mocker.Mock(spec=logging.Logger)
 
-    mock_soup = BeautifulSoup(load_response_file(args.response_file_name), "html.parser")
+    mock_soup = BeautifulSoup(markup=load_response_file(args.response_file_name), features="html.parser")
 
     # Call the function to test
     result = get_schedule_from_response_soup(
@@ -293,7 +293,7 @@ def test_get_schedule_from_response_soup_multiple_locations(
     # Setup mocks
     mock_logger = mocker.Mock(spec=logging.Logger)
 
-    mock_soup = BeautifulSoup(load_response_file(args.response_file_name), "html.parser")
+    mock_soup = BeautifulSoup(markup=load_response_file(args.response_file_name), features="html.parser")
 
     # Call the function to test
     result = get_schedule_from_response_soup(
@@ -388,7 +388,7 @@ def test_get_schedule_from_response_soup_invalid_soup(
     # Setup mocks
     mock_logger = mocker.Mock(spec=logging.Logger)
 
-    mock_soup = BeautifulSoup(load_response_file(response_file_name), "html.parser")
+    mock_soup = BeautifulSoup(markup=load_response_file(response_file_name), features="html.parser")
 
     # Call the function to test
     result = get_schedule_from_response_soup(
@@ -426,7 +426,7 @@ def test_get_schedule_from_response_soup_failed_to_map_room(
     # Setup mocks
     mock_logger = mocker.Mock(spec=logging.Logger)
 
-    mock_soup = BeautifulSoup(load_response_file("single_class_response.html"), "html.parser")
+    mock_soup = BeautifulSoup(markup=load_response_file("single_class_response.html"), features="html.parser")
 
     # Call the function to test
     result = get_schedule_from_response_soup(
@@ -492,7 +492,7 @@ def test_get_instructorid_map_from_response_soup_single_location(
     # Setup mocks
     mock_logger = mocker.Mock(spec=logging.Logger)
 
-    mock_soup = BeautifulSoup(load_response_file(args.response_file_name), "html.parser")
+    mock_soup = BeautifulSoup(markup=load_response_file(args.response_file_name), features="html.parser")
 
     # Call the function to test
     instructorid_map = get_instructorid_map_from_response_soup(
@@ -539,7 +539,7 @@ def test_get_instructorid_map_from_response_soup_multiple_locations(
     # Setup mocks
     mock_logger = mocker.Mock(spec=logging.Logger)
 
-    mock_soup = BeautifulSoup(load_response_file(args.response_file_name), "html.parser")
+    mock_soup = BeautifulSoup(markup=load_response_file(args.response_file_name), features="html.parser")
 
     # Call the function to test
     instructorid_map = get_instructorid_map_from_response_soup(
@@ -594,7 +594,7 @@ def test_get_instructorid_map_from_response_soup_invalid_soup(
     # Setup mocks
     mock_logger = mocker.Mock(spec=logging.Logger)
 
-    mock_soup = BeautifulSoup(load_response_file(response_file_name), "html.parser")
+    mock_soup = BeautifulSoup(markup=load_response_file(response_file_name), features="html.parser")
 
     # Call the function to test
     instructorid_map = get_instructorid_map_from_response_soup(
