@@ -419,7 +419,7 @@ def test_keep_alive(
     app.keep_alive()
 
     # Assert that flow was called with the expected arguments
-    mock_schedule.every.assert_called_once_with(10)
+    mock_schedule.every.assert_called_once_with(5)
     mock_schedule_every.minutes.do.assert_called_once_with(job_func=app.server.ping_self)
 
 
