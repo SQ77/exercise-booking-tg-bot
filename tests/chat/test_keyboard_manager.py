@@ -332,7 +332,7 @@ class GetLocationsKeyboardArgs(NamedTuple):
                 rows_number_of_buttons_list=[
                     2,  # Centrepoint, i12
                     2,  # Star Vista, Raffles
-                    1,  # Great World
+                    2,  # Millenia Walk, Great World
                     2,  # Select All, Unselect All
                     2,  # Select More, Next
                 ],
@@ -341,6 +341,7 @@ class GetLocationsKeyboardArgs(NamedTuple):
                     ("i12", "{'location': 'i12', 'step': 'locations'}"),
                     ("Star Vista", "{'location': 'StarVista', 'step': 'locations'}"),
                     ("Raffles", "{'location': 'Raffles', 'step': 'locations'}"),
+                    ("Millenia Walk", "{'location': 'MilleniaWalk', 'step': 'locations'}"),
                     ("Great World", "{'location': 'GreatWorld', 'step': 'locations'}"),
                     ("Select All", "{'location': 'All', 'step': 'locations'}"),
                     ("Unselect All", "{'location': 'Null', 'step': 'locations'}"),

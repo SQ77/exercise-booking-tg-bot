@@ -23,6 +23,7 @@ STUDIO_LOCATIONS_MAP = {
         StudioLocation.Centrepoint,
         StudioLocation.GreatWorld,
         StudioLocation.i12,
+        StudioLocation.MilleniaWalk,
         StudioLocation.Raffles,
         StudioLocation.StarVista,
     ],

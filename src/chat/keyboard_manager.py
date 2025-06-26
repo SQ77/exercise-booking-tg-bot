@@ -288,6 +288,10 @@ class KeyboardManager:
                     text="Great World",
                     callback_data="{'location': 'GreatWorld', 'step': 'locations'}",
                 ),
+                "Millenia Walk": telebot.types.InlineKeyboardButton(
+                    text="Millenia Walk",
+                    callback_data="{'location': 'MilleniaWalk', 'step': 'locations'}",
+                ),
             },
             "Ally (Spin)": {
                 "Cross Street": telebot.types.InlineKeyboardButton(
@@ -393,6 +397,10 @@ class KeyboardManager:
                 "Great World": telebot.types.InlineKeyboardButton(
                     text="Great World ✅",
                     callback_data="{'location': 'GreatWorld', 'step': 'locations'}",
+                ),
+                "Millenia Walk": telebot.types.InlineKeyboardButton(
+                    text="Millenia Walk ✅",
+                    callback_data="{'location': 'MilleniaWalk', 'step': 'locations'}",
                 ),
             },
             "Ally (Spin)": {
@@ -704,6 +712,9 @@ class KeyboardManager:
                 StudioLocation.GreatWorld: self.studios_locations_buttons_unselected_map["Absolute (Pilates)"][
                     "Great World"
                 ],
+                StudioLocation.MilleniaWalk: self.studios_locations_buttons_unselected_map["Absolute (Pilates)"][
+                    "Millenia Walk"
+                ],
             },
         }
 
@@ -757,7 +768,10 @@ class KeyboardManager:
                 studio_locations_buttons["Absolute (Pilates)"]["Star Vista"],
                 studio_locations_buttons["Absolute (Pilates)"]["Raffles"],
             )
-            locations_keyboard.add(studio_locations_buttons["Absolute (Pilates)"]["Great World"])
+            locations_keyboard.add(
+                studio_locations_buttons["Absolute (Pilates)"]["Millenia Walk"],
+                studio_locations_buttons["Absolute (Pilates)"]["Great World"],
+            )
         locations_keyboard.add(self.locations_select_all_button, self.locations_unselect_all_button)
         locations_keyboard.add(self.locations_select_more_studios_button, self.next_button_to_main_page)
         return locations_keyboard
