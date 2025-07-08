@@ -8,7 +8,7 @@ from common.studio_location import StudioLocation
 from common.studio_type import StudioType
 
 # Dictionary of room name strings from response and studio types
-ROOM_ID_TO_STUDIO_TYPE_MAP = {
+ROOM_NAME_TO_STUDIO_TYPE_MAP = {
     "Revolution - Bugis": StudioType.Rev,
     "Revolution - Orchard": StudioType.Rev,
     "Revolution - Tanjong Pagar": StudioType.Rev,
@@ -16,6 +16,7 @@ ROOM_ID_TO_STUDIO_TYPE_MAP = {
     "Orchard - Nov 2024": StudioType.Rev,
     "TP - Revised April": StudioType.Rev,
     "Revolution - SAFRA Punggol": StudioType.Rev,
+    "TP - August 2025": StudioType.Rev,
 }
 
 # Dictionary of room name strings from response and studio locations
@@ -27,6 +28,7 @@ ROOM_NAME_TO_STUDIO_LOCATION_MAP = {
     "Orchard - Nov 2024": StudioLocation.Orchard,
     "TP - Revised April": StudioLocation.TJPG,
     "Revolution - SAFRA Punggol": StudioLocation.Unknown,
+    "TP - August 2025": StudioLocation.TJPG,
 }
 
 # Dictionary of location strings and site ids

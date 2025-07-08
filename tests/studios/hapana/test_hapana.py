@@ -19,8 +19,8 @@ from common.class_data import ClassData
 from common.studio_location import StudioLocation
 from common.studio_type import StudioType
 from studios.hapana.data.rev import LOCATION_TO_SITE_ID_MAP as REV_LOCATION_TO_SITE_ID_MAP
-from studios.hapana.data.rev import ROOM_ID_TO_STUDIO_TYPE_MAP as REV_ROOM_ID_TO_STUDIO_TYPE_MAP
 from studios.hapana.data.rev import ROOM_NAME_TO_STUDIO_LOCATION_MAP as REV_ROOM_NAME_TO_STUDIO_LOCATION_MAP
+from studios.hapana.data.rev import ROOM_NAME_TO_STUDIO_TYPE_MAP as REV_ROOM_NAME_TO_STUDIO_TYPE_MAP
 from studios.hapana.hapana import (
     get_hapana_schedule,
     get_hapana_schedule_and_instructorid_map,
@@ -223,7 +223,7 @@ def test_parse_get_schedule_response_success(
         logger=mock_logger,
         studio_name="test studio",
         response=mock_response,
-        room_id_to_studio_type_map=REV_ROOM_ID_TO_STUDIO_TYPE_MAP,
+        room_id_to_studio_type_map=REV_ROOM_NAME_TO_STUDIO_TYPE_MAP,
         room_name_to_studio_location_map=REV_ROOM_NAME_TO_STUDIO_LOCATION_MAP,
     )
 
@@ -367,7 +367,7 @@ def test_parse_get_schedule_response_failure(
         logger=mock_logger,
         studio_name="test studio",
         response=mock_response,
-        room_id_to_studio_type_map=REV_ROOM_ID_TO_STUDIO_TYPE_MAP,
+        room_id_to_studio_type_map=REV_ROOM_NAME_TO_STUDIO_TYPE_MAP,
         room_name_to_studio_location_map=REV_ROOM_NAME_TO_STUDIO_LOCATION_MAP,
     )
 
@@ -425,7 +425,7 @@ def test_get_hapana_schedule(
         studio_name="test studio",
         security_token="test_security_token",
         location_to_site_id_map=REV_LOCATION_TO_SITE_ID_MAP,
-        room_id_to_studio_type_map=REV_ROOM_ID_TO_STUDIO_TYPE_MAP,
+        room_id_to_studio_type_map=REV_ROOM_NAME_TO_STUDIO_TYPE_MAP,
         room_name_to_studio_location_map=REV_ROOM_NAME_TO_STUDIO_LOCATION_MAP,
     )
 
@@ -629,7 +629,7 @@ def test_get_hapana_schedule_and_instructorid_map(
         studio_name="test studio",
         security_token="test_security_token",
         location_to_site_id_map=REV_LOCATION_TO_SITE_ID_MAP,
-        room_id_to_studio_type_map=REV_ROOM_ID_TO_STUDIO_TYPE_MAP,
+        room_id_to_studio_type_map=REV_ROOM_NAME_TO_STUDIO_TYPE_MAP,
         room_name_to_studio_location_map=REV_ROOM_NAME_TO_STUDIO_LOCATION_MAP,
     )
 

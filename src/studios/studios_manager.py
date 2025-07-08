@@ -17,8 +17,8 @@ from common.studio_type import StudioType
 from studios.anarchy.anarchy import get_anarchy_schedule_and_instructorid_map
 from studios.barrys.barrys import get_barrys_schedule_and_instructorid_map
 from studios.hapana.data.rev import LOCATION_TO_SITE_ID_MAP as REV_LOCATION_TO_SITE_ID_MAP
-from studios.hapana.data.rev import ROOM_ID_TO_STUDIO_TYPE_MAP as REV_ROOM_ID_TO_STUDIO_TYPE_MAP
 from studios.hapana.data.rev import ROOM_NAME_TO_STUDIO_LOCATION_MAP as REV_ROOM_NAME_TO_STUDIO_LOCATION_MAP
+from studios.hapana.data.rev import ROOM_NAME_TO_STUDIO_TYPE_MAP as REV_ROOM_NAME_TO_STUDIO_TYPE_MAP
 from studios.hapana.hapana import get_hapana_schedule_and_instructorid_map, get_hapana_security_token
 from studios.studio_manager import StudioManager
 from studios.zingfit.data.absolute import LOCATION_TO_SITE_ID_MAP as ABSOLUTE_LOCATION_TO_SITE_ID_MAP
@@ -108,7 +108,7 @@ class StudiosManager:
                     site_id=next(iter(REV_LOCATION_TO_SITE_ID_MAP.values())),  # Get the first value from the map
                 ),
                 location_to_site_id_map=REV_LOCATION_TO_SITE_ID_MAP,
-                room_id_to_studio_type_map=REV_ROOM_ID_TO_STUDIO_TYPE_MAP,
+                room_id_to_studio_type_map=REV_ROOM_NAME_TO_STUDIO_TYPE_MAP,
                 room_name_to_studio_location_map=REV_ROOM_NAME_TO_STUDIO_LOCATION_MAP,
             ),
         }
